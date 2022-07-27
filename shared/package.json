@@ -1,0 +1,10 @@
+{
+    "name": "@replugged/shared",
+    "version": "0.0.0",
+    "description": "Shared code for the entire backend",
+    "private": true,
+    "type": "module",
+    "exports": {
+        "./flags": "./flags.js"
+    }
+}

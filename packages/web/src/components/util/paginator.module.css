@@ -1,0 +1,53 @@
+/*
+ * Copyright (c) 2018-2022 Replugged Developers
+ * Licensed under the Open Software License version 3.0
+ * SPDX-License-Identifier: OSL-3.0
+ */
+
+.wrapper {
+  margin-top: 16px;
+  margin-bottom: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.container {
+  display: flex;
+  background-color: var(--background-secondary);
+  border: 1px var(--background-tertiary) solid;
+}
+
+.button {
+  padding: 4px;
+  display: block;
+}
+
+.button, .pages {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-left: 1px var(--background-tertiary) solid;
+}
+
+.button:first-child {
+  border-left-width: 0;
+}
+
+.button:not(:disabled):hover {
+  background-color: rgba(0, 0, 0, .2);
+}
+
+.button:disabled {
+  cursor: not-allowed;
+}
+
+.button svg {
+  width: 24px;
+  height: 24px;
+  color: var(--text-color);
+}
+
+.pages {
+  padding: 4px 8px;
+}
