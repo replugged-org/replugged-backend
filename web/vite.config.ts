@@ -2,9 +2,7 @@ import {
     type Plugin,
     defineConfig
 } from 'vite'
-import { readFileSync } from 'fs';
 import { rename } from 'fs/promises'
-import { createHash } from 'crypto'
 import { join } from 'path';
 import preact from '@preact/preset-vite'
 import magicalSvg from 'vite-plugin-magical-svg'
@@ -31,7 +29,8 @@ export default defineConfig({
     publicDir: isSsr ? '_' : 'public',
     build: {
         assetsInlineLimit: 0,
-        outDir: isSsr ? 'server' : 'dist'
+        outDir: isSsr ? 'server' : 'dist',
+        
     },
     server: {
         hmr: {
