@@ -10,7 +10,7 @@ import App from './components/App'
 
 const template = readFileSync(join(__dirname, 'index.html'), 'utf8')
 
-function handler (req: IncomingMessage, res: ServerResponse) {
+function handler(req: IncomingMessage, res: ServerResponse) {
   res.setHeader('content-type', 'text/html')
   if (req.method?.toLowerCase() !== 'get') {
     res.writeHead(405, 'method not allowed')
@@ -20,9 +20,9 @@ function handler (req: IncomingMessage, res: ServerResponse) {
 
   // Security headers
   // Note: HSTS is assumed setup by Cloudflare
-  res.setHeader('content-security-policy', 'default-src \'self\'; img-src \'self\' https://cdn.discordapp.com;')
-  res.setHeader('permissions-policy', 'interest-cohort=()')
-  res.setHeader('x-frame-options', 'DENY')
+  // res.setHeader('content-security-policy', 'default-src \'self\'; img-src \'self\' https://cdn.discordapp.com;')
+  // res.setHeader('permissions-policy', 'interest-cohort=()')
+  // res.setHeader('x-frame-options', 'DENY')
 
   const ctx: Record<string, any> = {}
   const body = render(h(App, { url: req.url ?? '/', ctx: ctx }))
@@ -44,4 +44,5 @@ function handler (req: IncomingMessage, res: ServerResponse) {
   )
 }
 
-createServer(handler).listen(Number(process.env.PORT ?? 8000), process.env.BIND ?? '127.0.0.1')
+createServer(handler).listen(Number(process.env.PORT ?? 8000))
+console.log(`Listening on  port ${Number(process.env.PORT ?? 8080)}`)
