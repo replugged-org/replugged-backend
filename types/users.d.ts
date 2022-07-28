@@ -16,7 +16,6 @@ export type ExternalAccount = {
     accounts: {
       discord: Omit<ExternalAccount, 'name'>
       spotify?: ExternalAccount
-      patreon?: ExternalAccount
     }
     createdAt: Date
     updatedAt?: Date
@@ -48,7 +47,6 @@ export type ExternalAccount = {
     avatar: User['avatar']
     accounts: {
       spotify?: string
-      patreon?: string
     }
     createdAt: User['createdAt']
   }
