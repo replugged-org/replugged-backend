@@ -1,4 +1,0 @@
-packages:
-  - 'shared'
-  - 'packages/types'
-  - 'packages/web'
