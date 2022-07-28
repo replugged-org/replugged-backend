@@ -50,9 +50,9 @@ export default function Header() {
         <header className={`${style.container}${opened ? ` ${style.opened}` : ''}`}>
             <a className={style.logo} href={Routes.HOME}>
                 {/* {isOctober
-          ? <img className={style.plug} src={spookycordPlug} alt='Powercord Logo'/>
-          : <PowercordPlug className={style.plug}/>}
-        <PowercordWordmark className={style.wordmark}/> */}
+          ? <img className={style.plug} src={spookycordPlug} alt='Replugged Logo'/>
+          : <RepluggedPlug className={style.plug}/>}
+        <RepluggedWordmark className={style.wordmark}/> */}
                 Replugged Logo Here
             </a>
 

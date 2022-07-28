@@ -30,43 +30,43 @@ function ProfileBadges({ flags }: ProfileBadgesProps) {
     return (
         <div className={style.badges} style={{ color: '#7289da' }}>
             {Boolean(flags & UserFlags.DEVELOPER) && (
-                <Tooltip text='Powercord Developer' align='center'>
+                <Tooltip text='Replugged Developer' align='center'>
                     {/* @ts-ignore */}
                     <Developer className={style.badge} />
                 </Tooltip>
             )}
             {Boolean(flags & UserFlags.STAFF) && (
-                <Tooltip text='Powercord Staff' align='center'>
+                <Tooltip text='Replugged Staff' align='center'>
                     {/* @ts-ignore */}
                     <Staff className={style.badge} />
                 </Tooltip>
             )}
             {Boolean(flags & UserFlags.SUPPORT) && (
-                <Tooltip text='Powercord Support' align='center'>
+                <Tooltip text='Replugged Support' align='center'>
                     {/* @ts-ignore */}
                     <Support className={style.badge} />
                 </Tooltip>
             )}
             {Boolean(flags & UserFlags.CONTRIBUTOR) && (
-                <Tooltip text='Powercord Contributor' align='center'>
+                <Tooltip text='Replugged Contributor' align='center'>
                     {/* @ts-ignore */}
                     <Contributor className={style.badge} />
                 </Tooltip>
             )}
             {Boolean(flags & UserFlags.TRANSLATOR) && (
-                <Tooltip text='Powercord Translator' align='center'>
+                <Tooltip text='Replugged Translator' align='center'>
                     {/* @ts-ignore */}
                     <Translator className={style.badge} />
                 </Tooltip>
             )}
             {Boolean(flags & UserFlags.BUG_HUNTER) && (
-                <Tooltip text='Powercord Bug Hunter' align='center'>
+                <Tooltip text='Replugged Bug Hunter' align='center'>
                     {/* @ts-ignore */}
                     <Hunter className={style.badge} />
                 </Tooltip>
             )}
             {Boolean(flags & UserFlags.EARLY_USER) && (
-                <Tooltip text='Powercord Early User' align='center'>
+                <Tooltip text='Replugged Early User' align='center'>
                     {/* @ts-ignore */}
                     <Early className={style.badge} />
                 </Tooltip>

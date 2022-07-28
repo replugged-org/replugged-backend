@@ -50,7 +50,7 @@ function Feature({ icon, title, description, note, link }: FeatureProps) {
 }
 
 export default function Homepage(_: Attributes) {
-    useTitleTemplate('Powercord')
+    useTitleTemplate('Replugged')
 
     return (
         <main className={style.container}>
@@ -77,7 +77,7 @@ export default function Homepage(_: Attributes) {
                 <section className={style.section}>
                     <h2 className={style.sectionTitle}>Zero-compromise experience</h2>
                     <p className={style.sectionDescription}>
-                        Powercord has everything you need to enhance your Discord client, without compromising on performance or
+                        Replugged has everything you need to enhance your Discord client, without compromising on performance or
                         security.
                     </p>
 
@@ -102,8 +102,8 @@ export default function Homepage(_: Attributes) {
                         <Feature
                             icon={Feather}
                             title='Lightweight'
-                            description={'Powercord is designed to consume as little resources as possible, and provides to plugin developers powerful tools to build efficient and robust plugins.'}
-                            note={'Note that Powercord still runs on top of the official client, and can\'t magically make it lighter. We just do our best to not consume even more resources.'}
+                            description={'Replugged is designed to consume as little resources as possible, and provides to plugin developers powerful tools to build efficient and robust plugins.'}
+                            note={'Note that Replugged still runs on top of the official client, and can\'t magically make it lighter. We just do our best to not consume even more resources.'}
                         />
                         <Feature
                             icon={Shield}
@@ -134,7 +134,7 @@ export default function Homepage(_: Attributes) {
                         <Feature
                             icon={BatteryCharging}
                             title='Efficient code'
-                            description={'An efficient plugin keeps users happy, their Discord client speedy, and preserves their laptop\'s battery. Powercord gives you in-depth insights and detects inefficient code to help you make better and more efficient plugins.'}
+                            description={'An efficient plugin keeps users happy, their Discord client speedy, and preserves their laptop\'s battery. Replugged gives you in-depth insights and detects inefficient code to help you make better and more efficient plugins.'}
                         />
                         <Feature
                             icon={Disc}
