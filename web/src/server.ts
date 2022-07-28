@@ -45,4 +45,4 @@ function handler(req: IncomingMessage, res: ServerResponse) {
 }
 
 createServer(handler).listen(Number(process.env.PORT ?? 8000))
-console.log(`Listening on  port ${Number(process.env.PORT ?? 8080)}`)
+console.log(`Listening on  port ${Number(process.env.PORT ?? 8000)}`)
