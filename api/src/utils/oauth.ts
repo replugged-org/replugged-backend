@@ -68,7 +68,7 @@ export function getAuthorizationUrl(provider: OAuthProvider, redirect: string, s
     const params = new URLSearchParams();
     params.set('state', state)
     params.set('response_type', 'code')
-    params.set('redirect_uri', `${config.domain}/api${redirect}`)
+    params.set('redirect_uri', `${config.domain}${redirect}`)
     params.set('client_id', config[provider].clientID)
     params.set('scope', scopes.join(' '))
 

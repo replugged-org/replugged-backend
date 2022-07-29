@@ -26,7 +26,7 @@ fastify.decorateRequest('jwtPayload', null)
 fastify.decorateRequest('user', null)
 fastify.register(authPlugin)
 
-fastify.register(apiModule)
+fastify.register(apiModule, {prefix: '/api'})
 fastify.setNotFoundHandler((request: FastifyRequest, reply: FastifyReply) => {
     void reply.code(404)
         .send({ 

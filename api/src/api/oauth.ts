@@ -64,23 +64,12 @@ type OAuthConfig = {
       return
     }
   
-    // api:v2
-    if (apiVersion !== 'v3') {
-      if (request.query.redirect) {
-        reply.setCookie('redirect', request.query.redirect, cookieSettings)
-      }
-  
-      if (request.query.code || request.query.error) {
-        // eslint-disable-next-line @typescript-eslint/no-use-before-define
-        return callback.call(this, request, reply)
-      }
-    }
   
     const state = randomBytes(16).toString('hex')
     reply.setCookie('state', state, cookieSettings)
   
-    // api:v2
-    const redirect = apiVersion !== 'v3' ? request.routerPath : `${request.routerPath}/callback`
+
+    const redirect = `${request.routerPath}/callback`
     reply.redirect(getAuthorizationUrl(reply.context.config.platform, redirect, reply.context.config.scopes, state))
   }
   
