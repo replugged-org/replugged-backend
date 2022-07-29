@@ -10,6 +10,8 @@ import config from './config.js'
 
 import authPlugin from './utils/auth.js'
 
+import apiModule from "./api/index.js";
+
 const fastify = fastifyFactory({
     logger: {
         level: process.env.NODE_ENV === 'development' ? 'info' : 'warn'
@@ -26,6 +28,7 @@ fastify.decorateRequest('jwtPayload', null)
 fastify.decorateRequest('user', null)
 fastify.register(authPlugin)
 
+fastify.register(apiModule);
 
 fastify.setNotFoundHandler((_: FastifyRequest, reply: FastifyReply) => void reply.code(404).send({ error: 404, message: 'Not Found' }))
 
