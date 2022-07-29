@@ -27,7 +27,14 @@ fastify.decorateRequest('user', null)
 fastify.register(authPlugin)
 
 fastify.register(apiModule)
-fastify.setNotFoundHandler((_: FastifyRequest, reply: FastifyReply) => void reply.code(404).send({ error: 404, message: 'Not Found' }))
+fastify.setNotFoundHandler((request: FastifyRequest, reply: FastifyReply) => {
+    void reply.code(404)
+        .send({ 
+            error: 404, 
+            message: 'Not Found',
+            url: request.url
+        })
+})
 
 fastify.ready()
     .then(
