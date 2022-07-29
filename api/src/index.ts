@@ -6,6 +6,7 @@ import fastifyCookie from '@fastify/cookie'
 import fastifyMongodb from '@fastify/mongodb'
 import fastifyRawBody from 'fastify-raw-body'
 
+// @ts-ignore pls shut up ts
 import config from './config.js'
 
 import authPlugin from './utils/auth.js'
@@ -20,17 +21,17 @@ const fastify = fastifyFactory({
 
 fastify.register(fastifyCookie)
 fastify.register(fastifyRawBody, { global: false }) // todo: necessary?
-fastify.register(fastifyMongodb, { url: `${config.mango}?appName=Powercord%20API` })
+fastify.register(fastifyMongodb, { url: config.mango })
 
 fastify.decorateRequest('jwtPayload', null)
 fastify.decorateRequest('user', null)
 fastify.register(authPlugin)
 
-fastify.register(apiModule, {prefix: '/api'})
+fastify.register(apiModule, { prefix: '/api' })
 fastify.setNotFoundHandler((request: FastifyRequest, reply: FastifyReply) => {
     void reply.code(404)
-        .send({ 
-            error: 404, 
+        .send({
+            error: 404,
             message: 'Not Found',
             url: request.url
         })
@@ -41,7 +42,7 @@ fastify.ready()
         () => fastify.listen({
             port: config.api.port
         }),
-        (e) => {
+        (e: Error) => {
             fastify.log.error(e)
             process.exit(1)
         }

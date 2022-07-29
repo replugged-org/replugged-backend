@@ -12,7 +12,7 @@ export type OAuthToken = {
 export const OAuthEndpoints = <const>{
     discord: {
         AUTHORIZE_URL: 'https://discord.com/oauth2/authorize',
-        TOKEN_URL: 'https://discord.com/api/v9/oauth2/token',
+        TOKEN_URL: 'https://discord.com/api/oauth2/token',
         SELF_URL: 'https://discord.com/api/v9/users/@me'
     },
     spotify: {

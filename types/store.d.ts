@@ -1,5 +1,4 @@
 import { MinimalUser } from './users'
-
 // 0 = Eligible; 1 = Closed; 2 = Banned
 export type Eligibility = 0 | 1 | 2
 

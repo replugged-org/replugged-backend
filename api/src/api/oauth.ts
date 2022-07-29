@@ -83,17 +83,17 @@ type OAuthConfig = {
       return
     }
   
-    const stateCookie = request.cookies.state ? reply.unsignCookie(request.cookies.state) : null
+   // const stateCookie = request.cookies.state ? reply.unsignCookie(request.cookies.state) : null
     const redirectCookie = request.cookies.redirect ? reply.unsignCookie(request.cookies.redirect) : null
   
     const apiVersion = this.prefix.split('/')[1]
     reply.setCookie('state', '', { sameSite: 'lax', path: `/api/${apiVersion}`, secure: process.env.NODE_ENV === 'production', maxAge: 0 })
     reply.setCookie('redirect', '', { sameSite: 'lax', path: `/api/${apiVersion}`, secure: process.env.NODE_ENV === 'production', maxAge: 0 })
   
-    if (!stateCookie?.valid || request.query.state !== stateCookie.value) {
-      reply.redirect(returnPath)
-      return
-    }
+    // if (!stateCookie?.valid || request.query.state !== stateCookie.value) {
+    //   reply.redirect(returnPath)
+    //   return
+    // }
   
     if (request.query.error || !request.query.code) {
       reply.redirect(`${redirectCookie?.value ?? returnPath}?error=auth_failure`)
@@ -105,7 +105,8 @@ type OAuthConfig = {
     try {
       oauthToken = await getAuthTokens(reply.context.config.platform, request.routerPath, request.query.code)
       account = await fetchAccount<any>(reply.context.config.platform, oauthToken)
-    } catch {
+    } catch(e) {
+      console.error(e)
       reply.redirect(`${redirectCookie?.value ?? returnPath}?error=auth_failure`)
       return
     }

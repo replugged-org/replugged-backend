@@ -97,7 +97,7 @@ export default function Homepage(_: Attributes) {
                         <Feature
                             icon={PenTool}
                             title='Customizable'
-                            description={'Plugins and themes are fully customizable, though easy-to-use interfaces, allowing you to turn your Discord client into what you want, whatever that is. Unnecessary feature? Disable it. Don\'t like the color? Change it.'}
+                            description={'Plugins and themes are fully customizable, through easy-to-use interfaces, allowing you to turn your Discord client into what you want, whatever that is. Unnecessary feature? Disable it. Don\'t like the color? Change it.'}
                         />
                         <Feature
                             icon={Feather}
