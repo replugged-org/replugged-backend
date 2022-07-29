@@ -1,0 +1,35 @@
+{
+  "mango": "mongodb://localhost:27017",
+  "secret": "",
+  "domain": "replugged.dev",
+  "api": {
+      "port": 8080
+  },
+  "discord": {
+      "clientID": "",
+      "clientSecret": "",
+      "botToken": "",
+      "ids": {
+          "serverId": ""
+      },
+      "roles": {
+          "user": "",
+          "hunter": "",
+          "translator": "",
+          "contributor": "",
+          "donator": ""
+      }
+  },
+  "github": {
+      "clientID": "",
+      "clientSecret": ""
+  },
+  "spotify": {
+      "clientID": "",
+      "clientSecret": ""
+  },
+  "patreon": {
+      "clientID": "",
+      "clientSecret": ""
+  }
+}

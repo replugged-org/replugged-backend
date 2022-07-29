@@ -13,6 +13,8 @@ import Footer from "./layout/Footer"
 import Homepage from "./Homepage"
 import Account from './account/Account';
 
+import NotFound from './NotFound';
+
 import { Routes } from "../constants"
 import AuthBoundary from './util/AuthBoundary';
 
@@ -47,6 +49,8 @@ export default function App(props: AppProps) {
           <AuthBoundary path={Routes.ME}>
             <Account />
           </AuthBoundary>
+
+          <NotFound ctx={props?.ctx} default />
         </Router>
       </Suspense>
       <Footer />
