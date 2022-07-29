@@ -1,6 +1,6 @@
 import type { User, Member, ApiMessage } from '../../../types/discord'
 import { fetch } from 'undici'
-import config from '../../../shared/config.js'
+import config from '../config.js'
 
 export async function fetchUser (userId: string): Promise<User> {
     return fetch(`https://discord.com/api/v9/users/${userId}`, { headers: { authorization: `Bot ${config.discord.botToken}` } })

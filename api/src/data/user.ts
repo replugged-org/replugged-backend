@@ -3,10 +3,10 @@ import type { DatabaseUser, User, GhostUser, RestUser, RestUserPrivate } from '.
 import { URL } from 'url'
 import { existsSync } from 'fs'
 import { unlink } from 'fs/promises'
-import config from '../../../shared/config.js'
+import config from '../config.js'
 import { SETTINGS_STORAGE_FOLDER } from '../api/settings.js'
 import { fetchMember, setRoles } from '../utils/discord.js'
-import { UserFlags, PrivateUserFlags, PersistentUserFlags } from '../../../shared/flags'
+import { UserFlags, PrivateUserFlags, PersistentUserFlags } from '../../../shared/flags.js'
 
 export enum UserDeletionCause {
   // User initiated account deletion manually

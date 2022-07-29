@@ -5,7 +5,7 @@ import {
 import { useContext } from 'preact/hooks';
 import { useRouter } from 'preact-router';
 import { useTitleTemplate } from 'hoofd/preact';
-import { UserFlags } from '../../../../shared/flags'
+import { UserFlags } from '../../../../shared/flags.js'
 
 import Spinner from "./Spinner";
 import Redirect from "./Redirect"

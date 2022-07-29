@@ -6,8 +6,8 @@ import {
     type User
 } from '../../../types/users'
 import { createHash } from 'crypto'
-import config from '../../../shared/config.js'
-import { UserFlags } from '../../../shared/flags';
+import config from '../config.js'
+import { UserFlags } from '../flags.js'
 import { createSigner, createVerifier } from 'fast-jwt'
 
 export type JWTPayload = { id: string };

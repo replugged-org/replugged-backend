@@ -9,7 +9,7 @@ import {
     useCallback,
 } from 'preact/hooks'
 import { useTitle } from 'hoofd/preact';
-import { UserFlags } from '../../../../shared/flags';
+import { UserFlags } from '../../../../shared/flags.js';
 
 import Profile from './Profile';
 import Spinner from '../util/Spinner'

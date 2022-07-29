@@ -6,7 +6,7 @@ import fastifyCookie from '@fastify/cookie'
 import fastifyMongodb from '@fastify/mongodb'
 import fastifyRawBody from 'fastify-raw-body'
 
-import config from '../../shared/config.js'
+import config from './config.js'
 
 import authPlugin from './utils/auth.js'
 
@@ -31,7 +31,10 @@ fastify.setNotFoundHandler((_: FastifyRequest, reply: FastifyReply) => void repl
 
 fastify.ready()
     .then(
-        () => fastify.listen(config.api.port),
+        () => {
+            console.log(`Listening on port: ${config.api.port}`)
+            fastify.listen({ port: config.api.port })
+        },
         (e) => {
             fastify.log.error(e)
             process.exit(1)
