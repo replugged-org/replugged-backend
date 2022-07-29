@@ -18,26 +18,22 @@ const fastify = fastifyFactory({
     }
 })
 
-fastify.register(fastifyCookie, {
-    secret: config.secret
-})
-fastify.register(fastifyRawBody, { global: false });
-fastify.register(fastifyMongodb, { url: config.mango })
+fastify.register(fastifyCookie)
+fastify.register(fastifyRawBody, { global: false }) // todo: necessary?
+fastify.register(fastifyMongodb, { url: `${config.mango}?appName=Powercord%20API` })
 
 fastify.decorateRequest('jwtPayload', null)
 fastify.decorateRequest('user', null)
 fastify.register(authPlugin)
 
-fastify.register(apiModule);
-
+fastify.register(apiModule)
 fastify.setNotFoundHandler((_: FastifyRequest, reply: FastifyReply) => void reply.code(404).send({ error: 404, message: 'Not Found' }))
 
 fastify.ready()
     .then(
-        () => {
-            console.log(`Listening on port: ${config.api.port}`)
-            fastify.listen({ port: config.api.port })
-        },
+        () => fastify.listen({
+            port: config.api.port
+        }),
         (e) => {
             fastify.log.error(e)
             process.exit(1)
