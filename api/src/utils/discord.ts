@@ -4,12 +4,12 @@ import config from '../config.js'
 
 export async function fetchUser (userId: string): Promise<User> {
     return fetch(`https://discord.com/api/v9/users/${userId}`, { headers: { authorization: `Bot ${config.discord.botToken}` } })
-      .then<any>((r) => r.json())
+      .then<any>((r: any) => r.json())
   }
   
   export async function fetchCurrentUser (token: string): Promise<User> {
     return fetch('https://discord.com/api/v9/users/@me', { headers: { authorization: `Bearer ${token}` } })
-      .then<any>((r) => r.json())
+      .then<any>((r: any) => r.json())
   }
   
   /// DM
@@ -22,7 +22,7 @@ export async function fetchUser (userId: string): Promise<User> {
         'content-type': 'application/json',
       },
       body: JSON.stringify({ recipient_id: userId }),
-    }).then<any>((r) => r.json())
+    }).then<any>((r: any) => r.json())
   
     if (!channel.id) return false
     const res = await fetch(`https://discord.com/api/v9/channels/${channel.id}/messages`, {
@@ -44,11 +44,11 @@ export async function fetchUser (userId: string): Promise<User> {
       method: 'POST',
       headers: { 'content-type': 'application/json' },
       body: JSON.stringify(payload),
-    }).then<any>((r) => r.json())
+    }).then<any>((r: any) => r.json())
   }
   
   export async function fetchHonkMessage (honk: string, message: string): Promise<ApiMessage> {
-    return fetch(`https://discord.com/api/v9/webhooks/${honk}/messages/${message}`).then<any>((r) => r.json())
+    return fetch(`https://discord.com/api/v9/webhooks/${honk}/messages/${message}`).then<any>((r: any) => r.json())
   }
   
   /** @deprecated */
@@ -57,7 +57,7 @@ export async function fetchUser (userId: string): Promise<User> {
       method: 'PATCH',
       headers: { 'content-type': 'application/json' },
       body: JSON.stringify(payload),
-    }).then<any>((r) => r.json())
+    }).then<any>((r: any) => r.json())
   }
   
   /// Members management
@@ -71,7 +71,7 @@ export async function fetchUser (userId: string): Promise<User> {
       res = await fetch(
         `https://discord.com/api/v9/guilds/${config.discord.ids.serverId}/members?limit=1000&after=${after}`,
         { headers: { authorization: `Bot ${config.discord.botToken}` } }
-      ).then<any>((r) => r.json())
+      ).then<any>((r: any) => r.json())
   
       users.push(...res)
     } while (res.length === 1000)
@@ -83,7 +83,7 @@ export async function fetchUser (userId: string): Promise<User> {
     return fetch(
       `https://discord.com/api/v9/guilds/${config.discord.ids.serverId}/members/${memberId}`,
       { headers: { authorization: `Bot ${config.discord.botToken}` } }
-    ).then<any>((r) => r.status === 200 ? r.json() : void 0)
+    ).then<any>((r: any) => r.status === 200 ? r.json() : void 0)
   }
   
   export async function setRoles (memberId: string, roleIds: string[], auditLogReason?: string): Promise<unknown> {

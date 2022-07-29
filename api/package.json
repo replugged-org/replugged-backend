@@ -19,6 +19,7 @@
         "@fastify/mongodb": "^6.0.1",
         "fast-jwt": "^1.6.1",
         "fastify": "^4.3.0",
-        "fastify-raw-body": "^4.0.0"
+        "fastify-raw-body": "^4.0.0",
+        "undici": "^5.8.0"
     }
 }
