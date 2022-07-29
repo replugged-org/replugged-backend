@@ -32,10 +32,6 @@ fastify.register(apiModule);
 
 fastify.setNotFoundHandler((_: FastifyRequest, reply: FastifyReply) => void reply.code(404).send({ error: 404, message: 'Not Found' }))
 
-fastify.addHook('onRequest', (req: FastifyRequest) => {
-    console.log(req.url)
-})
-
 fastify.ready()
     .then(
         () => {
