@@ -6,7 +6,7 @@ import { unlink } from 'fs/promises'
 import config from '../config.js'
 import { SETTINGS_STORAGE_FOLDER } from '../api/settings.js'
 import { fetchMember, setRoles } from '../utils/discord.js'
-import { UserFlags, PrivateUserFlags, PersistentUserFlags } from '../../../shared/flags.js'
+import { UserFlags, PrivateUserFlags, PersistentUserFlags } from '../flags.js'
 
 export enum UserDeletionCause {
   // User initiated account deletion manually

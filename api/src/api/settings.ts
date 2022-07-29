@@ -5,7 +5,7 @@ import { existsSync, mkdirSync, createReadStream, createWriteStream } from 'fs'
 
 const SETTINGS_UPLOAD_LIMIT = 1e8 // 100MB
 const SETTINGS_UPLOAD_EYES = 1e6 // 1MB
-export const SETTINGS_STORAGE_FOLDER = new URL('file:///var/lib/replugged/settings/')
+export const SETTINGS_STORAGE_FOLDER = process.platform !== 'linux' ? 'C:\\RepluggedData\\settings' : new URL('file:///var/lib/replugged/settings/')
 if (!existsSync(SETTINGS_STORAGE_FOLDER)) mkdirSync(SETTINGS_STORAGE_FOLDER)
 
 const locks = new Set<string>()
