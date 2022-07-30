@@ -12,6 +12,12 @@ import Footer from "./layout/Footer"
 
 import Homepage from "./Homepage"
 import Account from './account/Account';
+import Contributors from './Contributors';
+import Stats from './stats/Community'
+import Branding from './Branding'
+import Storefront from './store/Storefront';
+
+import { SoonRoute } from './util/Soon';
 
 import NotFound from './NotFound';
 
@@ -49,6 +55,13 @@ export default function App(props: AppProps) {
           <AuthBoundary path={Routes.ME}>
             <Account />
           </AuthBoundary>
+          <Contributors path={Routes.CONTRIBUTORS} />
+          <Stats path={Routes.STATS} />
+          <Branding path={Routes.BRANDING} />
+
+          <SoonRoute path={`${Routes.STORE}/:path*`}>
+            <Storefront path={`${Routes.STORE}/:path*`}/>
+          </SoonRoute>
 
           <NotFound ctx={props?.ctx} default />
         </Router>

@@ -7,6 +7,8 @@ import Avatar from '../util/Avatar'
 import Hamburger from '../util/Hamburger'
 import { Endpoints, Routes } from '../../constants'
 
+import RepluggedLogo from '../../assets/replugged.svg'
+
 import Staff from '../../assets/badges/staff.svg'
 
 import style from './header.module.css';
@@ -53,7 +55,9 @@ export default function Header() {
           ? <img className={style.plug} src={spookycordPlug} alt='Replugged Logo'/>
           : <RepluggedPlug className={style.plug}/>}
         <RepluggedWordmark className={style.wordmark}/> */}
-                Replugged Logo Here
+                {/* @ts-ignore */}
+                {/* <RepluggedLogo className={style.plug} /> */}
+                Replugged Logo
             </a>
 
             <nav className={style.nav}>

@@ -12,17 +12,20 @@
         "lint": "eslint --ext ts --ext tsx src"
     },
     "dependencies": {
+        "@borkenware/spoonfeed": "github:borkenware/spoonfeed",
         "@preact/preset-vite": "^2.3.0",
         "feather-icons": "^4.29.0",
         "hoofd": "^1.5.1",
         "preact": "^10.10.0",
         "preact-render-to-string": "^5.2.1",
         "preact-router": "^4.1.0",
+        "prismjs": "^1.28.0",
         "simple-icons": "^7.5.0",
         "vite": "^3.0.3",
         "vite-plugin-magical-svg": "^1.0.2"
     },
     "devDependencies": {
-        "@types/node": "^18.6.1"
+        "@types/node": "^18.6.1",
+        "@types/prismjs": "^1.26.0"
     }
 }
