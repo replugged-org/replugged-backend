@@ -8,7 +8,7 @@ import type {
     User
 } from '../../../types/users';
 import { createHash } from 'crypto';
-// import { UserFlags } from '../../flags.js'
+// import { UserFlags } from '../flags.js'
 import config from '../config.js'
 
 // import settingsModule from './settings.js'
@@ -60,44 +60,44 @@ async function getSelf(this: FastifyInstance, request: FastifyRequest, reply: Fa
 }
 
 // this endpoint can only be used to modify perks, but implements checks as a generic update to follow REST semantics (and future-proofing)
-//   type PatchSelfRequest = { TokenizeUser: User, Body: { } }
-//   async function patchSelf (this: FastifyInstance, request: FastifyRequest<PatchSelfRequest>, reply: FastifyReply) {
+// type PatchSelfRequest = { TokenizeUser: User, Body: {} }
+// async function patchSelf(this: FastifyInstance, request: FastifyRequest<PatchSelfRequest>, reply: FastifyReply) {
 //     const update: Record<string, any> = { updatedAt: new Date() }
-// const user = request.user!
-// if ('cutiePerks' in request.body) {
-//   const pledgeTier = user.flags & UserFlags.IS_CUTIE ? user.cutieStatus?.pledgeTier ?? 1 : 0
-//   if (('color' in request.body.cutiePerks && !pledgeTier) || (('badge' in request.body.cutiePerks || 'title' in request.body.cutiePerks) && pledgeTier < 2)) {
-//     reply.code(402).send({ error: 402, message: 'You must be a donator of a higher tier to modify these perks.' })
-//     return
-//   }
+//     const user = request.user!
+//     if ('cutiePerks' in request.body) {
+//         const pledgeTier = user.flags & UserFlags.IS_CUTIE ? user.cutieStatus?.pledgeTier ?? 1 : 0
+//         if (('color' in request.body.cutiePerks && !pledgeTier) || (('badge' in request.body.cutiePerks || 'title' in request.body.cutiePerks) && pledgeTier < 2)) {
+//             reply.code(402).send({ error: 402, message: 'You must be a donator of a higher tier to modify these perks.' })
+//             return
+//         }
 
-//   // Validate URL - todo: file upload?
-//   if (request.body.cutiePerks.badge) {
-//     try {
-//       const icon = new URL(request.body.cutiePerks.badge)
-//       if (!ALLOWED_HOSTS.includes(icon.hostname)) {
-//         reply.code(400).send({ error: 400, message: 'Icon URL is not from a whitelisted source. Allowed URLs: *.discord.com, *.discordapp.com, media.discordapp.net' })
-//         return
-//       }
+//         // Validate URL - todo: file upload?
+//         if (request.body.cutiePerks.badge) {
+//             try {
+//                 const icon = new URL(request.body.cutiePerks.badge)
+//                 if (!ALLOWED_HOSTS.includes(icon.hostname)) {
+//                     reply.code(400).send({ error: 400, message: 'Icon URL is not from a whitelisted source. Allowed URLs: *.discord.com, *.discordapp.com, media.discordapp.net' })
+//                     return
+//                 }
 
-//       icon.protocol = 'https' // Ensure protocol is https
-//       request.body.cutiePerks.badge = icon.toString()
-//     } catch {
-//       reply.code(400).send({ error: 400, message: 'Icon URL is malformed.' })
-//       return
+//                 icon.protocol = 'https' // Ensure protocol is https
+//                 request.body.cutiePerks.badge = icon.toString()
+//             } catch {
+//                 reply.code(400).send({ error: 400, message: 'Icon URL is malformed.' })
+//                 return
+//             }
+//         }
+
+//         if ('color' in request.body.cutiePerks) update['cutiePerks.color'] = request.body.cutiePerks.color
+//         if ('badge' in request.body.cutiePerks) update['cutiePerks.badge'] = request.body.cutiePerks.badge
+//         if ('title' in request.body.cutiePerks) update['cutiePerks.title'] = request.body.cutiePerks.title
 //     }
-//   }
 
-//   if ('color' in request.body.cutiePerks) update['cutiePerks.color'] = request.body.cutiePerks.color
-//   if ('badge' in request.body.cutiePerks) update['cutiePerks.badge'] = request.body.cutiePerks.badge
-//   if ('title' in request.body.cutiePerks) update['cutiePerks.title'] = request.body.cutiePerks.title
+//     const result = await this.mongo.db!.collection<DatabaseUser>('users').findOneAndUpdate({ _id: request.user!._id }, { $set: update }, { returnDocument: 'after' })
+//     const newUser = result.value as User // Cast is safe because the user is authenticated
+//     reply.send(formatUser(newUser, true))
+//     notifyStateChange(newUser, 'perks')
 // }
-
-// const result = await this.mongo.db!.collection<DatabaseUser>('users').findOneAndUpdate({ _id: request.user!._id }, { $set: update }, { returnDocument: 'after' })
-// const newUser = result.value as User // Cast is safe because the user is authenticated
-// reply.send(formatUser(newUser, true))
-// notifyStateChange(newUser, 'perks')
-//   }
 
 async function getSpotifyToken(this: FastifyInstance, request: FastifyRequest): Promise<unknown> {
     const { spotify } = request.user!.accounts
@@ -119,23 +119,23 @@ async function getSpotifyToken(this: FastifyInstance, request: FastifyRequest): 
     return { token: spotify.accessToken }
 }
 
-//   async function refreshPledge (this: FastifyInstance, request: FastifyRequest, reply: FastifyReply) {
+// async function refreshPledge(this: FastifyInstance, request: FastifyRequest, reply: FastifyReply) {
 //     const patreonAccount = request.user!.accounts.patreon
 //     const lastManualRefresh = request.user!.cutieStatus?.lastManualRefresh ?? 0
 //     if (!patreonAccount) {
-//       reply.code(422).send({ error: 422, message: 'This operation requires a linked Patreon account' })
-//       return
+//         reply.code(422).send({ error: 422, message: 'This operation requires a linked Patreon account' })
+//         return
 //     }
 
 //     if (request.user!.flags & UserFlags.CUTIE_OVERRIDE) {
-//       reply.code(422).send({ error: 422, message: 'Your pledge status is currently managed by Powercord Staff. Contact us for help.' })
-//       return
+//         reply.code(422).send({ error: 422, message: 'Your pledge status is currently managed by Powercord Staff. Contact us for help.' })
+//         return
 //     }
 
 //     // 1 refresh per hour
 //     if (Date.now() - lastManualRefresh < 3600e3) {
-//       reply.code(429).send({ error: 429, message: 'A refresh already was requested within the previous hour. Try again later.' })
-//       return
+//         reply.code(429).send({ error: 429, message: 'A refresh already was requested within the previous hour. Try again later.' })
+//         return
 //     }
 
 //     await refreshDonatorState(this.mongo.client, request.user!, true)
@@ -144,25 +144,25 @@ async function getSpotifyToken(this: FastifyInstance, request: FastifyRequest): 
 
 export default async function (fastify: FastifyInstance): Promise<void> {
     fastify.route({
-      method: 'GET',
-      url: '/@me',
-      handler: getSelf,
-      config: { auth: { allowClient: true } },
+        method: 'GET',
+        url: '/@me',
+        handler: getSelf,
+        config: { auth: { allowClient: true } },
     })
-  
+
     fastify.route({
-      method: 'GET',
-      url: '/@me/spotify',
-      handler: getSpotifyToken,
-      config: { auth: { allowClient: true } },
+        method: 'GET',
+        url: '/@me/spotify',
+        handler: getSpotifyToken,
+        config: { auth: { allowClient: true } },
     })
-  
+
     fastify.route({
-      method: 'GET',
-      url: '/:id(\\d{17,})',
-      handler: getUser,
+        method: 'GET',
+        url: '/:id(\\d{17,})',
+        handler: getUser,
     })
-  
+
     //   fastify.route({
     //     method: 'PATCH',
     //     url: '/@me',
@@ -176,7 +176,7 @@ export default async function (fastify: FastifyInstance): Promise<void> {
     //       },
     //     },
     //   })
-  
+
     //   fastify.route({
     //     method: 'POST',
     //     url: '/@me/refresh-pledge',
@@ -189,6 +189,6 @@ export default async function (fastify: FastifyInstance): Promise<void> {
     //       },
     //     },
     //   })
-  
+
     //   fastify.register(settingsModule, { prefix: '/@me/settings' })
-  }
+}

@@ -1,7 +1,9 @@
 import fastifyFactory, {
     type FastifyRequest,
     type FastifyReply,
+    FastifyInstance,
 } from 'fastify'
+import type { User } from '../../types/users.js'
 import fastifyCookie from '@fastify/cookie'
 import fastifyMongodb from '@fastify/mongodb'
 import fastifyRawBody from 'fastify-raw-body'
@@ -9,9 +11,10 @@ import fastifyRawBody from 'fastify-raw-body'
 // @ts-ignore pls shut up ts
 import config from './config.js'
 
-import authPlugin, { generateToken } from './utils/auth.js'
+import { generateToken, Verifiers } from './utils/auth.js'
 
 import apiModule from "./api/index.js";
+import { UserFlags } from './flags.js'
 
 const fastify = fastifyFactory({
     logger: {
@@ -27,8 +30,58 @@ fastify.decorateRequest('jwtPayload', null)
 fastify.decorateRequest('user', null)
 fastify.decorateReply('generateToken', generateToken)
 
+fastify.addHook('onRequest', async function (this: FastifyInstance, request, reply) {
+    request.jwtPayload = null;
+    request.user = null;
+
+    if (!reply.context.config.auth) return; // no auth required;
+    const { optional, permissions, allowClient } = reply.context.config.auth
+
+    // check cookies ( web ) and authorization ( client )
+    const token = request.cookies.token || request.headers.authorization;
+    if (!token) {
+        if (!optional) {
+            reply.code(401)
+            throw new Error('Unauthorized - No token provided')
+        }
+
+        return;
+    }
+
+    try {
+        request.jwtPayload = allowClient ? Verifiers.client(token) : Verifiers.web(token)
+    } catch (e) {
+        console.log(e)
+        if (!optional) {
+            reply.code(401)
+            throw new Error('Unauthorized - Token is not optional')
+        }
+
+        return
+    }
+
+    request.user = await this.mongo.db!.collection<User>('users').findOne({
+        _id: request.jwtPayload!.id,
+        flags: { $bitsAllClear: UserFlags.GHOST | UserFlags.BANNED }
+    })
+
+    if (!request.user) {
+        if (!optional) {
+            reply.code(401)
+            throw new Error('Unauthorized - No user')
+        }
+
+        return
+    }
+
+    if (permissions && (request.user!.flags & permissions) === 0) {
+        reply.code(403)
+        throw new Error('Insufficient permissions')
+    }
+})
+
 // todo: figure out why this isn't working
-fastify.register(authPlugin)
+// fastify.register(authPlugin)
 
 fastify.register(apiModule, { prefix: '/api' })
 fastify.setNotFoundHandler((request: FastifyRequest, reply: FastifyReply) => {

@@ -1,13 +1,13 @@
 import {
-    type FastifyInstance,
+    // type FastifyInstance,
     type FastifyReply
 } from 'fastify'
-import {
-    type User
-} from '../../../types/users'
+// import {
+//     type User
+// } from '../../../types/users'
 import { createHash } from 'crypto'
 import config from '../config.js'
-import { UserFlags } from '../flags.js'
+// import { UserFlags } from '../flags.js'
 import { createSigner, createVerifier } from 'fast-jwt'
 
 export type JWTPayload = { id: string };
@@ -16,18 +16,18 @@ export enum TokenType { WEB, CLIENT }
 
 const KEY = createHash('sha512').update(config.secret).digest();
 
-const Verifiers = {
+export const Verifiers = {
     web: createVerifier({
         key: KEY,
         algorithms: ['HS512'],
         allowedAud: 'replugged:web',
-        allowedIss: 'replugged:api:v1'
+        // allowedIss: 'replugged:api:v1'
     }),
     client: createVerifier({
         key: KEY,
         algorithms: ['HS512'],
         allowedAud: ['replugged:web', 'replugged:client'],
-        allowedIss: 'replugged:api:v1'
+        // allowedIss: 'replugged:api:v1'
     })
 }
 
@@ -43,59 +43,60 @@ export function generateToken(this: FastifyReply, payload: JWTPayload, type: Tok
     return signer(payload)
 }
 
-export default async function authPlugin(fastify: FastifyInstance) {
-    fastify.decorateReply('generateToken', generateToken)
-    fastify.addHook('onRequest', async function (this: FastifyInstance, request, reply) {
-        request.jwtPayload = null
-        request.user = null
+// export default async function authPlugin(fastify: FastifyInstance) {
+//     fastify.decorateReply('generateToken', generateToken)
+//     fastify.addHook('onRequest', async function (this: FastifyInstance, request, reply) {
+//         console.log(request.url)
+//         request.jwtPayload = null
+//         request.user = null
 
-        if (!reply.context.config.auth) return
-        const { optional, permissions, allowClient } = reply.context.config.auth
+//         if (!reply.context.config.auth) return
+//         const { optional, permissions, allowClient } = reply.context.config.auth
 
-        // Check cookies (web) and authorization (client)
-        const token = request.cookies.token || request.headers.authorization
-        if (!token) {
-            if (!optional) {
-                reply.code(401)
-                throw new Error('Unauthorized')
-            }
+//         // Check cookies (web) and authorization (client)
+//         const token = request.cookies.token || request.headers.authorization
+//         if (!token) {
+//             if (!optional) {
+//                 reply.code(401)
+//                 throw new Error('Unauthorized')
+//             }
 
-            return
-        }
+//             return
+//         }
 
-        try {
-            request.jwtPayload = allowClient
-                ? Verifiers.client(token)
-                : Verifiers.web(token)
-        } catch {
-            if (!optional) {
-                reply.code(401)
-                throw new Error('Unauthorized')
-            }
+//         try {
+//             request.jwtPayload = allowClient
+//                 ? Verifiers.client(token)
+//                 : Verifiers.web(token)
+//         } catch {
+//             if (!optional) {
+//                 reply.code(401)
+//                 throw new Error('Unauthorized')
+//             }
 
-            return
-        }
+//             return
+//         }
 
-        // eslint-disable-next-line require-atomic-updates
-        request.user = await this.mongo.db!.collection<User>('users').findOne({
-            _id: request.jwtPayload!.id,
-            flags: { $bitsAllClear: UserFlags.GHOST | UserFlags.BANNED },
-        })
+//         // eslint-disable-next-line require-atomic-updates
+//         request.user = await this.mongo.db!.collection<User>('users').findOne({
+//             _id: request.jwtPayload!.id,
+//             flags: { $bitsAllClear: UserFlags.GHOST | UserFlags.BANNED },
+//         })
 
-        if (!request.user) {
-            if (!optional) {
-                reply.code(401)
-                throw new Error('Unauthorized')
-            }
+//         if (!request.user) {
+//             if (!optional) {
+//                 reply.code(401)
+//                 throw new Error('Unauthorized')
+//             }
 
-            return
-        }
+//             return
+//         }
 
-        if (permissions && (request.user!.flags & permissions) === 0) {
-            reply.code(403)
-            throw new Error('Insufficient permission')
-        }
+//         if (permissions && (request.user!.flags & permissions) === 0) {
+//             reply.code(403)
+//             throw new Error('Insufficient permission')
+//         }
 
-        // todo: update user data if necessary - refreshUserData
-    })
-}
+//         // todo: update user data if necessary - refreshUserData
+//     })
+// }

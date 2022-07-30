@@ -7,6 +7,21 @@ export type ExternalAccount = {
     name: string
   }
   
+  export type CutieStatus = {
+    pledgeTier: number
+    // todo: ditch unix
+    perksExpireAt: number
+    // todo: ditch unix
+    lastManualRefresh?: number
+  }
+  
+  export type CutiePerks = {
+    color: string | null
+    badge: string | null
+    title: string | null
+  }
+  
+
   export type User = {
     _id: string
     username: string
@@ -16,7 +31,10 @@ export type ExternalAccount = {
     accounts: {
       discord: Omit<ExternalAccount, 'name'>
       spotify?: ExternalAccount
-    }
+      patreon?: ExternalAccount
+    },
+    cutieStatus?: CutieStatus
+    cutiePerks?: CutiePerks
     createdAt: Date
     updatedAt?: Date
   }
@@ -39,14 +57,17 @@ export type ExternalAccount = {
   export type RestUser = {
     _id: User['_id']
     flags: User['flags']
+    cutiePerks: Exclude<User['cutiePerks'], undefined>
   }
   
   export type RestUserPrivate = RestUser & {
     username: User['username']
     discriminator: User['discriminator']
     avatar: User['avatar']
+    cutieStatus: CutieStatus
     accounts: {
       spotify?: string
+      patreon?: string
     }
     createdAt: User['createdAt']
   }

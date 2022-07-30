@@ -19,7 +19,7 @@ function User() {
     if (!user) {
         return (
             /* @ts-expect-error */
-            <a native href={Endpoints.LOGIN} className={sharedStyle.button}>Login with discord</a>
+            <a native href={Endpoints.LOGIN} className={sharedStyle.button}>Login with Discord</a>
         )
     }
 
