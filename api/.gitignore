@@ -1,2 +1,3 @@
 dist
 config.ts
+!src/api/docs/spoonfeed/src/types/config.ts
