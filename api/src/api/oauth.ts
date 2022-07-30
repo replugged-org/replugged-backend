@@ -7,7 +7,7 @@ import config from '../config.js'
 import { UserFlags } from '../flags.js'
 import { getAuthorizationUrl, getAuthTokens, fetchAccount, toMongoFields } from '../utils/oauth.js'
 import { deleteUser, UserDeletionCause } from '../data/user.js'
-import { addRole } from '../utils/discord.js'
+import { addRole, fetchMember, removeRole } from '../utils/discord.js'
 import { TokenType } from '../utils/auth.js'
 import { prepareUpdateData, notifyStateChange } from '../utils/patreon.js'
 
@@ -138,6 +138,14 @@ async function callback(this: FastifyInstance, request: FastifyRequest<CallbackR
 
     // Cast is safe
     const user = res.value as User
+
+    const member = await fetchMember(user._id)
+    if (member) {
+      if (!member?.roles.includes(config.discord.roles.user)) {
+        addRole(user._id, config.discord.roles.user, 'User created their powercord.dev account').catch(() => 0)
+      }
+    }
+
     if (user.createdAt === date) {
       // New account
       addRole(user._id, config.discord.roles.user, 'User created their powercord.dev account').catch(() => 0)
@@ -208,6 +216,15 @@ async function unlink(this: FastifyInstance, request: FastifyRequest, reply: Rep
     }
 
     await deleteUser(this.mongo.client, request.user!._id, UserDeletionCause.REQUESTED)
+
+    const member = await fetchMember(request.user!._id);
+
+    if (member) {
+      if (member.roles.includes(config.discord.roles.user)) {
+        removeRole(request.user!._id, config.discord.roles.user)
+      }
+    }
+
     reply.setCookie('token', '', { maxAge: 0, path: '/' })
     reply.redirect('/')
     return
