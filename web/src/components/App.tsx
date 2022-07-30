@@ -1,5 +1,5 @@
 import { h } from 'preact'
-import { Suspense } from 'preact/compat'
+import { lazy, Suspense } from 'preact/compat'
 import { useTitleTemplate, useMeta } from 'hoofd/preact'
 import { useCallback, useMemo } from 'preact/hooks'
 import Router from "preact-router";
@@ -16,6 +16,13 @@ import Contributors from './Contributors';
 import Stats from './stats/Community'
 import Branding from './Branding'
 import Storefront from './store/Storefront';
+import Documentation from './docs/Documentation';
+import Markdown from './docs/Markdown'
+import Terms from './legal/Terms'
+import Privacy from './legal/Privacy';
+
+const Admin = lazy(() => import('./backoffice/Admin'))
+
 
 import { SoonRoute } from './util/Soon';
 
@@ -60,9 +67,24 @@ export default function App(props: AppProps) {
           <Branding path={Routes.BRANDING} />
 
           <SoonRoute path={`${Routes.STORE}/:path*`}>
-            <Storefront path={`${Routes.STORE}/:path*`}/>
+            <Storefront path={`${Routes.STORE}/:path*`} />
           </SoonRoute>
 
+          <SoonRoute path={Routes.DOCS_ITEM(':categoryId?', ':documentId?')}>
+            <Documentation path={Routes.DOCS_ITEM(':categoryId?', ':documentId?')} />
+          </SoonRoute>
+
+          <Markdown document='faq' path={Routes.FAQ} />
+          <Markdown document='installation' path={Routes.INSTALLATION} />
+          <Markdown document='guidelines' path={Routes.GUIDELINES} />
+
+          <Terms path={Routes.TERMS} />
+          <Privacy path={Routes.PRIVACY} />
+
+
+          <AuthBoundary staff path={`${Routes.BACKOFFICE}/:path*`}>
+            <Admin />
+          </AuthBoundary>
           <NotFound ctx={props?.ctx} default />
         </Router>
       </Suspense>

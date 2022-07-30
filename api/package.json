@@ -15,6 +15,7 @@
         "typescript": "^4.7.4"
     },
     "dependencies": {
+        "@borkenware/spoonfeed": "github:borkenware/spoonfeed",
         "@fastify/cookie": "^7.3.1",
         "@fastify/mongodb": "^6.0.1",
         "fast-jwt": "^1.6.1",

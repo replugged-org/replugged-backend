@@ -1,0 +1,30 @@
+{
+  "compilerOptions": {
+    "strict": true,
+    "alwaysStrict": true,
+    "strictNullChecks": true,
+    "strictBindCallApply": true,
+    "strictFunctionTypes": true,
+    "strictPropertyInitialization": true,
+    "incremental": true,
+
+    "noEmitOnError": true,
+    "noImplicitThis": true,
+    "noUnusedLocals": true,
+    "noUnusedParameters": true,
+    "noImplicitAny": true,
+    "allowUnreachableCode": false,
+    "allowSyntheticDefaultImports": true,
+    "allowJs": false,
+
+    "jsx": "react",
+    "jsxFactory": "h",
+    "jsxFragmentFactory": "Fragment",
+    "lib": [ "es2020" ],
+    "target": "es2020",
+    "module": "esnext",
+    "outDir": "./dist",
+    "declaration": true
+  },
+  "include": [ "./src/**/*" ]
+}

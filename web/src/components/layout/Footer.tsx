@@ -14,7 +14,7 @@ export default function Footer() {
                 <a className={style.link} href={Routes.STATS}>Stats</a>
                 <a className={style.link} href={Routes.BRANDING}>Branding</a>
                 <a className={style.link} href={Routes.GITHUB} target='_blank' rel='noreferrer'>GitHub</a>
-                <a className={style.link} href={Routes.GUIDELINES}>Guidelines</a>
+                {/* <a className={style.link} href={Routes.GUIDELINES}>Guidelines</a> */}
                 <a className={style.link} href={Routes.TERMS}>Terms</a>
                 <a className={style.link} href={Routes.PRIVACY}>Privacy</a>
             </div>
