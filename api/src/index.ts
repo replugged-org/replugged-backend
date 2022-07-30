@@ -9,7 +9,7 @@ import fastifyRawBody from 'fastify-raw-body'
 // @ts-ignore pls shut up ts
 import config from './config.js'
 
-import authPlugin from './utils/auth.js'
+import authPlugin, { generateToken } from './utils/auth.js'
 
 import apiModule from "./api/index.js";
 
@@ -25,6 +25,9 @@ fastify.register(fastifyMongodb, { url: config.mango })
 
 fastify.decorateRequest('jwtPayload', null)
 fastify.decorateRequest('user', null)
+fastify.decorateReply('generateToken', generateToken)
+
+// todo: figure out why this isn't working
 fastify.register(authPlugin)
 
 fastify.register(apiModule, { prefix: '/api' })

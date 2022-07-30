@@ -5,6 +5,7 @@ import type {
 } from 'fastify'
 
 import oauthModule from './oauth.js';
+import usersModule from './users.js'
 
 function logout(_: FastifyRequest, reply: FastifyReply): void {
     reply.setCookie('token', '', { maxAge: 0, path: '/' }).redirect('/');
@@ -15,4 +16,5 @@ export default async function (fastify: FastifyInstance) {
     fastify.get('/logout', { config: { auth: {} } }, logout)
 
     fastify.register(oauthModule, { prefix: '/oauth' });
+    fastify.register(usersModule, { prefix: '/users'})
 }

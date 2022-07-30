@@ -80,7 +80,7 @@ export async function getAuthTokens(provider: OAuthProvider, redirect: string, c
     body.set('grant_type', 'authorization_code')
     body.set('client_id', config[provider].clientID)
     body.set('client_secret', config[provider].clientSecret)
-    body.set('redirect_uri', `${config.domain}/api${redirect}`)
+    body.set('redirect_uri', `${config.domain}${redirect}`)
     body.set('code', code)
 
     return fetchToken(provider, body)

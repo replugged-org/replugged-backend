@@ -105,8 +105,7 @@ type OAuthConfig = {
     try {
       oauthToken = await getAuthTokens(reply.context.config.platform, request.routerPath, request.query.code)
       account = await fetchAccount<any>(reply.context.config.platform, oauthToken)
-    } catch(e) {
-      console.error(e)
+    } catch {
       reply.redirect(`${redirectCookie?.value ?? returnPath}?error=auth_failure`)
       return
     }

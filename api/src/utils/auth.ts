@@ -31,7 +31,7 @@ const Verifiers = {
     })
 }
 
-function generateToken(this: FastifyReply, payload: JWTPayload, type: TokenType) {
+export function generateToken(this: FastifyReply, payload: JWTPayload, type: TokenType) {
     const signer = createSigner({
         key: KEY,
         algorithm: 'HS512',
