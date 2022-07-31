@@ -39,7 +39,7 @@ export default async function (fastify: FastifyInstance): Promise<void> {
         format: (u: any) => formatUser(u, true, true),
       },
       create: { enabled: false },
-      update: { enabled: false },
+      update: { enabled: true },
       delete: {
         enabled: true,
         auth: { permissions: UserFlags.STAFF },

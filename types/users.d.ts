@@ -72,24 +72,14 @@ export type RestUserPrivate = RestUser & {
   createdAt: User['createdAt']
 }
 
-export type RestAdminUser = RestUserPrivate & {
-  patronTier: 0 | 1 | 2 | 3
-  badges: {
-    developer: boolean,
-    staff: boolean,
-    support: boolean,
-    contributor: boolean,
-    hunter: boolean,
-    early: boolean,
-    translator: boolean,
-    custom: {
-      color: string | null,
-      icon: string | null,
-      name: string | null
-    },
-    guild: {
-      icon: string | null,
-      name: string | null
-    }
-  }
+export type UserBanStatus = {
+  account: boolean
+  publish: boolean
+  verification: boolean
+  hosting: boolean
+  reporting: boolean
+  sync: boolean
+  events: boolean
 }
+
+export type RestAdminUser = RestUser & MinimalUser & { banStatus?: UserBanStatus }

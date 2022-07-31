@@ -1,6 +1,10 @@
 import type { FastifyInstance, FastifyRequest, FastifyReply, ConfiguredReply, FastifyContextConfig } from 'fastify'
 import type { Filter } from 'mongodb'
 import { ObjectId } from 'mongodb'
+import { UserFlags } from '../../flags.js'
+// import { deleteUser } from '../../data/user.js';
+// import { fetchMember, addRole, removeRole } from '../utils/discord.js'
+
 
 type CrudModule<TProps = {}> =
   | ({ enabled: false } & Partial<TProps>)
@@ -41,12 +45,12 @@ type RouteParams = { id: string }
 
 type ReadAllQuery = { limit?: number, page?: number }
 
-async function create () {
+async function create() {
   // todo
   return null
 }
 
-async function read (this: FastifyInstance, request: FastifyRequest<{ Params: RouteParams }>, reply: Reply) {
+async function read(this: FastifyInstance, request: FastifyRequest<{ Params: RouteParams }>, reply: Reply) {
   const config = reply.context.config
   const filter = {
     ...config.entity.baseQuery ?? {},
@@ -62,7 +66,7 @@ async function read (this: FastifyInstance, request: FastifyRequest<{ Params: Ro
   return config.read.format ? config.read.format(entity) : entity
 }
 
-async function readAll (this: FastifyInstance, request: FastifyRequest<{ Querystring: ReadAllQuery, Params: RouteParams }>, reply: Reply) {
+async function readAll(this: FastifyInstance, request: FastifyRequest<{ Querystring: ReadAllQuery, Params: RouteParams }>, reply: Reply) {
   const config = reply.context.config
   const page = (request.query.page ?? 1) - 1
   const limit = request.query.limit ?? 50
@@ -73,17 +77,69 @@ async function readAll (this: FastifyInstance, request: FastifyRequest<{ Queryst
   )
 
   if (config.read.format) cursor.map(config.read.format)
-  return cursor.toArray()
+
+  const res = await cursor.toArray();
+
+  return {
+    data: res,
+    page: page
+  }
 }
 
-async function update () {
+// type UpdateData = {
+//   patronTier: 0
+//   'badges.developer': Boolean | null
+//   'badges.staff': Boolean | null
+//   'badgessupport': Boolean | null
+//   'badges.contributor': Boolean | null
+//   'badges.hunter': Boolean | null
+//   'badges.early': Boolean | null
+//   'badges.translator': Boolean | null
+//   'badges.custom.color': string | null
+//   'badges.custom.icon': string | null
+//   'badges.custom.name': string | null
+//   'badges.guild.id': string | null,
+//   'badges.guild.icon': string | null,
+//   'badges.guild.name': string | null
+// }
+
+
+async function update(this: FastifyInstance, request: FastifyRequest, reply: Reply) {
+//  const data = request.body as UpdateData
+  const config = reply.context.config;
+  const params = request.params as { id: string }
+
+  const user = await this.mongo.db!.collection(config.entity.collection).findOne({ _id: params.id });
+
+  if (!user) return { code: 404, message: 'User does not exist' }
+ // const existingFlags = user.flags
+
+  // todo: add or remove from existing flags.
+
   // todo
-  return null
+  return { data: 'test' }
 }
 
-async function del () {
+async function del(this: FastifyInstance, request: FastifyRequest, reply: Reply) {
   // todo
-  return null
+  const config = reply.context.config;
+  const userId = (request.params as { id: string }).id
+
+  const user = await this.mongo.db!.collection(config.entity.collection).findOne({ _id: userId })
+
+  if (!user) {
+    return { deleted: false }
+  }
+
+  if (user.flags & UserFlags.STORE_PUBLISHER) {
+    return { deleted: false }
+  }
+
+  this.mongo.db!.collection(config.entity.collection).deleteOne({ _id: userId })
+
+  return {
+    deleted: true
+  }
 }
 
 export default function (fastify: FastifyInstance, { data }: { data: CrudSettings<any> }, next: (err?: Error) => void) {

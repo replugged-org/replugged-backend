@@ -124,6 +124,7 @@ export default function ManageUsers (_: Attributes) {
       .then((r) => r.json())
       .then((u: ApiResponse) => {
         pushUsers({ users: u.data, page: page })
+        console.log(u)
         if (!pages) setPages(u.pages)
       })
   }, [ page ])
@@ -134,6 +135,7 @@ export default function ManageUsers (_: Attributes) {
     fetchUserPage()
   }, [])
 
+
   return (
     <main>
       <h1 className={style.title}>Manage users</h1>
@@ -141,7 +143,7 @@ export default function ManageUsers (_: Attributes) {
         {/* <TextField name='search' label='Search' placeholder='Search a user...' raw disabled/> */}
         <button className={sharedStyle.button} onClick={editById}>Edit a user by ID</button>
       </div>
-      {users ? users.map((u) => <UserRow key={u.id} user={u} setModal={setModal}/>) : <Spinner/>}
+      {users ? users.map((u) => <UserRow key={u._id} user={u} setModal={setModal}/>) : <Spinner/>}
       {pages > 1 && <Paginator current={page} total={pages} setPage={setPage}/>}
 
       {modal?.kind === 'id' && <EditById onClose={onModalClose}/>}

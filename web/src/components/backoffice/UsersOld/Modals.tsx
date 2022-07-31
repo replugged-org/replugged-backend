@@ -147,7 +147,7 @@ export function ManageEdit ({ user, onClose }: ManageModalProps) {
       data['badges.guild.name'] = formGuildPerksRef.current.tooltip.value || null
     }
 
-    fetch(Endpoints.BACKOFFICE_USER(user.id), {
+    fetch(Endpoints.BACKOFFICE_USER(user._id), {
       method: 'PATCH',
       headers: { 'content-type': 'application/json' },
       body: JSON.stringify(data),
@@ -195,14 +195,14 @@ export function ManageModeration ({ user, onClose }: ManageModalProps) {
     }
 
     if (!Object.values(userbans).filter((b) => b).length) {
-      fetch(Endpoints.BACKOFFICE_BAN(user.id), {
+      fetch(Endpoints.BACKOFFICE_BAN(user._id), {
         method: 'DELETE',
         headers: { 'content-type': 'application/json' },
       }).then(() => onClose())
       return
     }
 
-    fetch(Endpoints.BACKOFFICE_BAN(user.id), {
+    fetch(Endpoints.BACKOFFICE_BAN(user._id), {
       method: 'PUT',
       headers: { 'content-type': 'application/json' },
       body: JSON.stringify(userbans),
@@ -258,10 +258,10 @@ export function ManageDelete ({ user, onClose }: ManageModalProps) {
   const formRef = useRef<HTMLFormElement>(null)
   const onYeet = useCallback(() => {
     setProcessing(true)
-    fetch(Endpoints.BACKOFFICE_USER(user.id), { method: 'DELETE' })
+    fetch(Endpoints.BACKOFFICE_USER(user._id), { method: 'DELETE' })
       .then(() => {
         if (formRef.current?.ban.checked) {
-          fetch(Endpoints.BACKOFFICE_BAN(user.id), {
+          fetch(Endpoints.BACKOFFICE_BAN(user._id), {
             method: 'POST',
             headers: { 'content-type': 'application/json' },
             body: JSON.stringify({ account: true }),
