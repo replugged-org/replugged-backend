@@ -22,8 +22,6 @@ function refreshUserPledge (this: FastifyInstance, request: FastifyRequest, repl
 export default async function (fastify: FastifyInstance): Promise<void> {
   // Main routes
 
-  
-
   // @ts-ignore
   fastify.register(newCrudModule, {
     data: {
