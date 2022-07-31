@@ -62,6 +62,8 @@ export const UserFlags = {
 
   // User is a ghost entry (entry with no real user data, used for flag keeping purposes). Private.
   GHOST: 1 << 26,
+
+  SERVER_BOOSTER: 1 << 27
 }
 
 export const PrivateUserFlags = 0

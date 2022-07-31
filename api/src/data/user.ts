@@ -60,6 +60,16 @@ export function formatUser(user: User, includePrivate?: boolean, allFlags?: bool
     _id: user._id,
     flags: user.flags & ~PrivateUserFlags,
     cutiePerks: perks,
+    badges: {
+      developer: (user.flags & (UserFlags.DEVELOPER)) !== 0,
+      staff: (user.flags & (UserFlags.STAFF)) !== 0,
+      support: (user.flags & (UserFlags.SUPPORT)) !== 0,
+      contributor: (user.flags & (UserFlags.CONTRIBUTOR)) !== 0,
+      translator: (user.flags & (UserFlags.TRANSLATOR)) !== 0,
+      hunter: (user.flags & (UserFlags.BUG_HUNTER)) !== 0,
+      early: (user.flags & (UserFlags.EARLY_USER)) !== 0,
+      booster: (user.flags & (UserFlags.SERVER_BOOSTER)) !== 0
+    }
   }
 
   if (includePrivate) {
