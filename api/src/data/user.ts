@@ -83,11 +83,11 @@ export function formatUser(user: User, includePrivate?: boolean, allFlags?: bool
         pledgeTier: user.cutieStatus?.pledgeTier ?? 0,
         perksExpireAt: user.cutieStatus?.perksExpireAt ?? 0,
       },
-// these don't matter in the backoffice anyways right now, might reimplement it eventually
-//     accounts: {
-//        spotify: user.accounts.spotify?.name || void 0,
-//        patreon: user.accounts.patreon?.name || void 0,
-//      },
+      // these don't matter in the backoffice anyways right now, might reimplement it eventually
+      accounts: {
+        spotify: user.accounts?.spotify?.name || void 0,
+        patreon: user.accounts?.patreon?.name || void 0,
+      },
     }
   }
 
