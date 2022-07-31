@@ -77,7 +77,7 @@ export const Endpoints = {
     BACKOFFICE_EVENTS_SECRET: '/backoffice/events/secret',
   
     // External links
-    DICKSWORD: 'https://discord.gg/69A6n9rj5t',
+    DICKSWORD: 'https://discord.gg/replugged',
     GITHUB: 'https://github.com/replugged-org',
     PATREON: 'https://google.com'
   }
