@@ -44,8 +44,6 @@ async function fetchToken(provider: OAuthProvider, params: URLSearchParams): Pro
         body: params.toString()
     })
 
-    console.log(response);
-
     if (response.status !== 200) {
         response.blob();
         throw new Error(`Token exchange failed: ${response.status}: ${response.statusText}`)

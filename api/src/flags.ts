@@ -66,6 +66,9 @@ export const UserFlags = {
   SERVER_BOOSTER: 1 << 27
 }
 
+export type UserFlagKeys = keyof typeof UserFlags;
+export type UserFlagsValues = typeof UserFlags[UserFlagKeys];
+
 export const PrivateUserFlags = 0
  | UserFlags.CUTIE_OVERRIDE
  | UserFlags.BANNED

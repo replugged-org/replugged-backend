@@ -1,7 +1,7 @@
 import type { FastifyInstance, FastifyRequest, FastifyReply, ConfiguredReply, FastifyContextConfig } from 'fastify'
 import type { Filter } from 'mongodb'
 import { ObjectId } from 'mongodb'
-import { UserFlags } from '../../flags.js'
+import { UserFlagKeys, UserFlags } from '../../flags.js'
 // import { deleteUser } from '../../data/user.js';
 // import { fetchMember, addRole, removeRole } from '../utils/discord.js'
 
@@ -86,35 +86,54 @@ async function readAll(this: FastifyInstance, request: FastifyRequest<{ Querystr
   }
 }
 
-// type UpdateData = {
-//   patronTier: 0
-//   'badges.developer': Boolean | null
-//   'badges.staff': Boolean | null
-//   'badgessupport': Boolean | null
-//   'badges.contributor': Boolean | null
-//   'badges.hunter': Boolean | null
-//   'badges.early': Boolean | null
-//   'badges.translator': Boolean | null
-//   'badges.custom.color': string | null
-//   'badges.custom.icon': string | null
-//   'badges.custom.name': string | null
-//   'badges.guild.id': string | null,
-//   'badges.guild.icon': string | null,
-//   'badges.guild.name': string | null
-// }
+type UpdateData = {
+  patronTier: 0
+  'badges.developer': Boolean
+  'badges.staff': Boolean
+  'badges.support': Boolean
+  'badges.contributor': Boolean
+  'badges.hunter': Boolean
+  'badges.early': Boolean
+  'badges.translator': Boolean
+  'badges.custom.color': string | null
+  'badges.custom.icon': string | null
+  'badges.custom.name': string | null
+  'badges.guild.id': string | null,
+  'badges.guild.icon': string | null,
+  'badges.guild.name': string | null
+}
 
+function toggleFlags(existingFlags: number, flag: UserFlagKeys, setTo: Boolean) {
+  if ((existingFlags & UserFlags[flag]) !== 0 && setTo === false) {
+    existingFlags ^= UserFlags[flag]
+  } else if ((existingFlags & UserFlags[flag]) === 0 && setTo === true) {
+    existingFlags ^= UserFlags[flag]
+  }
+
+  return existingFlags;
+}
 
 async function update(this: FastifyInstance, request: FastifyRequest, reply: Reply) {
-//  const data = request.body as UpdateData
+  const data = request.body as UpdateData
   const config = reply.context.config;
   const params = request.params as { id: string }
 
   const user = await this.mongo.db!.collection(config.entity.collection).findOne({ _id: params.id });
 
   if (!user) return { code: 404, message: 'User does not exist' }
- // const existingFlags = user.flags
-
+  // const existingFlags = user.flags
+  let existingFlags = user.flags
   // todo: add or remove from existing flags.
+  existingFlags = toggleFlags(existingFlags, 'DEVELOPER' as UserFlagKeys, data['badges.developer'])
+  existingFlags = toggleFlags(existingFlags, 'STAFF' as UserFlagKeys, data['badges.staff'])
+  existingFlags = toggleFlags(existingFlags, 'SUPPORT' as UserFlagKeys, data['badges.support'])
+  existingFlags = toggleFlags(existingFlags, 'CONTRIBUTOR' as UserFlagKeys, data['badges.contributor'])
+  existingFlags = toggleFlags(existingFlags, 'BUG_HUNTER' as UserFlagKeys, data['badges.hunter'])
+  existingFlags = toggleFlags(existingFlags, 'EARLY_USER' as UserFlagKeys, data['badges.early'])
+  existingFlags = toggleFlags(existingFlags, 'TRANSLATOR' as UserFlagKeys, data['badges.translator'])
+
+
+  this.mongo.db!.collection(config.entity.collection).updateOne({ _id: params.id }, { $set: { flags: existingFlags } })
 
   // todo
   return { data: 'test' }

@@ -51,7 +51,7 @@ fastify.addHook('onRequest', async function (this: FastifyInstance, request, rep
     try {
         request.jwtPayload = allowClient ? Verifiers.client(token) : Verifiers.web(token)
     } catch (e) {
-        console.log(e)
+        console.error(e)
         if (!optional) {
             reply.code(401)
             throw new Error('Unauthorized - Token is not optional')

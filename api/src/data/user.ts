@@ -84,7 +84,7 @@ export function formatUser(user: User, includePrivate?: boolean, allFlags?: bool
         perksExpireAt: user.cutieStatus?.perksExpireAt ?? 0,
       },
       accounts: {
-        spotify: user.accounts.spotify?.name || void 0,
+//        spotify: user.accounts.spotify?.name || void 0,
         patreon: user.accounts.patreon?.name || void 0,
       },
     }
