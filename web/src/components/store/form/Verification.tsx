@@ -16,7 +16,7 @@ export default function VerificationForm ({ eligibility }: FormProps) {
       <TextField
         label='Store URL'
         name='workUrl'
-        note={'The URL of the work you want to get verified. Must be an https://powercord.dev/store url.'}
+        note={'The URL of the work you want to get verified. Must be an https://replugged.dev/store url.'}
         maxLength={256}
         required
       />

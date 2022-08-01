@@ -8,15 +8,15 @@ import crudModule from './crudLegacy.js'
 
 const DmMessages = {
   publish: {
-    approved: 'Your submission in the Powercord Store has been approved! You should see it appear in the "Management > My works" tab of the Powercord Store shortly, the time it\'ll take Powercord Staff to prepare everything.\n\nIf your submission is a plugin, you will receive an invitation to a repository in the powercord-community organization that will be the new home of your plugin. Make sure to push future updates to this repository!',
-    rejected: 'Unfortunately, your submission in the Powercord Store has been rejected for the following reason: $reason\n\nMake sure your plugin follows the Powercord Guidelines available at <https://powercord.dev/guidelines> and that it is in a functional shape before submitting again.',
+    approved: 'Your submission in the Replugged Store has been approved! You should see it appear in the "Management > My works" tab of the Replugged Store shortly, the time it\'ll take Replugged Staff to prepare everything.\n\nIf your submission is a plugin, you will receive an invitation to a repository in the replugged-community organization that will be the new home of your plugin. Make sure to push future updates to this repository!',
+    rejected: 'Unfortunately, your submission in the Replugged Store has been rejected for the following reason: $reason\n\nMake sure your plugin follows the Replugged Guidelines available at <https://replugged.dev/guidelines> and that it is in a functional shape before submitting again.',
   },
   verification: {
     approved: 'Your verification request has been approved! Your plugin now has the verified tickmark in the Store, and you have unlocked the Verified Developer role in our support server.',
     rejected: 'Unfortunately, we rejected your verification request for the following reason: $reason\n\nWe want verified works to be the best-of-the-best, and we tend to be nitpick-y in our review process. Make sure your work meets the eligibility criteria for verification, and make sure to solve the outlined points before submitting again.',
   },
   hosting: {
-    approved: 'Your request for hosting a backend has been approved. A Powercord Developer will get in touch soon to prepare your backend for hosting on our servers.',
+    approved: 'Your request for hosting a backend has been approved. A Replugged Developer will get in touch soon to prepare your backend for hosting on our servers.',
     rejected: 'Unfortunately, we rejected your request for hosting a backend for the following reason: $reason',
   },
 }
@@ -86,7 +86,7 @@ async function finishFormUpdate (request: FastifyRequest, _reply: FastifyReply, 
 
   const couldDm = await sendDm(
     form.submitter as unknown as string,
-    `Hey $username,\n\n${dmMessage.replace('$reason', form.reviewReason ?? '')}\n\nCheers,\nPowercord Staff`
+    `Hey $username,\n\n${dmMessage.replace('$reason', form.reviewReason ?? '')}\n\nCheers,\nReplugged Staff`
   )
 
   return { couldDm: couldDm }

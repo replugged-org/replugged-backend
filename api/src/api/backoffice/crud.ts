@@ -2,6 +2,8 @@ import type { FastifyInstance, FastifyRequest, FastifyReply, ConfiguredReply, Fa
 import type { Filter } from 'mongodb'
 import { ObjectId } from 'mongodb'
 import { UserFlagKeys, UserFlags } from '../../flags.js'
+import { User } from '../../../../types/users'
+import { GuildBadge } from '../../../../types/guild'
 // import { deleteUser } from '../../data/user.js';
 // import { fetchMember, addRole, removeRole } from '../utils/discord.js'
 
@@ -118,11 +120,16 @@ async function update(this: FastifyInstance, request: FastifyRequest, reply: Rep
   const config = reply.context.config;
   const params = request.params as { id: string }
 
-  const user = await this.mongo.db!.collection(config.entity.collection).findOne({ _id: params.id });
+  const user = await this.mongo.db!.collection<User>(config.entity.collection).findOne({ _id: params.id });
 
   if (!user) return { code: 404, message: 'User does not exist' }
   // const existingFlags = user.flags
   let existingFlags = user.flags
+
+  let mongoData: Partial<User> = {
+    flags: existingFlags,
+    cutiePerks: user?.cutiePerks
+  }
   // todo: add or remove from existing flags.
   existingFlags = toggleFlags(existingFlags, 'DEVELOPER' as UserFlagKeys, data['badges.developer'])
   existingFlags = toggleFlags(existingFlags, 'STAFF' as UserFlagKeys, data['badges.staff'])
@@ -132,8 +139,78 @@ async function update(this: FastifyInstance, request: FastifyRequest, reply: Rep
   existingFlags = toggleFlags(existingFlags, 'EARLY_USER' as UserFlagKeys, data['badges.early'])
   existingFlags = toggleFlags(existingFlags, 'TRANSLATOR' as UserFlagKeys, data['badges.translator'])
 
+  if (data['badges.custom.color'] !== null) {
+    // @ts-ignore
+    mongoData.cutiePerks = {
+      ...mongoData.cutiePerks,
+      color: data['badges.custom.color']
+    }
+  }
 
-  this.mongo.db!.collection(config.entity.collection).updateOne({ _id: params.id }, { $set: { flags: existingFlags } })
+  if (data['badges.custom.icon'] !== null) {
+    // @ts-ignore
+    mongoData.cutiePerks = {
+      ...mongoData.cutiePerks,
+      badge: data['badges.custom.icon'].replace(/#/g, '')
+    }
+
+    if (!data['badges.custom.color'] || !mongoData.cutiePerks?.color) {
+      // @ts-ignore
+      mongoData.cutiePerks = {
+        ...mongoData.cutiePerks,
+        color: '7289da'
+      }
+    }
+  }
+
+  if (data['badges.guild.id'] && data['badges.guild.icon'] && data['badges.guild.name']) {
+    // @ts-ignore
+    mongoData.cutiePerks = {
+      ...mongoData.cutiePerks,
+      guild: {
+        id: data['badges.guild.id']
+      }
+    }
+
+    const existingGuild = await this.mongo.db!.collection('badges').findOne({ userId: params.id })
+
+
+    if (!existingGuild) {
+      this.mongo.db!.collection<GuildBadge>('badges').insertOne({
+        _id: data['badges.guild.id'],
+        userId: params.id,
+        name: data['badges.guild.name'],
+        badge: data['badges.guild.icon']
+      })
+
+    } else {
+      this.mongo.db!.collection<GuildBadge>('badges').updateOne({ userId: params.id }, {
+        $set: {
+          _id: data['badges.guild.id'],
+          name: data['badges.guild.name'],
+          badge: data['badges.guild.icon']
+        }
+      })
+    }
+  }
+
+  if (data['badges.custom.name'] !== null) {
+    // @ts-ignore
+    mongoData.cutiePerks = {
+      ...mongoData.cutiePerks,
+      title: data['badges.custom.name']
+    }
+
+    if (!data['badges.custom.color'] || !mongoData.cutiePerks?.color) {
+      // @ts-ignore
+      mongoData.cutiePerks = {
+        ...mongoData.cutiePerks,
+        color: '7289da'
+      }
+    }
+  }
+
+  this.mongo.db!.collection(config.entity.collection).updateOne({ _id: params.id }, { $set: { ...mongoData } })
 
   // todo
   return { data: 'test' }

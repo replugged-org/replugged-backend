@@ -39,9 +39,9 @@ export default function Branding(_: Attributes) {
         <main>
             <h1>Branding</h1>
             <p>Please keep all assets in their original shape, proportion, orientation and colors. You are not allowed to
-                re-use any asset and/or the Powercord name as a logo and/or name for your own project, or use it to imply our
+                re-use any asset and/or the Replugged name as a logo and/or name for your own project, or use it to imply our
                 endorsement.</p>
-            <p>Powercord is spelled with a capital P and all lowercase letters. It may also be spelled all uppercase.</p>
+            <p>Replugged is spelled with a capital R and all lowercase letters. It may also be spelled all uppercase.</p>
 
             <div className={style.assets}>
                 <Asset

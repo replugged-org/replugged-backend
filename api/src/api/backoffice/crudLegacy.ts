@@ -105,10 +105,9 @@ async function readAll (this: FastifyInstance, request: FastifyRequest<{ Queryst
 
 // @ts-expect-error -- not implemented
 async function create (this: FastifyInstance, request: FastifyRequest<{ Params: RouteParams }>, reply: Reply) {
-  const data = reply.context.config
+ // const data = reply.context.config
   // const opts = typeof data.modules?.create === 'object' ? data.modules.create : {}
 
-  console.log(data)
   return {}
 }
 

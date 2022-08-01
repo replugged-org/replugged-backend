@@ -59,7 +59,7 @@ export default function Contributors(_: Attributes) {
             <div className={style.wrapper}>
                 {contributors.developers.map((user) => <Contributor key={user._id} user={user} />)}
             </div>
-            <h2 className={style.section}>Powercord Staff &amp; Support</h2>
+            <h2 className={style.section}>Replugged Staff &amp; Support</h2>
             <div className={style.wrapper}>
                 {contributors.staff.map((user) => <Contributor key={user._id} user={user} />)}
             </div>

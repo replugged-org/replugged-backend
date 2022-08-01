@@ -35,21 +35,21 @@ export function formatUser(user: User, includePrivate?: boolean): RestUser
 export function formatUser(user: User, includePrivate?: true, allFlags?: boolean): RestUserPrivate
 export function formatUser(user: User, includePrivate?: boolean, allFlags?: boolean): RestUser | RestUserPrivate {
   const perks: CutiePerks = {
-    color: null,
-    badge: null,
-    title: null,
+    color: user?.cutiePerks?.color || null,
+    badge: user?.cutiePerks?.badge || null,
+    title: user?.cutiePerks?.title || null,
   }
 
   if (user.flags & UserFlags.HAS_DONATED) {
-    perks.title = 'Former Powercord Cutie'
+    perks.title = 'Former Replugged Cutie'
     perks.badge = 'default'
   }
 
   if (user.flags & UserFlags.IS_CUTIE) {
     perks.color = user.cutiePerks?.color || null
-    perks.title = 'Powercord Cutie'
+    perks.title = 'Replugged Cutie'
 
-    if ((user.cutieStatus?.pledgeTier ?? 1) >= 2) {
+    if ((user.cutieStatus?.pledgeTier ?? 1) >= 2 || user.flags & UserFlags.CUTIE_OVERRIDE) {
       perks.title = user.cutiePerks?.title || perks.title
       perks.badge = user.cutiePerks?.badge || perks.badge
     }
@@ -60,6 +60,7 @@ export function formatUser(user: User, includePrivate?: boolean, allFlags?: bool
     _id: user._id,
     flags: user.flags & ~PrivateUserFlags,
     cutiePerks: perks,
+    patronTier: user?.cutieStatus?.pledgeTier ?? 0,
     badges: {
       developer: (user.flags & (UserFlags.DEVELOPER)) !== 0,
       staff: (user.flags & (UserFlags.STAFF)) !== 0,
@@ -68,7 +69,12 @@ export function formatUser(user: User, includePrivate?: boolean, allFlags?: bool
       translator: (user.flags & (UserFlags.TRANSLATOR)) !== 0,
       hunter: (user.flags & (UserFlags.BUG_HUNTER)) !== 0,
       early: (user.flags & (UserFlags.EARLY_USER)) !== 0,
-      booster: (user.flags & (UserFlags.SERVER_BOOSTER)) !== 0
+      booster: (user.flags & (UserFlags.SERVER_BOOSTER)) !== 0,
+      custom: {
+        name: perks.title,
+        icon: perks.badge,
+        color: perks.color
+      } // this will be phased out soon:tm:
     }
   }
 

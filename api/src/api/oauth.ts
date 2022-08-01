@@ -142,13 +142,13 @@ async function callback(this: FastifyInstance, request: FastifyRequest<CallbackR
     const member = await fetchMember(user._id)
     if (member) {
       if (!member?.roles.includes(config.discord.roles.user)) {
-        addRole(user._id, config.discord.roles.user, 'User created their powercord.dev account').catch(() => 0)
+        addRole(user._id, config.discord.roles.user, 'User created their replugged.dev account').catch(() => 0)
       }
     }
 
     if (user.createdAt === date) {
       // New account
-      addRole(user._id, config.discord.roles.user, 'User created their powercord.dev account').catch(() => 0)
+      addRole(user._id, config.discord.roles.user, 'User created their replugged.dev account').catch(() => 0)
     }
 
     const token = reply.generateToken({ id: user._id }, TokenType.WEB)

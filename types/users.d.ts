@@ -18,7 +18,10 @@ export type CutieStatus = {
 export type CutiePerks = {
   color: string | null
   badge: string | null
-  title: string | null
+  title: string | null,
+  guild?: {
+    id: string | null
+  }
 }
 
 
@@ -58,13 +61,23 @@ export type RestUser = {
   _id: User['_id']
   flags: User['flags']
   cutiePerks: Exclude<User['cutiePerks'], undefined>
+  patronTier: number
+  badges: {
+    developer: boolean
+    staff: boolean
+    support: boolean
+    contributor: boolean
+    hunter: boolean
+    early: boolean
+    translator: boolean
+  }
 }
 
 export type RestUserPrivate = RestUser & {
   username: User['username']
   discriminator: User['discriminator']
   avatar: User['avatar']
-  cutieStatus: CutieStatus
+  cutieStatus: CutieStatus,
   accounts: {
     spotify?: string
     patreon?: string

@@ -97,7 +97,7 @@ function Sidebar () {
 }
 
 export default function Admin () {
-  useTitleTemplate('Powercord Admin')
+  useTitleTemplate('Replugged Admin')
 
   return (
     <LayoutWithSidebar>

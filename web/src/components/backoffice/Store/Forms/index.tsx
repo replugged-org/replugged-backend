@@ -111,7 +111,7 @@ function ReviewButtons({ form, canViewDiscussions }: FormProps) {
     return (
         <Fragment>
             <div className={sharedStyle.buttons}>
-                <Tooltip text={'Can\'t connect to Powercord'} disabled={canViewDiscussions}>
+                <Tooltip text={'Can\'t connect to Replugged'} disabled={canViewDiscussions}>
                     <button className={sharedStyle.button} disabled={!canViewDiscussions}>
                         {/* @ts-ignore */}
                         <ExternalLink className={sharedStyle.icon} />
@@ -143,7 +143,7 @@ function ReviewButtons({ form, canViewDiscussions }: FormProps) {
             {action === 3 && (
                 <Modal title='Could not DM the user' onClose={closeModals}>
                     <div>
-                        Failed to send a DM to the user, they either are not in the Powercord server or have their DMs closed.
+                        Failed to send a DM to the user, they either are not in the Replugged server or have their DMs closed.
                         You need to contact them manually.
                     </div>
                     <ul>

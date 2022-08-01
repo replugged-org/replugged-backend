@@ -13,7 +13,7 @@ import Tabs from '../../util/Tabs'
 type ManageModalProps = { user: RestAdminUser, onClose: () => void }
 type FormChunkProps = { user: RestAdminUser, formRef: Ref<HTMLFormElement> }
 
-function FormProperties ({ user, formRef, ...props }: FormChunkProps) {
+function FormProperties({ user, formRef, ...props }: FormChunkProps) {
   return (
     <form ref={formRef} onSubmit={(e) => e.preventDefault()} {...props}>
       <div className={style.form2}>
@@ -68,30 +68,32 @@ function FormProperties ({ user, formRef, ...props }: FormChunkProps) {
   )
 }
 
-function FormPerks ({ user, formRef, ...props }: FormChunkProps) {
+function FormPerks({ user, formRef, ...props }: FormChunkProps) {
   return (
     <form ref={formRef} onSubmit={(e) => e.preventDefault()} {...props}>
       <TextField
         name='color'
         label='Badges color'
         note='Hex code without the #. Defaults to blurple.'
-        value={user.badges?.custom?.color ?? ''}
+        value={user?.cutiePerks?.color ?? ''}
       />
       <TextField
         name='icon'
         label='Custom Badge'
-        value={user.badges?.custom?.icon ?? ''}
+        value={user?.cutiePerks?.badge ?? ''}
+        preview={user?.cutiePerks?.badge ? <img src={user.cutiePerks.badge ?? ''} /> : null}
       />
       <TextField
         name='tooltip'
         label='Custom Badge Tooltip'
-        value={user.badges?.custom?.name ?? ''}
+        value={user?.cutiePerks?.title ?? ''}
       />
     </form>
   )
 }
 
-function FormGuildBadge ({ user, formRef, ...props }: FormChunkProps) {
+function FormGuildBadge({ user, formRef, ...props }: FormChunkProps) {
+  // fetch guild here
   return (
     <form ref={formRef} onSubmit={(e) => e.preventDefault()} {...props}>
       <TextField
@@ -113,8 +115,8 @@ function FormGuildBadge ({ user, formRef, ...props }: FormChunkProps) {
   )
 }
 
-export function ManageEdit ({ user, onClose }: ManageModalProps) {
-  const [ processing, setProcessing ] = useState(false)
+export function ManageEdit({ user, onClose }: ManageModalProps) {
+  const [processing, setProcessing] = useState(false)
   const formPropertiesRef = useRef<HTMLFormElement>(null)
   const formPerksRef = useRef<HTMLFormElement>(null)
   const formGuildPerksRef = useRef<HTMLFormElement>(null)
@@ -164,21 +166,21 @@ export function ManageEdit ({ user, onClose }: ManageModalProps) {
     >
       <Tabs>
         <div data-tab-id='PROPERTIES' data-tab-name='Manage'>
-          <FormProperties user={user} formRef={formPropertiesRef}/>
+          <FormProperties user={user} formRef={formPropertiesRef} />
         </div>
         <div data-tab-id='PERKS' data-tab-name='Perks'>
-          <FormPerks user={user} formRef={formPerksRef}/>
+          <FormPerks user={user} formRef={formPerksRef} />
         </div>
         <div data-tab-id='GUILD' data-tab-name='Guild badge'>
-          <FormGuildBadge user={user} formRef={formGuildPerksRef}/>
+          <FormGuildBadge user={user} formRef={formGuildPerksRef} />
         </div>
       </Tabs>
     </Modal>
   )
 }
 
-export function ManageModeration ({ user, onClose }: ManageModalProps) {
-  const [ processing, setProcessing ] = useState(false)
+export function ManageModeration({ user, onClose }: ManageModalProps) {
+  const [processing, setProcessing] = useState(false)
   const formRef = useRef<HTMLFormElement>(null)
   const onApply = useCallback((e?: Event) => {
     if (e) e.preventDefault()
@@ -239,13 +241,13 @@ export function ManageModeration ({ user, onClose }: ManageModalProps) {
         <CheckboxField
           name='sync'
           label='Setting sync'
-          note='Forbids the user from using the Settings Sync feature on powercord.dev.'
+          note='Forbids the user from using the Settings Sync feature on replugged.dev.'
           value={user.banStatus?.sync}
         />
         <CheckboxField
           name='events'
           label='Community events'
-          note='Forbids the user from participating in Powercord-organized events.'
+          note='Forbids the user from participating in Replugged-organized events.'
           value={user.banStatus?.events}
         />
       </form>
@@ -253,8 +255,8 @@ export function ManageModeration ({ user, onClose }: ManageModalProps) {
   )
 }
 
-export function ManageDelete ({ user, onClose }: ManageModalProps) {
-  const [ processing, setProcessing ] = useState(false)
+export function ManageDelete({ user, onClose }: ManageModalProps) {
+  const [processing, setProcessing] = useState(false)
   const formRef = useRef<HTMLFormElement>(null)
   const onYeet = useCallback(() => {
     setProcessing(true)
@@ -275,12 +277,12 @@ export function ManageDelete ({ user, onClose }: ManageModalProps) {
   return (
     <Modal title='Delete an account' onClose={onClose} onConfirm={onYeet} confirmText='Yeet' processing={processing} color='red'>
       <div>Are you sure you want to delete {user.username}'s account? <b>This action is irreversible</b>!</div>
-      <hr/>
+      <hr />
       <form ref={formRef}>
         <CheckboxField
           name='ban'
           label='Ban the user as well'
-          note='The user will not be able to create a new Powercord account with this Discord account.'
+          note='The user will not be able to create a new Replugged account with this Discord account.'
           value={user.banStatus?.account}
         />
       </form>

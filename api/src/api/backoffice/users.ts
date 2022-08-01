@@ -1,6 +1,6 @@
 import type { FastifyInstance, FastifyRequest, FastifyReply } from 'fastify'
 import { UserFlags } from '../../flags.js'
-import newCrudModule from './crud.js'
+import crudModule from './crud.js'
 import { deleteUser, formatUser, UserDeletionCause } from '../../data/user.js'
 
 
@@ -23,7 +23,7 @@ export default async function (fastify: FastifyInstance): Promise<void> {
   // Main routes
 
   // @ts-ignore
-  fastify.register(newCrudModule, {
+  fastify.register(crudModule, {
     data: {
       entity: {
         collection: 'users',

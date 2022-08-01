@@ -109,7 +109,7 @@ function PerksEdit({ onReturn }: { onReturn: () => void }) {
     const originalCutiePerks = useMemo(() => ({
         color: user.cutiePerks.color || '',
         badge: user.cutiePerks.badge === 'default' ? '' : user.cutiePerks.badge || '',
-        title: user.cutiePerks.title === 'Powercord Cutie' ? '' : user.cutiePerks.title || '',
+        title: user.cutiePerks.title === 'Replugged Cutie' ? '' : user.cutiePerks.title || '',
     }), [])
 
     const cutiePerks = useMemo(() => ({ ...originalCutiePerks }), [])
@@ -119,7 +119,7 @@ function PerksEdit({ onReturn }: { onReturn: () => void }) {
         // Memoize new values
         cutiePerks.color = data.get('color') as string || ''
         cutiePerks.badge = data.get('badge') as string || ''
-        cutiePerks.title = data.get('title') as string || 'Powercord Cutie'
+        cutiePerks.title = data.get('title') as string || 'Replugged Cutie'
 
         if (originalCutiePerks.color === cutiePerks.color && originalCutiePerks.badge === cutiePerks.badge && originalCutiePerks.title === cutiePerks.title) {
             onReturn()
@@ -164,7 +164,7 @@ function PerksEdit({ onReturn }: { onReturn: () => void }) {
             <TextField
                 name='color'
                 label='Badge Color'
-                note={'Color of your Powercord badges, in hex (without the #). Has no effect if you use a custom icon and you don\'t have other badges. Leave blank for default blurple.'}
+                note={'Color of your Replugged badges, in hex (without the #). Has no effect if you use a custom icon and you don\'t have other badges. Leave blank for default blurple.'}
                 value={cutiePerks.color}
             />
             {user.cutieStatus.pledgeTier > 1 && (
@@ -183,7 +183,7 @@ function PerksEdit({ onReturn }: { onReturn: () => void }) {
                     />
 
                     <div className={style.perksManagementNotice}>
-                        <span>You are not allowed to use any official Discord badge, nor Powercord's. Badge updates are monitored and inappropriate ones will be reset. Repeated offenders may see their access to Powercord Cutie perks revoked.</span>
+                        <span>You are not allowed to use any official Discord badge, nor Replugged's. Badge updates are monitored and inappropriate ones will be reset. Repeated offenders may see their access to Replugged Cutie perks revoked.</span>
                     </div>
                 </Fragment>
             )}
@@ -231,7 +231,7 @@ export default function Account() {
                         platform='patreon'
                         icon={Patreon}
                         account={user.accounts.patreon}
-                        explainer={'Link your Patreon account to benefit from the Powercord Cutie perks, and manage them from here. If you pledged but don\'t see your perks, use the refresh button.'}
+                        explainer={'Link your Patreon account to benefit from the Replugged Cutie perks, and manage them from here. If you pledged but don\'t see your perks, use the refresh button.'}
                         refreshEndpoint={Endpoints.USER_REFRESH_PLEDGE}
                     />
                     <hr className={style.separator} />

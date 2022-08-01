@@ -34,7 +34,7 @@ function ProfileBadges({ flags, cutiePerks }: ProfileBadgesProps) {
     return (
         <div className={style.badges} style={{ color: `#${cutiePerks.color || '7289da'}` }}>
 
-            <Tooltip text={cutiePerks.title ?? 'Powercord Cutie'} align='center'>
+            <Tooltip text={cutiePerks.title ?? 'Replugged Cutie'} align='center'>
                 {cutiePerks.badge && cutiePerks.badge !== 'default'
                     ? <img src={cutiePerks.badge} className={style.badge} />
                     // @ts-ignore

@@ -1,7 +1,8 @@
 import {
     type Attributes,
     type ComponentChild,
-    h
+    h,
+    ComponentChildren
 } from 'preact';
 import {
     useState,
@@ -35,7 +36,13 @@ type BaseFieldProps = Attributes & {
     rk?: number // [Cynthia] this is used to force re-render of form fields, to help with errors sometimes not showing up
 }
 
-type TextFieldProps = BaseFieldProps & { value?: string, minLength?: number, maxLength?: number, placeholder?: string }
+type TextFieldProps = BaseFieldProps & {
+    value?: string,
+    minLength?: number,
+    maxLength?: number,
+    placeholder?: string,
+    preview?: ComponentChildren
+}
 type CheckboxFieldProps = BaseFieldProps & { value?: boolean }
 type SelectFieldProps = BaseFieldProps & { value?: string, options: Array<{ id: string, name: string }> }
 
@@ -104,6 +111,7 @@ export function TextField(props: TextFieldProps) {
     return (
         <BaseField {...field} label={props.label} required={props.required} id={field.id}>
             {inputElement}
+            {props.preview ? props.preview : null}
         </BaseField>
     )
 }
