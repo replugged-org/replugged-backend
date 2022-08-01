@@ -9,11 +9,23 @@ export type EligibilityStatus = {
   reporting: Eligibility,
 }
 
-type PendingForm = { reviewed?: false, approved?: boolean, reviewer?: null, reviewReason?: null, submitter: MinimalUser }
-type ReviewedForm = { reviewed: true, approved: boolean, reviewer: MinimalUser, reviewReason?: string, submitter?: MinimalUser }
+type PendingForm = { 
+  reviewed?: false, 
+  approved?: boolean, 
+  reviewer?: null, 
+  reviewReason?: null, 
+  submitter: string 
+}
+type ReviewedForm = { 
+  reviewed: true, 
+  approved: boolean, 
+  reviewer: MinimalUser, 
+  reviewReason?: string, 
+  submitter?: string 
+}
 
 export type Form = (PendingForm | ReviewedForm) & {
-  id: string
+  _id: string
   kind: 'publish' | 'verification' | 'hosting'
   messageId: string
 }

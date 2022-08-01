@@ -2,9 +2,9 @@ import type { User } from '../../../../types/users'
 import type { StoreForm } from '../../../../types/store'
 import type { FastifyInstance, FastifyRequest, FastifyReply } from 'fastify'
 import config from '../../config.js'
-import { UserFlags } from '../../flags.js'
 import { dispatchHonk, editHonkMessage, fetchHonkMessage, sendDm } from '../../utils/discord.js'
-import crudModule from './crudLegacy.js'
+import crudModule from './crud.js'
+import { UserFlags } from '../../flags.js'
 
 const DmMessages = {
   publish: {
@@ -21,135 +21,200 @@ const DmMessages = {
   },
 }
 
-const updateFormSchema = {
-  body: {
-    required: [ 'reviewed', 'approved', 'reviewer' ],
-    type: 'object',
-    additionalProperties: false,
-    properties: {
-      reviewed: { type: 'boolean' },
-      approved: { type: 'boolean' },
-      reviewer: { type: 'string', pattern: '^\\d{16,}$' },
-      reviewReason: { type: 'string', minLength: 8, maxLength: 256 },
-    },
-    if: { properties: { approved: { const: false } } },
-    then: { required: [ 'reviewReason' ] },
-  },
-}
+// const updateFormSchema = {
+//   body: {
+//     required: [ 'reviewed', 'approved', 'reviewer' ],
+//     type: 'object',
+//     additionalProperties: false,
+//     properties: {
+//       reviewed: { type: 'boolean' },
+//       approved: { type: 'boolean' },
+//       reviewer: { type: 'string', pattern: '^\\d{16,}$' },
+//       reviewReason: { type: 'string', minLength: 8, maxLength: 256 },
+//     },
+//     if: { properties: { approved: { const: false } } },
+//     then: { required: [ 'reviewReason' ] },
+//   },
+// }
 
-const formsAggregation = [
-  { $lookup: { from: 'users', localField: 'submitter', foreignField: '_id', as: 'submitter' } },
-  { $lookup: { from: 'users', localField: 'reviewer', foreignField: '_id', as: 'reviewer' } },
-  { $unwind: { path: '$submitter', preserveNullAndEmptyArrays: true } },
-  { $unwind: { path: '$reviewer', preserveNullAndEmptyArrays: true } },
-  { $set: { 'submitter.id': '$submitter._id' } },
-  { $unset: 'submitter._id' },
-]
+// const formsAggregation = [
+//   { $lookup: { from: 'users', localField: 'submitter', foreignField: '_id', as: 'submitter' } },
+//   { $lookup: { from: 'users', localField: 'reviewer', foreignField: '_id', as: 'reviewer' } },
+//   { $unwind: { path: '$submitter', preserveNullAndEmptyArrays: true } },
+//   { $unwind: { path: '$reviewer', preserveNullAndEmptyArrays: true } },
+//   { $set: { 'submitter.id': '$submitter._id' } },
+//   { $unset: 'submitter._id' },
+// ]
 
-const formsProjection: Record<string, 0 | 1> = {
-  complianceLegal: 0,
-  complianceGuidelines: 0,
-  complianceSecurity: 0,
-  compliancePrivacy: 0,
-  complianceCute: 0,
-  'submitter.accounts': 0,
-  'submitter.badges': 0,
-  'submitter.createdAt': 0,
-  'submitter.updatedAt': 0,
-  'submitter.patronTier': 0,
-  'reviewer.accounts': 0,
-  'reviewer.badges': 0,
-  'reviewer.createdAt': 0,
-  'reviewer.updatedAt': 0,
-  'reviewer.patronTier': 0,
-}
+// const formsProjection: Record<string, 0 | 1> = {
+//   complianceLegal: 0,
+//   complianceGuidelines: 0,
+//   complianceSecurity: 0,
+//   compliancePrivacy: 0,
+//   complianceCute: 0,
+//   'submitter.accounts': 0,
+//   'submitter.badges': 0,
+//   'submitter.createdAt': 0,
+//   'submitter.updatedAt': 0,
+//   'submitter.patronTier': 0,
+//   'reviewer.accounts': 0,
+//   'reviewer.badges': 0,
+//   'reviewer.createdAt': 0,
+//   'reviewer.updatedAt': 0,
+//   'reviewer.patronTier': 0,
+// }
 
 const pendingFormQuery = { $or: [ { reviewed: { $exists: false } }, { reviewed: { $eq: false } } ] }
 
-async function finishFormUpdate (request: FastifyRequest, _reply: FastifyReply, form: StoreForm) {
-  const user = request.user as User
-  const message = await fetchHonkMessage(config.honks.formsChannel, form.messageId)
+// async function finishFormUpdate (request: FastifyRequest, _reply: FastifyReply, form: StoreForm) {
+//   const user = request.user as User
+//   const message = await fetchHonkMessage(config.honks.formsChannel, form.messageId)
+
+//   const modMessage = form.approved
+//     ? `Form **approved** by ${user.username}#${user.discriminator}`
+//     : `Form **rejected** by ${user.username}#${user.discriminator} for the following reason: ${form.reviewReason}`
+
+//   const dmMessage = form.approved
+//     ? DmMessages[form.kind].approved
+//     : DmMessages[form.kind].rejected
+
+//   if (message.thread) {
+//     await dispatchHonk(config.honks.formsChannel, { content: modMessage }, `thread_id=${message.thread.id}`)
+//   } else {
+//     await editHonkMessage(config.honks.formsChannel, message.id, { content: `${message.content}\n\n${modMessage}` })
+//   }
+
+//   const couldDm = await sendDm(
+//     form.submitter as unknown as string,
+//     `Hey $username,\n\n${dmMessage.replace('$reason', form.reviewReason ?? '')}\n\nCheers,\nReplugged Staff`
+//   )
+
+//   return { couldDm: couldDm }
+// }
+
+// async function getFormCount (this: FastifyInstance) {
+//   const res: Record<string, number> = {
+//     verification: 0,
+//     publish: 0,
+//     hosting: 0,
+//     reports: 0,
+//   }
+
+//   const forms = await this.mongo.db!.collection('forms').aggregate([
+//     { $match: pendingFormQuery },
+//     { $group: { _id: '$kind', count: { $sum: 1 } } },
+//   ]).toArray()
+//   for (const form of forms) res[form._id] = form.count
+
+//   return res
+// }
+
+// export default async function (fastify: FastifyInstance): Promise<void> {
+//   fastify.register(crudModule, {
+//     data: {
+//       auth: { permissions: UserFlags.STAFF },
+//       collection: 'forms',
+//       projection: formsProjection,
+//       modules: {
+//         readAll: { filter: [ 'kind' ], all: true },
+//         read: false,
+//         create: false,
+//         update: {
+//           post: finishFormUpdate,
+//           schema: updateFormSchema,
+//         },
+//       },
+//     },
+//   })
+
+//   fastify.register(crudModule, {
+//     prefix: '/reviewed',
+//     data: {
+//       auth: { permissions: UserFlags.STAFF },
+//       collection: 'forms',
+//       projection: formsProjection,
+//       aggregation: [
+//         { $match: { reviewed: true } },
+//         ...formsAggregation,
+//       ],
+//       modules: {
+//         readAll: { filter: [ 'kind' ] },
+//         create: false,
+//         update: {
+//           post: finishFormUpdate,
+//           schema: updateFormSchema,
+//         },
+//       },
+//     },
+//   })
+
+//   fastify.get('/count', getFormCount)
+// }
+
+async function finishFormUpdate(request: FastifyRequest, _reply: FastifyReply, form: StoreForm) {
+  const user = request.user as User;
+  const message = await fetchHonkMessage(config.honks.formsChannel, form.messageId);
 
   const modMessage = form.approved
     ? `Form **approved** by ${user.username}#${user.discriminator}`
     : `Form **rejected** by ${user.username}#${user.discriminator} for the following reason: ${form.reviewReason}`
 
-  const dmMessage = form.approved
-    ? DmMessages[form.kind].approved
-    : DmMessages[form.kind].rejected
+    const dmMessage = form.approved
+      ? DmMessages[form.kind].approved
+      : DmMessages[form.kind].rejected
 
-  if (message.thread) {
-    await dispatchHonk(config.honks.formsChannel, { content: modMessage }, `thread_id=${message.thread.id}`)
-  } else {
-    await editHonkMessage(config.honks.formsChannel, message.id, { content: `${message.content}\n\n${modMessage}` })
-  }
+    if(message.thread) {
+      await dispatchHonk(config.honks.formsChannel, {content: modMessage}, `thread_id=${message.thread.id}`)
+    } else {
+      await editHonkMessage(config.honks.formsChannel, message.id, {content: `${message.content}\n\n${modMessage}`})
+    }
 
-  const couldDm = await sendDm(
-    form.submitter as unknown as string,
-    `Hey $username,\n\n${dmMessage.replace('$reason', form.reviewReason ?? '')}\n\nCheers,\nReplugged Staff`
-  )
+    const couldDm = await sendDm(
+      form.submitter as unknown as string,
+      `Hey $username, \n\n${dmMessage.replace(/$reason/g, form.reviewReason ?? '')}\n\nCheers, \nReplugged Staff`
+    )
 
-  return { couldDm: couldDm }
+    return { couldDm }
 }
-
-async function getFormCount (this: FastifyInstance) {
+// @ts-ignore
+async function getFormCount(this: FastifyInstance) {
   const res: Record<string, number> = {
     verification: 0,
     publish: 0,
     hosting: 0,
-    reports: 0,
+    reports: 0
   }
 
   const forms = await this.mongo.db!.collection('forms').aggregate([
     { $match: pendingFormQuery },
-    { $group: { _id: '$kind', count: { $sum: 1 } } },
+    { $group: { _id: '$kind', count: { $sum: 1 }}}
   ]).toArray()
-  for (const form of forms) res[form._id] = form.count
 
-  return res
+  for(const form of forms) res[form._id] = form.count;
+
+  return res;
 }
 
-export default async function (fastify: FastifyInstance): Promise<void> {
+export default async function(fastify: FastifyInstance): Promise<void> {
+  // @ts-ignore
   fastify.register(crudModule, {
     data: {
-      auth: { permissions: UserFlags.STAFF },
-      collection: 'forms',
-      projection: formsProjection,
-      aggregation: [
-        { $match: pendingFormQuery },
-        ...formsAggregation,
-      ],
-      modules: {
-        readAll: { filter: [ 'kind' ], all: true },
-        read: false,
-        create: false,
-        update: {
-          post: finishFormUpdate,
-          schema: updateFormSchema,
-        },
+      entity: {
+        collection: 'forms',
+        stringId: true,
       },
-    },
-  })
-
-  fastify.register(crudModule, {
-    prefix: '/reviewed',
-    data: {
-      auth: { permissions: UserFlags.STAFF },
-      collection: 'forms',
-      projection: formsProjection,
-      aggregation: [
-        { $match: { reviewed: true } },
-        ...formsAggregation,
-      ],
-      modules: {
-        readAll: { filter: [ 'kind' ] },
-        create: false,
-        update: {
-          post: finishFormUpdate,
-          schema: updateFormSchema,
-        },
+      read: {
+        enabled: true,
+        allowAll: true,
+        auth: { permissions: UserFlags.STAFF }
       },
-    },
+      create: {enabled: false},
+      update: {
+        enabled: true,
+        executor: finishFormUpdate
+      },
+      delete: {enabled: true}
+    }
   })
 
   fastify.get('/count', getFormCount)

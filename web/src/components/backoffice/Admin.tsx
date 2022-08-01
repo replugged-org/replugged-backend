@@ -126,9 +126,8 @@ export default function Admin () {
           <div>threats</div>
         </SoonRoute>
 
-        <SoonRoute path={Routes.BACKOFFICE_STORE_FORMS}>
-          <Forms path={Routes.BACKOFFICE_STORE_FORMS}/>
-        </SoonRoute>
+        <Forms path={Routes.BACKOFFICE_STORE_FORMS}/>
+        
         <SoonRoute path={Routes.BACKOFFICE_STORE_REPORTS}>
           <div>reports</div>
         </SoonRoute>

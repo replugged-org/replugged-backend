@@ -83,6 +83,7 @@ export default async function (fastify: FastifyInstance): Promise<void> {
   for (const cat of await readdir(docsUrl)) {
     if (cat === 'LICENSE' || cat === 'README.md' || cat === '.git' || cat === '.DS_Store') continue
 
+    
     const catId = cat.replace(/^\d+-/, '')
     const docs = new Map<string, Document>()
     const catUrl = new URL(`${cat}/`, docsUrl)

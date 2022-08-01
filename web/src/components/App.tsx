@@ -66,9 +66,7 @@ export default function App(props: AppProps) {
           <Stats path={Routes.STATS} />
           <Branding path={Routes.BRANDING} />
 
-          <SoonRoute path={`${Routes.STORE}/:path*`}>
-            <Storefront path={`${Routes.STORE}/:path*`} />
-          </SoonRoute>
+          <Storefront path={`${Routes.STORE}/:path*`} />
 
           <SoonRoute path={Routes.DOCS_ITEM(':categoryId?', ':documentId?')}>
             <Documentation path={Routes.DOCS_ITEM(':categoryId?', ':documentId?')} />

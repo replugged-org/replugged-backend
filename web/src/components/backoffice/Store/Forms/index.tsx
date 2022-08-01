@@ -17,6 +17,7 @@ import X from 'feather-icons/dist/icons/x.svg'
 import style from '../../admin.module.css'
 import sharedStyle from '../../../shared.module.css'
 import UserContext from '../../../UserContext'
+import { RestUser } from '../../../../../../types/users'
 
 type FormProps = {
     form: StoreForm
@@ -88,8 +89,16 @@ function ReviewButtons({ form, canViewDiscussions }: FormProps) {
     const closeModals = useCallback(() => setAction(0), [setAction])
     const approveForm = useCallback(() => setAction(1), [setAction])
     const rejectForm = useCallback(() => setAction(2), [setAction])
+
+    const [formUser, setUser] = useState<any | null>(null)
+    useEffect(() => {
+        fetch(Endpoints.BACKOFFICE_USER(form.submitter!))
+            .then((r) => r.json())
+            .then((u) => setUser(u))
+    }, [])
+
     const reviewForm = useCallback(async (reason: string) => {
-        const resp = await fetch(Endpoints.BACKOFFICE_FORM(form.id), {
+        const resp = await fetch(Endpoints.BACKOFFICE_FORM(form._id), {
             method: 'PATCH',
             headers: { 'content-type': 'application/json' },
             body: JSON.stringify({
@@ -102,6 +111,7 @@ function ReviewButtons({ form, canViewDiscussions }: FormProps) {
 
         if (resp.status === 200) {
             const res = await resp.json()
+            console.log(res);
             setAction(res.couldDm ? 0 : 3)
         }
 
@@ -147,8 +157,8 @@ function ReviewButtons({ form, canViewDiscussions }: FormProps) {
                         You need to contact them manually.
                     </div>
                     <ul>
-                        <li>Discord ID: {form.submitter!._id}</li>
-                        <li>Discord Tag: {form.submitter!.username}#{form.submitter!.discriminator}</li>
+                        <li>Discord ID: {form.submitter}</li>
+                        <li>Discord Tag: {formUser.username}#{formUser.discriminator}</li>
                     </ul>
                 </Modal>
             )}
@@ -170,12 +180,20 @@ function Form({ form, canViewDiscussions }: FormProps) {
             break
     }
 
+    const [user, setUser] = useState<any | null>(null)
+    useEffect(() => {
+        fetch(Endpoints.BACKOFFICE_USER(form.submitter!))
+            .then((r) => r.json())
+            .then((u) => setUser(u))
+    }, [])
+
+
     return (
         <section className={style.section}>
             <header className={style.sectionHeader}>
                 <span className={style.sectionTitle}>{form.kind[0].toUpperCase()}{form.kind.slice(1)} form</span>
                 <span className={style.sectionSubtitle}>
-                    Submitted by {form.submitter ? <>{form.submitter.username}#{form.submitter.discriminator}</> : 'Deleted User'}
+                    Submitted by {user ? <>{user.username}#{user.discriminator}</> : 'Deleted User'}
                 </span>
             </header>
             <div className={style.sectionBody}>
@@ -184,7 +202,7 @@ function Form({ form, canViewDiscussions }: FormProps) {
                 <ReviewButtons form={form} canViewDiscussions={canViewDiscussions} />
             </div>
             <footer className={style.sectionFooter}>
-                Form ID: {form.id}
+                Form ID: {form._id}
             </footer>
         </section>
     )
@@ -195,8 +213,10 @@ export default function ManageForms(_: Attributes) {
     useEffect(() => {
         fetch(Endpoints.BACKOFFICE_FORMS)
             .then((r) => r.json())
-            .then((f) => setForms(f))
+            .then((f) => setForms(f.data))
     }, [])
+
+    console.log(forms);
 
     return (
         <main>
@@ -205,7 +225,7 @@ export default function ManageForms(_: Attributes) {
             {forms
                 ? !forms.length
                     ? <div>All clear!</div>
-                    : forms.map((f) => <Form key={f.id} form={f} canViewDiscussions={false} />)
+                    : forms.map((f) => <Form key={f._id} form={f} canViewDiscussions={false} />)
                 : <Spinner />}
         </main>
     )

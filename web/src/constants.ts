@@ -2,6 +2,7 @@ export const Endpoints = {
     LOGIN: '/api/v1/login',
     LOGOUT: '/api/v1/logout',
     USER_SELF: '/api/v1/users/@me',
+    FETCH_USER: (id: string) => `/api/v1/users/${id}`,
     USER_REFRESH_PLEDGE: '/api/v1/users/@me/refresh-pledge',
     LINK_ACCOUNT: (platform: string) => `/api/v1/oauth/${platform}`,
     UNLINK_ACCOUNT: (platform: string) => `/api/v1/oauth/${platform}/unlink`,

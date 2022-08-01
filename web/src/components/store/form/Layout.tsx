@@ -21,6 +21,7 @@ function Intro ({ id, onNext }: { id: string, onNext: () => void }) {
   const isLoggedIn = Boolean(useContext(UserContext))
   const path = typeof location !== 'undefined' ? location.pathname : ''
 
+
   return (
     <MarkdownDocument document={`store/${id}`} notFoundClassName={style.notfound}>
       <h2>Ready?</h2>

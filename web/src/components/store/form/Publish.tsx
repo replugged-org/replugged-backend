@@ -1,6 +1,6 @@
 import type { Attributes } from 'preact'
 import type { Eligibility } from '../../../../../types/store'
-import { h, Fragment } from 'preact'
+import { h } from 'preact'
 import { useTitle } from 'hoofd/preact'
 
 import FormLayout from './Layout'

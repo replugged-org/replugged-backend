@@ -105,7 +105,7 @@ type UpdateData = {
   'badges.guild.name': string | null
 }
 
-function toggleFlags(existingFlags: number, flag: UserFlagKeys, setTo: Boolean) {
+export function toggleFlags(existingFlags: number, flag: UserFlagKeys, setTo: Boolean) {
   if ((existingFlags & UserFlags[flag]) !== 0 && setTo === false) {
     existingFlags ^= UserFlags[flag]
   } else if ((existingFlags & UserFlags[flag]) === 0 && setTo === true) {
@@ -122,6 +122,7 @@ async function update(this: FastifyInstance, request: FastifyRequest, reply: Rep
 
   const user = await this.mongo.db!.collection<User>(config.entity.collection).findOne({ _id: params.id });
 
+  
   if (!user) return { code: 404, message: 'User does not exist' }
   // const existingFlags = user.flags
   let existingFlags = user.flags

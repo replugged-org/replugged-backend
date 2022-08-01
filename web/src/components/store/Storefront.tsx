@@ -39,7 +39,7 @@ function useEligibility () {
     if (!eligibility) {
       fetch(Endpoints.STORE_FORM_ELIGIBILITY).then((res) => {
         if (res.status !== 200) {
-          setEligibility({ publish: 1, verification: 1, hosting: 1, reporting: 1 })
+          setEligibility({ publish: 0, verification: 1, hosting: 1, reporting: 1 })
           return
         }
 
@@ -77,7 +77,7 @@ function Sidebar () {
       <h1>Replugged Store</h1>
       <Item icon={Plugin} label='Plugins' href={Routes.STORE_PLUGINS}/>
       <Item icon={Theme} label='Themes' href={Routes.STORE_THEMES}/>
-      <Item icon={Yifi} label='Suggestions' href={Routes.STORE_SUGGESTIONS}/>
+      {/* <Item icon={Yifi} label='Suggestions' href={Routes.STORE_SUGGESTIONS}/> */}
 
       <h3>Management</h3>
       <Item icon={Package} label='Your works' href={Routes.STORE_MANAGE}/>
@@ -85,8 +85,8 @@ function Sidebar () {
 
       <h3>Get in touch</h3>
       <Item icon={Upload} label='Publish your work' href={Routes.STORE_PUBLISH}/>
-      <Item icon={Verified} label='Get verified' href={Routes.STORE_VERIFICATION}/>
-      <Item icon={HardDisk} label='Host a backend' href={Routes.STORE_HOSTING}/>
+      {/* <Item icon={Verified} label='Get verified' href={Routes.STORE_VERIFICATION}/>
+      <Item icon={HardDisk} label='Host a backend' href={Routes.STORE_HOSTING}/> */}
 
       <div className={style.sideFooter}>
         <a href={Routes.STORE_COPYRIGHT}>Copyright policy</a>
