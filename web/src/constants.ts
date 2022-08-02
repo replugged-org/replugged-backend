@@ -18,6 +18,9 @@ export const Endpoints = {
     DOCS_DOCUMENT: (doc: string) => `/api/v1/docs/${doc}`,
     DOCS_CATEGORIZED: (cat: string, doc: string) => `/api/v1/docs/${cat}/${doc}`,
   
+    STORE_ITEMS: (type: string) => `/api/v1/store/items/${type}`,
+    STORE_ITEM: (type: string, id: string) => `/api/v1/store/items/${type}/${id}`,
+
     CONTRIBUTORS: '/api/v1/stats/contributors',
     STATS: '/api/v1/stats/numbers',
   

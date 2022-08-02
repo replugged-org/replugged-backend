@@ -27,7 +27,7 @@ import Yifi from '../../assets/icons/bulb.svg' // private jokes best jokes alexc
 import Staff from '../../assets/badges/staff.svg'
 import Verified from '../../assets/icons/verified.svg'
 
-import style from './store.module.css'
+import style from './storefront.module.css'
 
 type StoreProps = Attributes & { url?: string }
 type ItemProps = Attributes & { icon: any, href: string, label: string }

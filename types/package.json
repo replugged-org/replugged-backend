@@ -4,6 +4,9 @@
     "description": "Shared replugged types",
     "private": true,
     "devDependencies": {
-      "typescript": "^4.5.4"
+        "typescript": "^4.5.4"
+    },
+    "dependencies": {
+        "mongodb": "^4.8.1"
     }
-  }
+}

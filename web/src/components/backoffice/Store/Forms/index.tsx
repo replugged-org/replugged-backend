@@ -17,7 +17,6 @@ import X from 'feather-icons/dist/icons/x.svg'
 import style from '../../admin.module.css'
 import sharedStyle from '../../../shared.module.css'
 import UserContext from '../../../UserContext'
-import { RestUser } from '../../../../../../types/users'
 
 type FormProps = {
     form: StoreForm
@@ -91,14 +90,21 @@ function ReviewButtons({ form, canViewDiscussions }: FormProps) {
     const rejectForm = useCallback(() => setAction(2), [setAction])
 
     const [formUser, setUser] = useState<any | null>(null)
+    const [formReviewer, setFormReviewer] = useState<any | null>(null);
     useEffect(() => {
         fetch(Endpoints.BACKOFFICE_USER(form.submitter!))
             .then((r) => r.json())
             .then((u) => setUser(u))
+
+        if (form.reviewed) {
+            fetch(Endpoints.BACKOFFICE_USER(form.reviewer!))
+                .then((r) => r.json())
+                .then((u) => setFormReviewer(u))
+        }
     }, [])
 
     const reviewForm = useCallback(async (reason: string) => {
-        const resp = await fetch(Endpoints.BACKOFFICE_FORM(form._id), {
+        const resp = await fetch(Endpoints.BACKOFFICE_FORM(form._id.toString()), {
             method: 'PATCH',
             headers: { 'content-type': 'application/json' },
             body: JSON.stringify({
@@ -132,7 +138,7 @@ function ReviewButtons({ form, canViewDiscussions }: FormProps) {
                     ? <div className={style.alignCenter}>
                         {/* @ts-ignore */}
                         {form.approved ? <Check className={sharedStyle.icon} /> : <X className={sharedStyle.icon} />}
-                        <span>{form.approved ? 'Approved' : 'Rejected'} by {form.reviewer.username}#{form.reviewer.discriminator}</span>
+                        <span>{form.approved ? 'Approved' : 'Rejected'} by {formReviewer?.username}#{formReviewer?.discriminator}</span>
                     </div>
                     : <Fragment>
                         <button className={`${sharedStyle.button} ${sharedStyle.green}`} onClick={approveForm}>
@@ -225,7 +231,11 @@ export default function ManageForms(_: Attributes) {
             {forms
                 ? !forms.length
                     ? <div>All clear!</div>
-                    : forms.map((f) => <Form key={f._id} form={f} canViewDiscussions={false} />)
+                    : forms.sort((a, b) => {
+                        if (a === b) return 0
+                        if (a) return -1
+                        return 1
+                    }).map((f) => <Form key={f._id} form={f} canViewDiscussions={false} />)
                 : <Spinner />}
         </main>
     )

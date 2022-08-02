@@ -3,8 +3,8 @@ import type { StoreForm } from '../../../../types/store'
 import type { FastifyInstance, FastifyRequest, FastifyReply } from 'fastify'
 import config from '../../config.js'
 import { dispatchHonk, editHonkMessage, fetchHonkMessage, sendDm } from '../../utils/discord.js'
-import crudModule from './crud.js'
 import { UserFlags } from '../../flags.js'
+import { ObjectId } from '@fastify/mongodb'
 
 const DmMessages = {
   publish: {
@@ -21,135 +21,32 @@ const DmMessages = {
   },
 }
 
-// const updateFormSchema = {
-//   body: {
-//     required: [ 'reviewed', 'approved', 'reviewer' ],
-//     type: 'object',
-//     additionalProperties: false,
-//     properties: {
-//       reviewed: { type: 'boolean' },
-//       approved: { type: 'boolean' },
-//       reviewer: { type: 'string', pattern: '^\\d{16,}$' },
-//       reviewReason: { type: 'string', minLength: 8, maxLength: 256 },
-//     },
-//     if: { properties: { approved: { const: false } } },
-//     then: { required: [ 'reviewReason' ] },
-//   },
-// }
+type RouteParams = {
+  id: string
+}
 
-// const formsAggregation = [
-//   { $lookup: { from: 'users', localField: 'submitter', foreignField: '_id', as: 'submitter' } },
-//   { $lookup: { from: 'users', localField: 'reviewer', foreignField: '_id', as: 'reviewer' } },
-//   { $unwind: { path: '$submitter', preserveNullAndEmptyArrays: true } },
-//   { $unwind: { path: '$reviewer', preserveNullAndEmptyArrays: true } },
-//   { $set: { 'submitter.id': '$submitter._id' } },
-//   { $unset: 'submitter._id' },
-// ]
+async function update(this: FastifyInstance, request: FastifyRequest<{Params: RouteParams}>, reply: FastifyReply) {
+  const collection = this.mongo.db!.collection<StoreForm>('forms')
+  const id = request.params.id
 
-// const formsProjection: Record<string, 0 | 1> = {
-//   complianceLegal: 0,
-//   complianceGuidelines: 0,
-//   complianceSecurity: 0,
-//   compliancePrivacy: 0,
-//   complianceCute: 0,
-//   'submitter.accounts': 0,
-//   'submitter.badges': 0,
-//   'submitter.createdAt': 0,
-//   'submitter.updatedAt': 0,
-//   'submitter.patronTier': 0,
-//   'reviewer.accounts': 0,
-//   'reviewer.badges': 0,
-//   'reviewer.createdAt': 0,
-//   'reviewer.updatedAt': 0,
-//   'reviewer.patronTier': 0,
-// }
+  const query = request.body as Record<string, unknown>
 
-const pendingFormQuery = { $or: [ { reviewed: { $exists: false } }, { reviewed: { $eq: false } } ] }
+  const res = await collection.findOneAndUpdate({ _id: new ObjectId(id) }, {$set: query}, {
+    returnDocument: 'after'
+  })
 
-// async function finishFormUpdate (request: FastifyRequest, _reply: FastifyReply, form: StoreForm) {
-//   const user = request.user as User
-//   const message = await fetchHonkMessage(config.honks.formsChannel, form.messageId)
+  console.log(res);
 
-//   const modMessage = form.approved
-//     ? `Form **approved** by ${user.username}#${user.discriminator}`
-//     : `Form **rejected** by ${user.username}#${user.discriminator} for the following reason: ${form.reviewReason}`
+  if(!res.value) return reply.callNotFound();
+  const resp = await Promise.resolve(finishFormUpdate(request, reply, res.value));
+  if(resp) {
+    reply.code(200).send(resp);
+    return;
+  } 
 
-//   const dmMessage = form.approved
-//     ? DmMessages[form.kind].approved
-//     : DmMessages[form.kind].rejected
-
-//   if (message.thread) {
-//     await dispatchHonk(config.honks.formsChannel, { content: modMessage }, `thread_id=${message.thread.id}`)
-//   } else {
-//     await editHonkMessage(config.honks.formsChannel, message.id, { content: `${message.content}\n\n${modMessage}` })
-//   }
-
-//   const couldDm = await sendDm(
-//     form.submitter as unknown as string,
-//     `Hey $username,\n\n${dmMessage.replace('$reason', form.reviewReason ?? '')}\n\nCheers,\nReplugged Staff`
-//   )
-
-//   return { couldDm: couldDm }
-// }
-
-// async function getFormCount (this: FastifyInstance) {
-//   const res: Record<string, number> = {
-//     verification: 0,
-//     publish: 0,
-//     hosting: 0,
-//     reports: 0,
-//   }
-
-//   const forms = await this.mongo.db!.collection('forms').aggregate([
-//     { $match: pendingFormQuery },
-//     { $group: { _id: '$kind', count: { $sum: 1 } } },
-//   ]).toArray()
-//   for (const form of forms) res[form._id] = form.count
-
-//   return res
-// }
-
-// export default async function (fastify: FastifyInstance): Promise<void> {
-//   fastify.register(crudModule, {
-//     data: {
-//       auth: { permissions: UserFlags.STAFF },
-//       collection: 'forms',
-//       projection: formsProjection,
-//       modules: {
-//         readAll: { filter: [ 'kind' ], all: true },
-//         read: false,
-//         create: false,
-//         update: {
-//           post: finishFormUpdate,
-//           schema: updateFormSchema,
-//         },
-//       },
-//     },
-//   })
-
-//   fastify.register(crudModule, {
-//     prefix: '/reviewed',
-//     data: {
-//       auth: { permissions: UserFlags.STAFF },
-//       collection: 'forms',
-//       projection: formsProjection,
-//       aggregation: [
-//         { $match: { reviewed: true } },
-//         ...formsAggregation,
-//       ],
-//       modules: {
-//         readAll: { filter: [ 'kind' ] },
-//         create: false,
-//         update: {
-//           post: finishFormUpdate,
-//           schema: updateFormSchema,
-//         },
-//       },
-//     },
-//   })
-
-//   fastify.get('/count', getFormCount)
-// }
+  reply.code(204).send();
+  return;
+}
 
 async function finishFormUpdate(request: FastifyRequest, _reply: FastifyReply, form: StoreForm) {
   const user = request.user as User;
@@ -157,26 +54,29 @@ async function finishFormUpdate(request: FastifyRequest, _reply: FastifyReply, f
 
   const modMessage = form.approved
     ? `Form **approved** by ${user.username}#${user.discriminator}`
-    : `Form **rejected** by ${user.username}#${user.discriminator} for the following reason: ${form.reviewReason}`
+    : `Form **rejected** by ${user.username}#${user.discriminator} for the following reason: ${form.reviewReason}`;
 
-    const dmMessage = form.approved
-      ? DmMessages[form.kind].approved
-      : DmMessages[form.kind].rejected
+  const dmMessage = form.approved
+    ? DmMessages[form.kind].approved
+    : DmMessages[form.kind].rejected
 
-    if(message.thread) {
-      await dispatchHonk(config.honks.formsChannel, {content: modMessage}, `thread_id=${message.thread.id}`)
-    } else {
-      await editHonkMessage(config.honks.formsChannel, message.id, {content: `${message.content}\n\n${modMessage}`})
-    }
+  if (message.thread) {
+    await dispatchHonk(config.honks.formsChannel, { content: modMessage }, `thread_id=${message.thread.id}`);
+  } else {
+    await editHonkMessage(config.honks.formsChannel, message.id, { content: `${message.content}\n\n${modMessage}` })
+  }
 
-    const couldDm = await sendDm(
-      form.submitter as unknown as string,
-      `Hey $username, \n\n${dmMessage.replace(/$reason/g, form.reviewReason ?? '')}\n\nCheers, \nReplugged Staff`
-    )
+  const couldDm = await sendDm(
+    form.submitter as unknown as string,
+    `Hey $username,\n\n${dmMessage.replace(/$reason/g, form.reviewReason ?? '')}\n\nCheers, \nReplugged Staff`
+  )
 
-    return { couldDm }
+  return { couldDm: couldDm }
 }
-// @ts-ignore
+
+const pendingFormQuery = { $or: [{ reviewed: { $exists: false } }, { reviewed: { $eq: false } }] }
+
+
 async function getFormCount(this: FastifyInstance) {
   const res: Record<string, number> = {
     verification: 0,
@@ -187,35 +87,107 @@ async function getFormCount(this: FastifyInstance) {
 
   const forms = await this.mongo.db!.collection('forms').aggregate([
     { $match: pendingFormQuery },
-    { $group: { _id: '$kind', count: { $sum: 1 }}}
-  ]).toArray()
+    { $group: { _id: '$kind', count: { $sum: 1 } } }
+  ]).toArray();
 
-  for(const form of forms) res[form._id] = form.count;
+  for (const form of forms) res[form._id] = form.count
 
   return res;
 }
 
-export default async function(fastify: FastifyInstance): Promise<void> {
-  // @ts-ignore
-  fastify.register(crudModule, {
-    data: {
-      entity: {
-        collection: 'forms',
-        stringId: true,
-      },
-      read: {
-        enabled: true,
-        allowAll: true,
-        auth: { permissions: UserFlags.STAFF }
-      },
-      create: {enabled: false},
-      update: {
-        enabled: true,
-        executor: finishFormUpdate
-      },
-      delete: {enabled: true}
+type ReadAllQuery = { limit?: number, page?: number }
+
+async function readAll(this: FastifyInstance, request: FastifyRequest<{Querystring: ReadAllQuery}>) {
+  const page = (request.query.page ?? 1) - 1
+  const limit = request.query.limit ?? 50
+
+  const cursor = this.mongo.db!.collection<StoreForm>('forms').find({}, {
+    limit: limit, skip: page * limit
+  })
+
+  const res = await cursor.toArray();
+
+  return {
+    data: res,
+    page
+  }
+}
+
+async function del(this: FastifyInstance, request: FastifyRequest<{Params: RouteParams}>) {
+
+  this.mongo.db!.collection<StoreForm>('forms').deleteOne({_id: new ObjectId(request.params.id)})
+    
+  return {
+    deleted: true
+  }
+}
+
+async function read(this: FastifyInstance, request: FastifyRequest<{Params: RouteParams}>, reply: FastifyReply) {
+  const entity = await this.mongo.db!.collection<StoreForm>('forms').findOne({_id: new ObjectId(request.params.id)});
+
+  if(!entity) {
+    reply.callNotFound();
+    return;
+  }
+
+  return entity
+}
+
+export default async function (fastify: FastifyInstance): Promise<void> {
+
+
+  fastify.route({
+    method: 'GET',
+    url: '/',
+    handler: readAll,
+    config: {
+      auth: {
+        permissions: UserFlags.STAFF
+      }
     }
   })
 
-  fastify.get('/count', getFormCount)
+  fastify.route({
+    method: 'GET',
+    url: '/:id',
+    handler: read,
+    config: {
+      auth: {
+        permissions: UserFlags.STAFF
+      }
+    }
+  })
+
+  fastify.route({
+    method: 'PATCH',
+    url: '/:id',
+    handler: update,
+    config: {
+      auth: {
+        permissions: UserFlags.STAFF
+      }
+    }
+  })
+
+  fastify.route({
+    method: 'DELETE',
+    url: '/:id',
+    handler: del,
+    config: {
+      auth: {
+        permissions: UserFlags.STAFF
+      }
+    }
+  })
+
+  fastify.route({
+    method: 'GET',
+    url: '/count',
+    handler: getFormCount,
+    config: {
+      auth: {
+        permissions: UserFlags.STAFF
+      }
+    }
+  })
 }

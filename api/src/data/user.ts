@@ -60,6 +60,8 @@ export function formatUser(user: User, includePrivate?: boolean, allFlags?: bool
     _id: user._id,
     flags: user.flags & ~PrivateUserFlags,
     cutiePerks: perks,
+    username: user.username,
+    discriminator: user.discriminator,
     patronTier: user?.cutieStatus?.pledgeTier ?? 0,
     badges: {
       developer: (user.flags & (UserFlags.DEVELOPER)) !== 0,

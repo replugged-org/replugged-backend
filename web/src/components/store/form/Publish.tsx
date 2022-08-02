@@ -4,16 +4,27 @@ import { h } from 'preact'
 import { useTitle } from 'hoofd/preact'
 
 import FormLayout from './Layout'
-import { TextField, TextareaField, CheckboxField } from '../../util/Form'
+import { TextField, TextareaField, CheckboxField, SelectField } from '../../util/Form'
 import { Routes } from '../../../constants'
 
 type FormProps = Attributes & { eligibility?: Eligibility }
 
-export default function PublishForm ({ eligibility }: FormProps) {
+export default function PublishForm({ eligibility }: FormProps) {
   useTitle('Publish your work')
 
   return (
     <FormLayout id='publish' title='Publish your work' eligibility={eligibility}>
+      <SelectField
+        name='type'
+        label='Type'
+        options={[
+          { name: 'Plugin', id: 'plugin' },
+          { name: 'Theme', id: 'theme' }
+        ]}
+        value="Please choose one"
+        note={'What is it that you\'re submitting, a theme or plugin.'}
+        required
+      />
       <TextField
         label='Repository URL'
         name='repoUrl'
@@ -26,6 +37,12 @@ export default function PublishForm ({ eligibility }: FormProps) {
         name='bdAlternative'
         note='Let us know if your work is an alternative to an existing one for BetterDiscord. Provide a URL from betterdiscord.app.'
         maxLength={256}
+      />
+      <TextareaField
+        label='Description'
+        name='description'
+        note='Description of what your plugin or theme does.'
+        maxLength={512}
       />
       <TextareaField
         label='Notes for reviewers'

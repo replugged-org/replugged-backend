@@ -25,23 +25,21 @@ type UpdateData = {
 }
 
 // @ts-ignore
-function searchUsers (this: FastifyInstance, request: FastifyRequest, reply: FastifyReply) { // eslint-disable-line
+function searchUsers(this: FastifyInstance, request: FastifyRequest, reply: FastifyReply) { // eslint-disable-line
   // todo
 }
 
 // @ts-ignore
-function banUser (this: FastifyInstance, request: FastifyRequest, reply: FastifyReply) { // eslint-disable-line
+function banUser(this: FastifyInstance, request: FastifyRequest, reply: FastifyReply) { // eslint-disable-line
   // todo
 }
 
 // @ts-ignore
-function refreshUserPledge (this: FastifyInstance, request: FastifyRequest, reply: FastifyReply) { // eslint-disable-line
+function refreshUserPledge(this: FastifyInstance, request: FastifyRequest, reply: FastifyReply) { // eslint-disable-line
   // todo
 }
 
-async function read(this: FastifyInstance, request: FastifyRequest<{Params: RouteParams}>, reply: FastifyReply) {
-
-  if(!request.user || request.user?.flags & UserFlags.STAFF) return;
+async function read(this: FastifyInstance, request: FastifyRequest<{ Params: RouteParams }>, reply: FastifyReply) {
 
   const filter = {
     flags: { $bitsAllClear: UserFlags.GHOST },
@@ -50,15 +48,15 @@ async function read(this: FastifyInstance, request: FastifyRequest<{Params: Rout
 
   const entity = await this.mongo.db!.collection<User>('users').findOne(filter)
 
-  if(!entity) {
+  if (!entity) {
     reply.callNotFound();
     return;
   }
 
-  return formatUser(entity);
+  return formatUser(entity, true, true);
 }
 
-async function readAll(this: FastifyInstance, request: FastifyRequest<{Querystring: ReadAllQuery}>) {
+async function readAll(this: FastifyInstance, request: FastifyRequest<{ Querystring: ReadAllQuery }>) {
   const page = (request.query.page ?? 1) - 1;
   const limit = request.query.limit ?? 50
 
@@ -76,16 +74,16 @@ async function readAll(this: FastifyInstance, request: FastifyRequest<{Querystri
   }
 }
 
-async function del(this: FastifyInstance, request: FastifyRequest<{ Params: RouteParams}>) {
+async function del(this: FastifyInstance, request: FastifyRequest<{ Params: RouteParams }>) {
   const userId = request.params.id;
 
   const user = await this.mongo.db!.collection<User>('users').findOne({ _id: userId });
 
-  if(!user || user.flags & UserFlags.STORE_PUBLISHER) {
+  if (!user || user.flags & UserFlags.STORE_PUBLISHER) {
     return { deleted: false }
   }
 
-  this.mongo.db!.collection('users').deleteOne({_id: userId})
+  this.mongo.db!.collection('users').deleteOne({ _id: userId })
 
   return { deleted: true }
 }
@@ -101,7 +99,7 @@ function toggleFlags(existingFlags: number, flag: UserFlagKeys, setTo: Boolean) 
   return newFlags;
 }
 
-async function update(this: FastifyInstance, request: FastifyRequest<{Params: RouteParams}>) {
+async function update(this: FastifyInstance, request: FastifyRequest<{ Params: RouteParams }>) {
   const data = request.body as UpdateData
 
   const user = await this.mongo.db!.collection<User>('users').findOne({ _id: request.params.id });
@@ -111,7 +109,7 @@ async function update(this: FastifyInstance, request: FastifyRequest<{Params: Ro
   // const existingFlags = user.flags
 
   let mongoData: Partial<User> = {
-    flags: user.flags,
+    flags: user.flags ?? 0,
     cutiePerks: user?.cutiePerks
   }
 
@@ -123,6 +121,24 @@ async function update(this: FastifyInstance, request: FastifyRequest<{Params: Ro
   mongoData.flags = toggleFlags(mongoData.flags, 'BUG_HUNTER' as UserFlagKeys, data['badges.hunter'])
   mongoData.flags = toggleFlags(mongoData.flags, 'EARLY_USER' as UserFlagKeys, data['badges.early'])
   mongoData.flags = toggleFlags(mongoData.flags, 'TRANSLATOR' as UserFlagKeys, data['badges.translator'])
+
+  if (data.patronTier >= 1) {
+    mongoData.cutieStatus = {
+      pledgeTier: data.patronTier,
+      perksExpireAt: Date.now() + 2.628e+9 // basically just adds a month of donator status
+    }
+
+    mongoData.flags ^= UserFlags.CUTIE_OVERRIDE
+  }
+
+  if (data.patronTier === 0) {
+    mongoData.cutieStatus = {
+      pledgeTier: data.patronTier,
+      perksExpireAt: Date.now()
+    }
+
+    mongoData.flags ^= UserFlags.CUTIE_OVERRIDE
+  }
 
   if (data['badges.custom.color'] !== null) {
     // @ts-ignore
@@ -248,29 +264,6 @@ export default async function (fastify: FastifyInstance): Promise<void> {
     }
   })
 
-  // @ts-ignore
-  // fastify.register(crudModule, {
-  //   data: {
-  //     entity: {
-  //       collection: 'users',
-  //       stringId: true,
-  //       baseQuery: { flags: { $bitsAllClear: UserFlags.GHOST } },
-  //     },
-  //     read: {
-  //       enabled: true,
-  //       allowAll: true,
-  //       auth: { permissions: UserFlags.STAFF },
-  //       format: (u: any) => formatUser(u, true, true),
-  //     },
-  //     create: { enabled: false },
-  //     update: { enabled: true },
-  //     delete: {
-  //       enabled: true,
-  //       auth: { permissions: UserFlags.STAFF },
-  //       executor: (userId: string) => deleteUser(fastify.mongo.client, userId.toString(), UserDeletionCause.ADMINISTRATOR),
-  //     },
-  //   },
-  // })
 
   // And some other ones
   fastify.get('/search', { schema: void 0 }, searchUsers)

@@ -17,7 +17,7 @@ type PawaScreenProps = { headline: ComponentChild, text: ComponentChild }
 
 const button = `${sharedStyle.button} ${style.button}`
 
-function Intro ({ id, onNext }: { id: string, onNext: () => void }) {
+function Intro({ id, onNext }: { id: string, onNext: () => void }) {
   const isLoggedIn = Boolean(useContext(UserContext))
   const path = typeof location !== 'undefined' ? location.pathname : ''
 
@@ -42,18 +42,18 @@ function Intro ({ id, onNext }: { id: string, onNext: () => void }) {
   )
 }
 
-function Form ({ children, onNext, onError, onLimit, id }: FormProps) {
+function Form({ children, onNext, onError, onLimit, id }: FormProps) {
   // [Cynthia] this is used to force re-render of form fields, to help with errors sometimes not showing up
-  const [ renderKey, setRenderKey ] = useState(0)
-  const [ isSubmitting, setSubmitting ] = useState(false)
-  const [ errors, setErrorsRaw ] = useState<Record<string, string>>({})
-  function setErrors (e: Record<string, string>) {
+  const [renderKey, setRenderKey] = useState(0)
+  const [isSubmitting, setSubmitting] = useState(false)
+  const [errors, setErrorsRaw] = useState<Record<string, string>>({})
+  function setErrors(e: Record<string, string>) {
     setErrorsRaw(e)
     setRenderKey((k) => ++k)
     setSubmitting(false)
   }
 
-  const names = useMemo<string[]>(() => children.map((c) => c.props.name), [ children ])
+  const names = useMemo<string[]>(() => children.map((c) => c.props.name), [children])
 
   const onSubmitHandler = useCallback(async (e: Event) => {
     e.preventDefault()
@@ -101,11 +101,11 @@ function Form ({ children, onNext, onError, onLimit, id }: FormProps) {
     }
 
     onNext()
-  }, [ onNext ])
+  }, [onNext])
 
   const statefulChildren = useMemo(
     () => children.map((c) => cloneElement(c, { error: errors[c.props.name], rk: renderKey })),
-    [ children, errors, renderKey ]
+    [children, errors, renderKey]
   )
 
   return (
@@ -114,37 +114,37 @@ function Form ({ children, onNext, onError, onLimit, id }: FormProps) {
       <div className={style.note}>Make sure your form is complete and accurate before submitting. Once submitted, you won't be able to edit it!</div>
       <div>
         <button type='submit' className={button} disabled={isSubmitting}>
-          {isSubmitting ? <Spinner balls/> : 'Submit'}
+          {isSubmitting ? <Spinner balls /> : 'Submit'}
         </button>
       </div>
     </form>
   )
 }
 
-function PawaScreen ({ headline, text }: PawaScreenProps) {
+function PawaScreen({ headline, text }: PawaScreenProps) {
   return (
     <div className={style.pawaScreen}>
-      <hr/>
+      <hr />
       <h3>{headline}</h3>
       <p>{text}</p>
     </div>
   )
 }
 
-export default function FormLayout ({ id, title, children, eligibility }: FormLayoutProps) {
-  const [ stage, setStage ] = useState(0)
+export default function FormLayout({ id, title, children, eligibility }: FormLayoutProps) {
+  const [stage, setStage] = useState(0)
   useLayoutEffect(() => {
     document.querySelector('header + div')!.scrollTop = 0
-  }, [ stage ])
+  }, [stage])
 
   if (typeof eligibility !== 'number') {
     return (
-      <Spinner/>
+      <Spinner />
     )
   }
 
   if (eligibility === 1) {
-    return <PawaScreen headline='This form is closed for now!' text='We currently have paused submissions, try again later.'/>
+    return <PawaScreen headline='This form is closed for now!' text='We currently have paused submissions, try again later.' />
   }
 
   if (eligibility === 2) {
@@ -161,31 +161,31 @@ export default function FormLayout ({ id, title, children, eligibility }: FormLa
   }
 
   if (stage === 0) {
-    return <Intro id={id} onNext={() => setStage(1)}/>
+    return <Intro id={id} onNext={() => setStage(1)} />
   }
 
   let view: VNode
   switch (stage) {
     case 1:
-      view = <Form children={children} onNext={() => setStage(2)} onError={() => setStage(3)} onLimit={() => setStage(429)} id={id}/>
+      view = <Form children={children} onNext={() => setStage(2)} onError={() => setStage(3)} onLimit={() => setStage(429)} id={id} />
       break
     case 2:
       view = <PawaScreen
         headline='Received!'
         text={<>
-          The Replugged Staff will give your form the attention it deserves soon.<br/><br/>
+          The Replugged Staff will give your form the attention it deserves soon.<br /><br />
           We highly recommend joining the <a href={Routes.DICKSWORD} target='_blank' rel='noreferrer'>Replugged Support server</a> and opening your DMs, so we can contact you directly.
         </>}
       />
       break
     case 3:
-      view = <PawaScreen headline='Uh, what happened?' text={'It seems like we\'re unable to process your request at this time. Please try again later!'}/>
+      view = <PawaScreen headline='Uh, what happened?' text={'It seems like we\'re unable to process your request at this time. Please try again later!'} />
       break
     case 429:
-      view = <PawaScreen headline='Woah, calm down!' text={'You have too many submissions currently pending review. Wait for the Replugged Staff to review them, and try again.'}/>
+      view = <PawaScreen headline='Woah, calm down!' text={'You have too many submissions currently pending review. Wait for the Replugged Staff to review them, and try again.'} />
       break
     default:
-      view = <PawaScreen headline='Hehe, how did you get there cutie?' text={'I\'d happily give you a cookie but I ate them all :3'}/>
+      view = <PawaScreen headline='Hehe, how did you get there cutie?' text={'I\'d happily give you a cookie but I ate them all :3'} />
       break
   }
 

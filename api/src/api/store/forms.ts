@@ -1,4 +1,4 @@
-import type { Db } from 'mongodb'
+import { type Db } from 'mongodb'
 import type { FastifyInstance, FastifyRequest, FastifyReply } from 'fastify'
 import type { EligibilityStatus } from '../../../../types/store'
 import type { User } from '../../../../types/users'
@@ -15,6 +15,8 @@ type PublishBody = {
     reviewNotes: string
     complianceGuidelines: boolean
     complianceLegal: boolean
+    type: string,
+    descripion: string
 }
 
 type VerificationBody = {
@@ -38,21 +40,6 @@ type HostingBody = {
 
 const BD_URL_RE = /^(?:https?:\/\/)?betterdiscord\.app\/(plugin|theme)\/([^/]+)/i
 const PLAIN_RE = /^[a-z0-9-]+$/i
-
-const publishSchema = {
-    body: {
-        required: ['repoUrl', 'bdAlternative', 'reviewNotes', 'complianceGuidelines'],
-        additionalProperties: false,
-        type: 'object',
-        properties: {
-            repoUrl: { type: 'string', maxLength: 256 },
-            bdAlternative: { type: 'string', maxLength: 256 },
-            reviewNotes: { type: 'string', maxLength: 1024 },
-            complianceGuidelines: { type: 'boolean' },
-            complianceLegal: { type: 'boolean' },
-        },
-    },
-}
 
 const verificationSchema = {
     body: {
@@ -99,6 +86,8 @@ const fieldToDescription: Record<string, string> = {
     purpose: 'Purpose',
     technical: 'Technical details',
     subdomain: 'Desired subdomain',
+    type: 'Type',
+    description: 'Description'
 }
 
 // -- Helpers
@@ -125,6 +114,8 @@ async function isAvailable(subdomain: string): Promise<boolean> {
     return new Promise((resolve) => lookup(`${subdomain}.replugged.dev`, (e) => resolve(e?.code === 'ENOTFOUND')))
 }
 
+/** @deprecated */
+// @ts-ignore
 function stringifyForm(data: Record<string, unknown>): string {
     const acc: string[] = []
     for (const key in data) {
@@ -137,6 +128,29 @@ function stringifyForm(data: Record<string, unknown>): string {
     return acc.join('\n')
 }
 
+type EmbedField = {
+    inline?: boolean
+    name: string
+    value: string
+}
+
+function fieldifyForm(data: Record<string, unknown>): EmbedField[] {
+    const fields: EmbedField[] = []
+    for (const key in data) {
+        if (key in data && key in fieldToDescription) {
+            const value = data[key] as string
+            if (value !== '') {
+                fields.push({
+                    name: fieldToDescription[key],
+                    value: value.length > 128 ? `${value.slice(128)}...` : value
+                })
+            }
+        }
+    }
+
+    return fields
+}
+
 async function finalizeForm(db: Db, user: User, kind: string, data: Record<string, unknown>, reply: FastifyReply) {
     const collection = db.collection('forms')
     const pending = await collection.countDocuments({ submitter: user._id, kind: kind })
@@ -144,9 +158,20 @@ async function finalizeForm(db: Db, user: User, kind: string, data: Record<strin
 
     const inserted = await collection.insertOne({ submitter: user._id, kind: kind, ...data })
     const msg = await dispatchHonk(config.honks.formsChannel, {
-        content: `New ${kind} form submitted by <@${user._id}> (${user.username}#${user.discriminator})\n`
-            + `Form ID: ${inserted.insertedId.toHexString()}\n\n`
-            + `${stringifyForm(data)}`,
+        content: '',
+        embeds: [
+            {
+                author: {
+                    name: `${user.username}#${user.discriminator} submitted a form!`,
+                    url: `${config.domain}/backoffice/store/forms#${inserted.insertedId.toHexString()}`
+                },
+                footer: {
+                    text: `Form ID: ${inserted.insertedId.toHexString()}`
+                },
+                fields: fieldifyForm(data),
+                color: 7506394
+            }
+        ]
     })
 
     await collection.updateOne({ _id: inserted.insertedId }, { $set: { messageId: msg.id } })
@@ -172,6 +197,11 @@ async function publishForm(this: FastifyInstance, request: FastifyRequest<{ Body
             return reply.code(400)
                 .send({ errors: { bdAlternative: 'The provided URL doesn\'t point to a BetterDiscord work.' } })
         }
+    }
+
+    if (!request.body.type || !['plugin', 'theme'].includes(request.body.type)) {
+        return reply.code(400)
+            .send({ errors: { type: 'You must provde a type' } })
     }
 
     if (!request.body.complianceGuidelines) {
@@ -233,7 +263,7 @@ export default async function (fastify: FastifyInstance): Promise<void> {
     // if (process.env.NODE_ENV !== 'development') return
 
     fastify.get('/eligibility', { config: { auth: { optional: true } } }, (request) => fetchEligibility(fastify.mongo.db!, request.user))
-    fastify.post<{ Body: PublishBody }>('/publish', { config: { auth: {} }, schema: publishSchema }, publishForm)
+    fastify.post<{ Body: PublishBody }>('/publish', { config: { auth: {} } }, publishForm)
     fastify.post<{ Body: VerificationBody }>('/verification', { config: { auth: {} }, schema: verificationSchema }, verificationForm)
     fastify.post<{ Body: HostingBody }>('/hosting', { config: { auth: {} }, schema: hostingSchema }, hostingForm)
 }

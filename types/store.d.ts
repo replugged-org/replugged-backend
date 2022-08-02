@@ -1,4 +1,5 @@
 import { MinimalUser } from './users'
+import { ObjectId } from 'mongodb'
 // 0 = Eligible; 1 = Closed; 2 = Banned
 export type Eligibility = 0 | 1 | 2
 
@@ -9,25 +10,25 @@ export type EligibilityStatus = {
   reporting: Eligibility,
 }
 
-type PendingForm = { 
-  reviewed?: false, 
-  approved?: boolean, 
-  reviewer?: null, 
-  reviewReason?: null, 
-  submitter: string 
+type PendingForm = {
+  reviewed?: false,
+  approved?: boolean,
+  reviewer?: null,
+  reviewReason?: null,
+  submitter: string
 }
-type ReviewedForm = { 
-  reviewed: true, 
-  approved: boolean, 
-  reviewer: MinimalUser, 
-  reviewReason?: string, 
-  submitter?: string 
+type ReviewedForm = {
+  reviewed: true,
+  approved: boolean,
+  reviewer: string,
+  reviewReason?: string,
+  submitter?: string
 }
 
 export type Form = (PendingForm | ReviewedForm) & {
-  _id: string
+  _id: ObjectId
   kind: 'publish' | 'verification' | 'hosting'
-  messageId: string
+  messageId: string,
 }
 
 export type FormPublish = Form & {
@@ -35,6 +36,8 @@ export type FormPublish = Form & {
   repoUrl: string
   bdAlterative: string
   reviewNotes: string
+  type: string,
+  description: string
 }
 
 export type FormVerification = Form & {
