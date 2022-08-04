@@ -1,0 +1,46 @@
+.title {
+    margin-bottom: 24px;
+}
+
+.tagTitle {
+    font-weight: 700;
+    font-size: 24px;
+}
+
+.action {
+    width: 24px;
+    height: 24px;
+}
+
+.toolbar {
+    display: flex;
+    margin-bottom: 16px;
+    gap: 16px;
+}
+
+.row {
+    display: flex;
+    padding: 16px;
+    gap: 16px;
+    /* border-bottom: 1px solid var(--background-tertiary); */
+    align-items: center;
+    background-color: var(--background-secondary);
+    border-radius: 4px;
+}
+
+.row-info {
+    display: flex;
+    flex-direction: column;
+}
+
+.row-actions {
+    display: flex;
+    margin-left: auto;
+    gap: 16px;
+}
+
+.row-embed {
+    display: flex;
+    margin-left: auto;
+    gap: 16px;
+}

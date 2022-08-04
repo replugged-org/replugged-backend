@@ -56,8 +56,7 @@ export default function Header() {
           : <RepluggedPlug className={style.plug}/>}
         <RepluggedWordmark className={style.wordmark}/> */}
                 {/* @ts-ignore */}
-                {/* <RepluggedLogo className={style.plug} /> */}
-                Replugged Logo
+                <RepluggedLogo className={style.plug} />
             </a>
 
             <nav className={style.nav}>

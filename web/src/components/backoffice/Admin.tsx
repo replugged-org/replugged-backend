@@ -10,6 +10,7 @@ import { SoonRoute } from '../util/Soon'
 import Users from './UsersOld/Manage'
 import UsersManage from './Users/Manage'
 import Forms from './Store/Forms'
+import ManageBotTags from './Bot/Tags'
 
 import { Endpoints, Routes } from '../../constants'
 
@@ -29,82 +30,88 @@ import CodeSandbox from 'feather-icons/dist/icons/codesandbox.svg'
 
 import style from './admin.module.css'
 
-function Sidebar () {
+function Sidebar() {
   // Unread badges
-  const [ unread, setUnread ] = useState({ forms: 0, reports: 0 })
-//   useEffect(() => {
-//     fetch(Endpoints.BACKOFFICE_FORMS_COUNT).then((r) => r.json()).then((d) => {
-//       setUnread({
-//         forms: d.publish + d.verification + d.hosting,
-//         reports: d.reports,
-//       })
-//     })
-//   }, [])
+  const [unread, setUnread] = useState({ forms: 0, reports: 0 })
+  useEffect(() => {
+    fetch(Endpoints.BACKOFFICE_FORMS_COUNT).then((r) => r.json()).then((d) => {
+      setUnread({
+        forms: d.publish + d.verification + d.hosting,
+        reports: d.reports,
+      })
+    })
+  }, [])
 
   return (
     <Fragment>
       <h1>Administration</h1>
       <Link class={style.item} activeClassName={style.active} href={Routes.BACKOFFICE_USERS}>
-        <Smile/>
+        <Smile />
         <span>Users</span>
       </Link>
       <Link class={style.item} activeClassName={style.active} href={Routes.BACKOFFICE_BANS}>
-        <Shield/>
+        <Shield />
         <span>Bans</span>
       </Link>
       <Link class={style.item} activeClassName={style.active} href={Routes.BACKOFFICE_MONITORING}>
-        <Activity/>
+        <Activity />
         <span>Abuse Monitoring</span>
+      </Link>
+
+      <h3>Bot management</h3>
+      <Link class={style.item} activeClassName={style.active} href={Routes.BACKOFFICE_BOT_TAGS}>
+        <Tag />
+        <span>Tags</span>
       </Link>
 
       <h3>Store management</h3>
       <Link class={style.item} activeClassName={style.active} href={Routes.BACKOFFICE_STORE_ITEMS}>
-        <Package/>
+        <Package />
         <span>Items</span>
       </Link>
       <Link class={style.item} activeClassName={style.active} href={Routes.BACKOFFICE_STORE_TAGS}>
-        <Tag/>
+        <Tag />
         <span>Tags</span>
       </Link>
       <Link class={style.item} activeClassName={style.active} href={Routes.BACKOFFICE_STORE_FRONT}>
-        <Layout/>
+        <Layout />
         <span>Frontpage</span>
       </Link>
       <Link class={style.item} activeClassName={style.active} href={Routes.BACKOFFICE_THREATS}>
-        <Alert/>
+        <Alert />
         <span>Known Threats</span>
       </Link>
 
       <h3>Store submissions</h3>
       <Link class={style.item} activeClassName={style.active} href={Routes.BACKOFFICE_STORE_FORMS}>
-        <Inbox/>
+        <Inbox />
         <span>Forms</span>
         {Boolean(unread.forms) && <span className={style.unread}>{unread.forms}</span>}
       </Link>
       <Link class={style.item} activeClassName={style.active} href={Routes.BACKOFFICE_STORE_REPORTS}>
-        <Flag/>
+        <Flag />
         <span>Reports</span>
         {Boolean(unread.reports) && <span className={style.unread}>{unread.reports}</span>}
       </Link>
 
       <h3>Community</h3>
       <Link class={style.item} activeClassName={style.active} href={Routes.BACKOFFICE_EVENTS_SECRET}>
-        <CodeSandbox/>
+        <CodeSandbox />
         <span>Super Secret Event</span>
       </Link>
     </Fragment>
   )
 }
 
-export default function Admin () {
+export default function Admin() {
   useTitleTemplate('Replugged Admin')
 
   return (
     <LayoutWithSidebar>
-      <Sidebar/>
+      <Sidebar />
       <Router>
-        <Users path={Routes.BACKOFFICE_USERS}/>
-        <UsersManage path={Routes.BACKOFFICE_USERS_MANAGE(':id')}/>
+        <Users path={Routes.BACKOFFICE_USERS} />
+        <UsersManage path={Routes.BACKOFFICE_USERS_MANAGE(':id')} />
 
         <SoonRoute path={Routes.BACKOFFICE_BANS}>
           <div>banned users</div>
@@ -116,6 +123,9 @@ export default function Admin () {
         <SoonRoute path={Routes.BACKOFFICE_STORE_ITEMS}>
           <div>store items</div>
         </SoonRoute>
+
+        <ManageBotTags path={Routes.BACKOFFICE_BOT_TAGS} />
+
         <SoonRoute path={Routes.BACKOFFICE_STORE_TAGS}>
           <div>store tags</div>
         </SoonRoute>
@@ -126,8 +136,8 @@ export default function Admin () {
           <div>threats</div>
         </SoonRoute>
 
-        <Forms path={Routes.BACKOFFICE_STORE_FORMS}/>
-        
+        <Forms path={Routes.BACKOFFICE_STORE_FORMS} />
+
         <SoonRoute path={Routes.BACKOFFICE_STORE_REPORTS}>
           <div>reports</div>
         </SoonRoute>
@@ -135,7 +145,7 @@ export default function Admin () {
         <SoonRoute path={Routes.BACKOFFICE_EVENTS_SECRET}>
           <div>eyes</div>
         </SoonRoute>
-        <Redirect default to={Routes.BACKOFFICE_USERS}/>
+        <Redirect default to={Routes.BACKOFFICE_USERS} />
       </Router>
     </LayoutWithSidebar>
   )

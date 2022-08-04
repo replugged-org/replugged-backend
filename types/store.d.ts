@@ -1,4 +1,3 @@
-import { MinimalUser } from './users'
 import { ObjectId } from 'mongodb'
 // 0 = Eligible; 1 = Closed; 2 = Banned
 export type Eligibility = 0 | 1 | 2
@@ -8,6 +7,29 @@ export type EligibilityStatus = {
   verification: Eligibility,
   hosting: Eligibility,
   reporting: Eligibility,
+}
+
+export enum Visibility {
+  PUBLIC = 0,
+  PRIVATE = 1,
+}
+
+type StoreItem = {
+  type: 'plugin' | 'theme'
+  description: string
+  author: string,
+  visibility: Visibility
+
+  repository: string
+  branch: string
+
+  stars: number,
+  downloads: number,
+
+  lastCommit: string,
+  lastCommitTime: Date
+
+  nsfw: boolean
 }
 
 type PendingForm = {

@@ -74,12 +74,17 @@ async function readAll(this: FastifyInstance, request: FastifyRequest<{ Querystr
   }
 }
 
-async function del(this: FastifyInstance, request: FastifyRequest<{ Params: RouteParams }>) {
+async function del(this: FastifyInstance, request: FastifyRequest<{ Params: RouteParams }>, reply: FastifyReply) {
   const userId = request.params.id;
 
   const user = await this.mongo.db!.collection<User>('users').findOne({ _id: userId });
 
-  if (!user || user.flags & UserFlags.STORE_PUBLISHER) {
+  if (!user) {
+    reply.callNotFound();
+    return;
+  }
+
+  if (user.flags & UserFlags.STORE_PUBLISHER) {
     return { deleted: false }
   }
 
@@ -99,13 +104,16 @@ function toggleFlags(existingFlags: number, flag: UserFlagKeys, setTo: Boolean) 
   return newFlags;
 }
 
-async function update(this: FastifyInstance, request: FastifyRequest<{ Params: RouteParams }>) {
+async function update(this: FastifyInstance, request: FastifyRequest<{ Params: RouteParams }>, reply: FastifyReply) {
   const data = request.body as UpdateData
 
   const user = await this.mongo.db!.collection<User>('users').findOne({ _id: request.params.id });
 
 
-  if (!user) return { code: 404, message: 'User does not exist' }
+  if (!user) {
+    reply.callNotFound();
+    return;
+  }
   // const existingFlags = user.flags
 
   let mongoData: Partial<User> = {
