@@ -33,7 +33,9 @@ export const Endpoints = {
   BACKOFFICE_FORM: (id: string) => `/api/v1/backoffice/forms/${id}`,
   BACKOFFICE_REPORTS: '/api/v1/backoffice/forms?kind=reports',
   BACKOFFICE_TAGS: '/api/v1/backoffice/tags',
-  BACKOFFICE_TAG: (id: string) => `/api/v1/backoffice/tags/${id}`
+  BACKOFFICE_TAG: (id: string) => `/api/v1/backoffice/tags/${id}`,
+  BACKOFFICE_GET_USERS_GUILD_PERKS: (user: string) => `/api/v1/backoffice/users/perks/guild/${user}`,
+  BACKOFFICE_USER_COUNT: '/api/v1/backoffice/users/count'
 }
 
 export const Routes = {

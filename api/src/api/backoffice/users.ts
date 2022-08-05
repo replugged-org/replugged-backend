@@ -66,7 +66,7 @@ async function readAll(this: FastifyInstance, request: FastifyRequest<{ Querystr
 
   cursor.map((u) => formatUser(u, true, true))
 
-  const res = await cursor.toArray()
+  let res = await cursor.toArray()
 
   return {
     data: res,
@@ -225,6 +225,22 @@ async function update(this: FastifyInstance, request: FastifyRequest<{ Params: R
   return { data: 'test' }
 }
 
+async function readGuildBadge(this: FastifyInstance, request: FastifyRequest<{ Params: RouteParams }>, reply: FastifyReply) {
+  const entity = await this.mongo.db!.collection('badges').findOne({ userId: request.params.id });
+
+  if (!entity) {
+    reply.callNotFound();
+    return;
+  }
+
+  return entity;
+}
+
+async function getUserCount(this: FastifyInstance) {
+  const users = await this.mongo.db!.collection('users').countDocuments();
+  return users;
+}
+
 export default async function (fastify: FastifyInstance): Promise<void> {
   // Main routes
 
@@ -241,8 +257,30 @@ export default async function (fastify: FastifyInstance): Promise<void> {
 
   fastify.route({
     method: 'GET',
+    url: '/count',
+    handler: getUserCount,
+    config: {
+      auth: {
+        permissions: UserFlags.STAFF
+      }
+    }
+  })
+
+  fastify.route({
+    method: 'GET',
     url: '/:id',
     handler: read,
+    config: {
+      auth: {
+        permissions: UserFlags.STAFF
+      }
+    }
+  })
+
+  fastify.route({
+    method: 'GET',
+    url: '/perks/guild/:id',
+    handler: readGuildBadge,
     config: {
       auth: {
         permissions: UserFlags.STAFF

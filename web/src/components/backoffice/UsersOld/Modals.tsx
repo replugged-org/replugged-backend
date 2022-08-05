@@ -1,6 +1,6 @@
 import type { Ref } from 'preact'
 import type { RestAdminUser } from '../../../../../types/users'
-import { useCallback, useRef, useState } from 'preact/hooks'
+import { useCallback, useEffect, useRef, useState } from 'preact/hooks'
 import { h } from 'preact'
 
 import Modal from '../../util/Modal'
@@ -92,24 +92,41 @@ function FormPerks({ user, formRef, ...props }: FormChunkProps) {
   )
 }
 
+type DatabaseBadge = {
+  /** Guild id */
+  _id: string,
+  /** user id */
+  userId: string,
+  name: string
+  badge: string
+}
+
+
 function FormGuildBadge({ user, formRef, ...props }: FormChunkProps) {
-  // fetch guild here
+  const [perks, setPerks] = useState<DatabaseBadge | null>(null)
+  useEffect(() => {
+    fetch(Endpoints.BACKOFFICE_GET_USERS_GUILD_PERKS(user._id))
+      .then((r) => r.json())
+      .then((p) => setPerks(p));
+  }, [])
+
   return (
     <form ref={formRef} onSubmit={(e) => e.preventDefault()} {...props}>
       <TextField
         name='color'
         label='Guild ID'
-        value={user.badges?.guild?.id ?? ''}
+        value={perks?._id ?? ''}
       />
       <TextField
         name='icon'
         label='Guild Badge'
-        value={user.badges?.guild?.icon ?? ''}
+        value={perks?.badge ?? ''}
+        preview={perks?.badge ? <img src={perks.badge} /> : null}
       />
       <TextField
         name='tooltip'
         label='Guild Badge Tooltip'
-        value={user.badges?.guild?.name ?? ''}
+        value={perks?.name ?? ''}
       />
     </form>
   )

@@ -26,13 +26,13 @@ type ModalState = { kind: 'edit' | 'mod' | 'delete', user: RestAdminUser } | { k
 
 const Status = { IDLE: 0, PROCESSING: 1, NOT_FOUND: 2, FOUND: 3 }
 
-function userReducer (state: UserStore, action: UserStoreAction): UserStore {
+function userReducer(state: UserStore, action: UserStoreAction): UserStore {
   return { ...state, [action.page]: action.users }
 }
 
-function EditById ({ onClose }: { onClose: () => void }) {
-  const [ status, setStatus ] = useState(Status.IDLE)
-  const [ user, setUser ] = useState<RestAdminUser | null>(null)
+function EditById({ onClose }: { onClose: () => void }) {
+  const [status, setStatus] = useState(Status.IDLE)
+  const [user, setUser] = useState<RestAdminUser | null>(null)
   const formRef = useRef<HTMLFormElement>(null)
 
   const doEditById = useCallback((e?: Event) => {
@@ -53,7 +53,7 @@ function EditById ({ onClose }: { onClose: () => void }) {
   useEffect(() => formRef.current?.querySelector('input')?.focus(), [])
 
   if (user) {
-    return <ManageEdit user={user} onClose={onClose}/>
+    return <ManageEdit user={user} onClose={onClose} />
   }
 
   return (
@@ -69,20 +69,20 @@ function EditById ({ onClose }: { onClose: () => void }) {
   )
 }
 
-function UserRow ({ user, setModal }: { user: RestAdminUser, setModal: (s: ModalState) => void }) {
+function UserRow({ user, setModal }: { user: RestAdminUser, setModal: (s: ModalState) => void }) {
   const bans = user.banStatus
     ? Object.entries(user.banStatus)
-      .filter(([ , isBanned ]) => isBanned)
-      .map(([ key ]) => key)
+      .filter(([, isBanned]) => isBanned)
+      .map(([key]) => key)
     : []
 
-  const editUser = useCallback(() => setModal({ kind: 'edit', user: user }), [ user, setModal ])
-  const moderateUser = useCallback(() => setModal({ kind: 'mod', user: user }), [ user, setModal ])
-  const deleteUser = useCallback(() => setModal({ kind: 'delete', user: user }), [ user, setModal ])
+  const editUser = useCallback(() => setModal({ kind: 'edit', user: user }), [user, setModal])
+  const moderateUser = useCallback(() => setModal({ kind: 'mod', user: user }), [user, setModal])
+  const deleteUser = useCallback(() => setModal({ kind: 'delete', user: user }), [user, setModal])
 
   return (
     <div className={style.row}>
-      <DiscordAvatar user={user}/>
+      <DiscordAvatar user={user} />
       <div className={style.rowInfo}>
         <span>{user.username}#{user.discriminator}</span>
         <span className={bans.length ? sharedStyle.red : ''}>
@@ -92,18 +92,18 @@ function UserRow ({ user, setModal }: { user: RestAdminUser, setModal: (s: Modal
       <div className={style.rowActions}>
         <Tooltip text='Edit user'>
           <button className={style.action} onClick={editUser}>
-            <Edit/>
+            <Edit />
           </button>
         </Tooltip>
         <Tooltip text='Manage user bans'>
           <button className={style.action} onClick={moderateUser}>
-            <Shield/>
+            <Shield />
           </button>
         </Tooltip>
         <Tooltip text='Delete user account'>
           <button className={style.action} onClick={deleteUser}>
             {/* @ts-ignore */}
-            <Trash className={sharedStyle.red}/>
+            <Trash className={sharedStyle.red} />
           </button>
         </Tooltip>
       </div>
@@ -111,13 +111,14 @@ function UserRow ({ user, setModal }: { user: RestAdminUser, setModal: (s: Modal
   )
 }
 
-export default function ManageUsers (_: Attributes) {
-  const [ page, setPage ] = useState(1)
-  const [ pages, setPages ] = useState(0)
-  const [ usersStore, pushUsers ] = useReducer(userReducer, {})
-  const [ modal, setModal ] = useState<ModalState | null>(null)
-  const editById = useCallback(() => setModal({ kind: 'id' }), [ setModal ])
-  const users = usersStore[page]
+export default function ManageUsers(_: Attributes) {
+  const [page, setPage] = useState(1)
+  const [pages, setPages] = useState(0)
+  const [usersStore, pushUsers] = useReducer(userReducer, {})
+  const [modal, setModal] = useState<ModalState | null>(null)
+  const editById = useCallback(() => setModal({ kind: 'id' }), [setModal])
+  let users = usersStore[page]
+
 
   const fetchUserPage = useCallback(() => {
     fetch(`${Endpoints.BACKOFFICE_USERS}?page=${page}`)
@@ -127,9 +128,9 @@ export default function ManageUsers (_: Attributes) {
         console.log(u)
         if (!pages) setPages(u.pages)
       })
-  }, [ page ])
+  }, [page])
 
-  useEffect(fetchUserPage, [ page ])
+  useEffect(fetchUserPage, [page])
   const onModalClose = useCallback(() => {
     setModal(null)
     fetchUserPage()
@@ -143,13 +144,13 @@ export default function ManageUsers (_: Attributes) {
         {/* <TextField name='search' label='Search' placeholder='Search a user...' raw disabled/> */}
         <button className={sharedStyle.button} onClick={editById}>Edit a user by ID</button>
       </div>
-      {users ? users.map((u) => <UserRow key={u._id} user={u} setModal={setModal}/>) : <Spinner/>}
-      {pages > 1 && <Paginator current={page} total={pages} setPage={setPage}/>}
+      {users ? users.map((u) => <UserRow key={u._id} user={u} setModal={setModal} />) : <Spinner />}
+      {pages > 1 && <Paginator current={page} total={pages} setPage={setPage} />}
 
-      {modal?.kind === 'id' && <EditById onClose={onModalClose}/>}
-      {modal?.kind === 'edit' && <ManageEdit user={modal.user} onClose={onModalClose}/>}
-      {modal?.kind === 'mod' && <ManageModeration user={modal.user} onClose={onModalClose}/>}
-      {modal?.kind === 'delete' && <ManageDelete user={modal.user} onClose={onModalClose}/>}
+      {modal?.kind === 'id' && <EditById onClose={onModalClose} />}
+      {modal?.kind === 'edit' && <ManageEdit user={modal.user} onClose={onModalClose} />}
+      {modal?.kind === 'mod' && <ManageModeration user={modal.user} onClose={onModalClose} />}
+      {modal?.kind === 'delete' && <ManageDelete user={modal.user} onClose={onModalClose} />}
     </main>
   )
 }

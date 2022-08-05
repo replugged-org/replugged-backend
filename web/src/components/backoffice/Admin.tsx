@@ -10,7 +10,6 @@ import { SoonRoute } from '../util/Soon'
 import Users from './UsersOld/Manage'
 import UsersManage from './Users/Manage'
 import Forms from './Store/Forms'
-import ManageBotTags from './Bot/Tags'
 
 import { Endpoints, Routes } from '../../constants'
 
@@ -33,12 +32,17 @@ import style from './admin.module.css'
 function Sidebar() {
   // Unread badges
   const [unread, setUnread] = useState({ forms: 0, reports: 0 })
+  const [totalUsers, setTotalUsers] = useState<number>(0)
   useEffect(() => {
     fetch(Endpoints.BACKOFFICE_FORMS_COUNT).then((r) => r.json()).then((d) => {
       setUnread({
         forms: d.publish + d.verification + d.hosting,
         reports: d.reports,
       })
+    })
+
+    fetch(Endpoints.BACKOFFICE_USER_COUNT).then((r) => r.json()).then((d) => {
+      setTotalUsers(d);
     })
   }, [])
 
@@ -47,7 +51,7 @@ function Sidebar() {
       <h1>Administration</h1>
       <Link class={style.item} activeClassName={style.active} href={Routes.BACKOFFICE_USERS}>
         <Smile />
-        <span>Users</span>
+        <span>Users {totalUsers > 0 ? `(${totalUsers})` : ''}</span>
       </Link>
       <Link class={style.item} activeClassName={style.active} href={Routes.BACKOFFICE_BANS}>
         <Shield />
@@ -56,12 +60,6 @@ function Sidebar() {
       <Link class={style.item} activeClassName={style.active} href={Routes.BACKOFFICE_MONITORING}>
         <Activity />
         <span>Abuse Monitoring</span>
-      </Link>
-
-      <h3>Bot management</h3>
-      <Link class={style.item} activeClassName={style.active} href={Routes.BACKOFFICE_BOT_TAGS}>
-        <Tag />
-        <span>Tags</span>
       </Link>
 
       <h3>Store management</h3>
@@ -123,8 +121,6 @@ export default function Admin() {
         <SoonRoute path={Routes.BACKOFFICE_STORE_ITEMS}>
           <div>store items</div>
         </SoonRoute>
-
-        <ManageBotTags path={Routes.BACKOFFICE_BOT_TAGS} />
 
         <SoonRoute path={Routes.BACKOFFICE_STORE_TAGS}>
           <div>store tags</div>

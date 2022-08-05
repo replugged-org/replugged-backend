@@ -55,7 +55,6 @@ export function formatUser(user: User, includePrivate?: boolean, allFlags?: bool
     }
   }
 
-
   const restUser = {
     _id: user._id,
     flags: user.flags & ~PrivateUserFlags,
