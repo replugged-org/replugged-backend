@@ -16,7 +16,7 @@ const html = (jwt: string): string => `<!doctype html>
 
 function legacy (request: FastifyRequest, reply: FastifyReply): void {
   if (!request.user) {
-    reply.redirect('/api/v2/oauth/discord?redirect=/api/v2/users/@me/link/legacy')
+    reply.redirect('/api/v1/oauth/discord?redirect=/api/v1/users/@me/link/legacy')
     return
   }
 
