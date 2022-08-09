@@ -44,6 +44,7 @@ export const Routes = {
   CONTRIBUTORS: '/contributors',
   STATS: '/stats',
   BRANDING: '/branding',
+  INSTALL: '/install',
   FAQ: '/faq',
 
   STORE: '/store',

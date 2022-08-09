@@ -16,6 +16,7 @@ import Account from './account/Account';
 import Contributors from './Contributors';
 import Stats from './stats/Community';
 import Branding from './Branding';
+import Install from './Install';
 import Storefront from './store/Storefront';
 import Documentation from './docs/Documentation';
 import Markdown from './docs/Markdown';
@@ -71,6 +72,7 @@ export default function App (props: AppProps) {
           <Route path={Routes.CONTRIBUTORS} component={Contributors} />
           <Route path={Routes.STATS} component={Stats} />
           <Route path={Routes.BRANDING} component={Branding} />
+          <Route path={Routes.INSTALL} component={Install} />
 
           <Route path={Routes.STORE} component={Storefront} />
 
