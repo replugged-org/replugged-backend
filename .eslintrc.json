@@ -95,7 +95,7 @@
     "no-new-wrappers": [ "error" ],
     "no-octal": [ "error" ],
     "no-octal-escape": [ "error" ],
-    "no-redeclare": [ "error", {
+    "@typescript-eslint/no-redeclare": [ "error", {
       "builtinGlobals": true
     }],
     "no-return-await": [ "error" ],
@@ -111,7 +111,6 @@
     "no-useless-concat": [ "error" ],
     "no-useless-escape": [ "error" ],
     "no-useless-return": [ "error" ],
-    "no-warning-comments": [ "warn" ],
     "no-with": [ "error" ],
     "prefer-promise-reject-errors": ["error", {
       "allowEmptyReject": true
@@ -124,7 +123,7 @@
     "no-undef": [ "error" ],
     "no-undef-init": [ "error" ],
     "no-undefined": [ "error" ],
-    "no-unused-vars": [ "error" ],
+    "@typescript-eslint/no-unused-vars": [ "error" ],
     "no-use-before-define": [ "error" ],
     "callback-return": [ "error" ],
     "handle-callback-err": [ "error" ],
