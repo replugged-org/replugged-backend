@@ -144,7 +144,7 @@
     "eol-last": [ "error", "always" ],
     "func-call-spacing": [ "error", "never" ],
     "func-name-matching": [ "error", "always" ],
-    "indent": [ "error", 2, {
+    "@typescript-eslint/indent": [ "error", 2, {
       "SwitchCase": 1
     }],
     "keyword-spacing": [ "error" ],
@@ -156,9 +156,6 @@
     }],
     // "multiline-comment-style": [ "error" ],
     "multiline-ternary": [ "error", "always-multiline" ],
-    "new-cap": [ "error", {
-      "newIsCap": true
-    }],
     "new-parens": [ "error" ],
     "no-array-constructor": [ "error" ],
     "no-mixed-operators": [ "error" ],
