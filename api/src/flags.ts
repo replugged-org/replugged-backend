@@ -64,39 +64,39 @@ export const UserFlags = {
   GHOST: 1 << 26,
 
   SERVER_BOOSTER: 1 << 27
-}
+};
 
 export type UserFlagKeys = keyof typeof UserFlags;
 export type UserFlagsValues = typeof UserFlags[UserFlagKeys];
 
-export const PrivateUserFlags = 0
- | UserFlags.CUTIE_OVERRIDE
- | UserFlags.BANNED
- | UserFlags.BANNED_PUBLISHER
- | UserFlags.BANNED_VERIFICATION
- | UserFlags.BANNED_HOSTING
- | UserFlags.BANNED_REPORTING
- | UserFlags.BANNED_SYNC
- | UserFlags.BANNED_EVENTS
- | UserFlags.APPEALED_SUPPORT
- | UserFlags.APPEALED_MUTE
- | UserFlags.APPEALED_BAN
- | UserFlags.APPEALED_SYNC
- | UserFlags.APPEALED_EVENTS
- | UserFlags.GHOST
+export const PrivateUserFlags = 0 |
+ UserFlags.CUTIE_OVERRIDE |
+ UserFlags.BANNED |
+ UserFlags.BANNED_PUBLISHER |
+ UserFlags.BANNED_VERIFICATION |
+ UserFlags.BANNED_HOSTING |
+ UserFlags.BANNED_REPORTING |
+ UserFlags.BANNED_SYNC |
+ UserFlags.BANNED_EVENTS |
+ UserFlags.APPEALED_SUPPORT |
+ UserFlags.APPEALED_MUTE |
+ UserFlags.APPEALED_BAN |
+ UserFlags.APPEALED_SYNC |
+ UserFlags.APPEALED_EVENTS |
+ UserFlags.GHOST;
 
-  
-  // Flags that make a user go ghost instead of deleted.
-  export const PersistentUserFlags = 0
-   | UserFlags.BANNED
-   | UserFlags.BANNED_PUBLISHER
-   | UserFlags.BANNED_VERIFICATION
-   | UserFlags.BANNED_HOSTING
-   | UserFlags.BANNED_REPORTING
-   | UserFlags.BANNED_SYNC
-   | UserFlags.BANNED_EVENTS
-   | UserFlags.APPEALED_SUPPORT
-   | UserFlags.APPEALED_MUTE
-   | UserFlags.APPEALED_BAN
-   | UserFlags.APPEALED_SYNC
-   | UserFlags.APPEALED_EVENTS
+
+// Flags that make a user go ghost instead of deleted.
+export const PersistentUserFlags = 0 |
+   UserFlags.BANNED |
+   UserFlags.BANNED_PUBLISHER |
+   UserFlags.BANNED_VERIFICATION |
+   UserFlags.BANNED_HOSTING |
+   UserFlags.BANNED_REPORTING |
+   UserFlags.BANNED_SYNC |
+   UserFlags.BANNED_EVENTS |
+   UserFlags.APPEALED_SUPPORT |
+   UserFlags.APPEALED_MUTE |
+   UserFlags.APPEALED_BAN |
+   UserFlags.APPEALED_SYNC |
+   UserFlags.APPEALED_EVENTS;

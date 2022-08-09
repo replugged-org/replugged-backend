@@ -1,11 +1,11 @@
-import { h, render, hydrate } from 'preact'
+import { h, render, hydrate } from 'preact';
 import { useState, useEffect } from 'preact/hooks';
 import {
   type User
-} from './components/UserContext'
+} from './components/UserContext';
 import { Endpoints } from './constants';
-import App from './components/App'
-import './main.css'
+import App from './components/App';
+import './main.css';
 
 declare global {
   interface Window {
@@ -13,30 +13,33 @@ declare global {
   }
 }
 
-function Wrapper() {
-  const [user, setUser] = useState<User | null | undefined>(void 0);
+function Wrapper () {
+  const [ user, setUser ] = useState<User | null | undefined>(void 0);
   useEffect(() => {
     if (window.HAS_TOKEN !== false) {
       fetch(Endpoints.USER_SELF)
         .then((r) => r.json())
         .then((u) => {
           if (u._id) {
-            const patch = ((newUser: Partial<User>): void => setUser((oldUser) => <User>({ ...oldUser, ...newUser, patch: patch })))
-            setUser({ ...u, patch: patch });
+            const patch = ((newUser: Partial<User>): void => setUser((oldUser) => <User>({ ...oldUser,
+              ...newUser,
+              patch })));
+            setUser({ ...u,
+              patch });
             return;
           }
 
-          setUser(null)
-        })
+          setUser(null);
+        });
     } else {
-      setUser(null)
+      setUser(null);
     }
-  }, [])
-  return h(App, { user: user })
+  }, []);
+  return h(App, { user });
 }
 
 if (import.meta.env.DEV) {
-  render(h(Wrapper, null), document.querySelector('#app')!)
+  render(h(Wrapper, null), document.querySelector('#app')!);
 } else {
-  hydrate(h(Wrapper, null), document.querySelector('#app')!)
+  hydrate(h(Wrapper, null), document.querySelector('#app')!);
 }

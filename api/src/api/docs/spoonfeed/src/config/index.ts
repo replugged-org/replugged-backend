@@ -25,13 +25,13 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-import type { Config } from '../types/config.js'
+import type { Config } from '../types/config.js';
 
-import { existsSync } from 'fs'
-import { dirname, join } from 'path'
+import { existsSync } from 'fs';
+import { dirname, join } from 'path';
 
-import { extendedTypeof } from '../util.js'
-import validate from './validator.js'
+import { extendedTypeof } from '../util.js';
+import validate from './validator.js';
 
 interface ConfigPath { cfg: string | null, dir: string }
 
@@ -40,7 +40,7 @@ const BaseConfig: Config = {
   documents: {
     source: 'filesystem',
     path: 'docs',
-    assets: 'assets',
+    assets: 'assets'
   },
   ui: {
     title: 'Documentation',
@@ -48,7 +48,7 @@ const BaseConfig: Config = {
     copyright: null,
     logo: null,
     favicon: null,
-    acknowledgements: true,
+    acknowledgements: true
   },
   build: {
     target: 'build',
@@ -56,68 +56,79 @@ const BaseConfig: Config = {
     optimizeImg: true,
     offline: true,
     mangle: true,
-    split: true,
+    split: true
   },
   ssr: {
     generate: false,
     redirectInsecure: false,
     http2: false,
-    ssl: null,
-  },
-}
+    ssl: null
+  }
+};
 
 function mergeDeep (target: Record<string, unknown>, ...sources: Array<Record<string, unknown>>): Record<string, unknown> {
-  if (!sources.length) return target
-  const source = sources.shift()
+  if (!sources.length) {
+    return target;
+  }
+  const source = sources.shift();
 
   for (const key in source) {
     if (extendedTypeof(source[key]) === 'object') {
-      if (!target[key]) Object.assign(target, { [key]: {} })
-      mergeDeep(target[key] as Record<string, unknown>, source[key] as Record<string, unknown>)
+      if (!target[key]) {
+        Object.assign(target, { [key]: {} });
+      }
+      mergeDeep(target[key] as Record<string, unknown>, source[key] as Record<string, unknown>);
     } else {
-      Object.assign(target, { [key]: source[key] })
+      Object.assign(target, { [key]: source[key] });
     }
   }
 
-  return mergeDeep(target, ...sources)
+  return mergeDeep(target, ...sources);
 }
 
 export function findConfig (dir: string | null = null): ConfigPath {
-  if (!dir) dir = process.cwd()
+  if (!dir) {
+    dir = process.cwd();
+  }
 
   if (existsSync(join(dir, 'spoonfeed.config.js'))) {
-    return { cfg: join(dir, 'spoonfeed.config.js'), dir: dir }
+    return { cfg: join(dir, 'spoonfeed.config.js'),
+      dir };
   }
 
   if (existsSync(join(dir, 'package.json'))) {
-    return { cfg: null, dir: dir }
+    return { cfg: null,
+      dir };
   }
 
-  const next = dirname(dir)
+  const next = dirname(dir);
   if (next === dir) {
     // We reached system root
-    return { cfg: null, dir: dir }
+    return { cfg: null,
+      dir };
   }
 
-  return findConfig(next)
+  return findConfig(next);
 }
 
 export default async function readConfig (): Promise<Config> {
-  let cfg: Record<string, unknown> | void = {}
-  const path = findConfig()
+  let cfg: Record<string, unknown> | void = {};
+  const path = findConfig();
   if (path.cfg) {
     try {
-      cfg = await import(path.cfg).then((m) => m?.default) as Record<string, unknown> | void
+      cfg = await import(path.cfg).then((m) => m?.default) as Record<string, unknown> | void;
     } catch (e) {
       // @ts-ignore
-      throw new SyntaxError(e)
+      throw new SyntaxError(e);
     }
 
-    if (!cfg) throw new Error('No config was exported')
-    validate(cfg)
+    if (!cfg) {
+      throw new Error('No config was exported');
+    }
+    validate(cfg);
   }
 
-  const config = {}
-  mergeDeep(config, BaseConfig, cfg, { workdir: path.dir })
-  return config as Config
+  const config = {};
+  mergeDeep(config, BaseConfig, cfg, { workdir: path.dir });
+  return config as Config;
 }

@@ -1,8 +1,8 @@
-import type { FastifyInstance } from 'fastify'
+import type { FastifyInstance } from 'fastify';
 // import { fetchSuggestions } from './suggestions.js'
 
-import formModule from './forms.js'
-import itemsModule from './items.js'
+import formModule from './forms.js';
+import itemsModule from './items.js';
 
 export default async function (fastify: FastifyInstance): Promise<void> {
 //   fastify.get('/suggestions', (_request: FastifyRequest, reply: FastifyReply) => {
@@ -10,6 +10,6 @@ export default async function (fastify: FastifyInstance): Promise<void> {
 //     fetchSuggestions()
 //   })
 
-  fastify.register(formModule, { prefix: '/forms' })
-  fastify.register(itemsModule, {prefix: '/items'})
+  fastify.register(formModule, { prefix: '/forms' });
+  fastify.register(itemsModule, { prefix: '/items' });
 }

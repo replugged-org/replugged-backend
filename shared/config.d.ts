@@ -1,4 +1,4 @@
-import type RawConfig from '../config.example.json'
+import type RawConfig from '../config.example.json';
 
 
 type Config<TConfig = typeof RawConfig> = {
@@ -10,5 +10,5 @@ type Config<TConfig = typeof RawConfig> = {
         : TConfig[TProperty]
 }
 
-declare const config: Config
-export default config
+declare const config: Config;
+export default config;

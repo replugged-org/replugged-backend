@@ -25,13 +25,13 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-import { join } from 'path'
-import { existsSync } from 'fs'
-import { stat, readdir as fsReaddir } from 'fs/promises'
+import { join } from 'path';
+import { existsSync } from 'fs';
+import { stat, readdir as fsReaddir } from 'fs/promises';
 
-import type { DocumentRegistry, RawDocumentRegistry } from './config/types.js'
+import type { DocumentRegistry, RawDocumentRegistry } from './config/types.js';
 
-const md = /\.(md|markdown)$/i
+const md = /\.(md|markdown)$/i;
 
 interface ReaddirResult {
   folders: string[]
@@ -39,51 +39,57 @@ interface ReaddirResult {
 }
 
 async function readdir (folder: string): Promise<ReaddirResult> {
-  const files: string[] = []
-  const folders: string[] = []
+  const files: string[] = [];
+  const folders: string[] = [];
 
   for (const file of await fsReaddir(folder)) {
-    const fileStat = await stat(join(folder, file))
+    const fileStat = await stat(join(folder, file));
     if (fileStat.isDirectory()) {
-      folders.push(file)
+      folders.push(file);
     } else if (md.test(file)) {
-      files.push(file)
+      files.push(file);
     }
   }
 
-  return { files: files, folders: folders }
+  return { files,
+    folders };
 }
 
 export function validateRegistry (basepath: string, registry: RawDocumentRegistry): boolean {
   for (const r of registry) {
     if (typeof r === 'string') {
-      if (!existsSync(join(basepath, r))) return false
+      if (!existsSync(join(basepath, r))) {
+        return false;
+      }
     } else {
-      const base = join(basepath, r.category)
+      const base = join(basepath, r.category);
       for (const d of r.documents) {
-        if (!existsSync(join(base, d))) return false
+        if (!existsSync(join(base, d))) {
+          return false;
+        }
       }
     }
   }
 
-  return true
+  return true;
 }
 
 export default async function fsToRegistry (basepath: string): Promise<DocumentRegistry> {
   const registry: DocumentRegistry = {
     documentCount: 0,
-    documents: [],
-  }
+    documents: []
+  };
 
-  const res = await readdir(basepath)
-  registry.documentCount += res.files.length
-  registry.documents.push(...res.files.map((f) => join(basepath, f)))
+  const res = await readdir(basepath);
+  registry.documentCount += res.files.length;
+  registry.documents.push(...res.files.map((f) => join(basepath, f)));
   for (const folder of res.folders) {
-    const { files } = await readdir(join(basepath, folder))
-    const documents = files.map((f) => join(basepath, folder, f))
-    registry.documentCount += documents.length
-    registry.documents.push({ category: folder, documents: documents })
+    const { files } = await readdir(join(basepath, folder));
+    const documents = files.map((f) => join(basepath, folder, f));
+    registry.documentCount += documents.length;
+    registry.documents.push({ category: folder,
+      documents });
   }
 
-  return registry
+  return registry;
 }

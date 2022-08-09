@@ -25,15 +25,15 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-import { readFileSync, writeFileSync } from 'fs'
-import { execSync } from 'child_process'
+import { readFileSync, writeFileSync } from 'fs';
+import { execSync } from 'child_process';
 
 // Replace contributors count
 const contribCount = execSync('git --no-pager shortlog -s -n --no-merges', { stdio: [ 'inherit', 'pipe', 'pipe' ] })
   .toString()
   .split('\n')
   .filter(Boolean)
-  .length
+  .length;
 
-const sfCli = new URL('./dist/cli/index.js', import.meta.url)
-writeFileSync(sfCli, readFileSync(sfCli, 'utf8').replace('##{CONTRIBUTORS}', contribCount), 'utf8')
+const sfCli = new URL('./dist/cli/index.js', import.meta.url);
+writeFileSync(sfCli, readFileSync(sfCli, 'utf8').replace('##{CONTRIBUTORS}', contribCount), 'utf8');

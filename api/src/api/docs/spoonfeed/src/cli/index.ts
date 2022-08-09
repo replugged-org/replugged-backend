@@ -27,69 +27,71 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-import log from '../log.js'
+import log from '../log.js';
 
 // eslint-disable-next-line @typescript-eslint/no-var-requires -- We use require here so it doesn't get bundled by TS
-const { version: VERSION } = require('../../package.json') as { version: string }
+const { version: VERSION } = require('../../package.json') as { version: string };
 
 function bundle (serve: boolean): void {
   if (serve) {
-    console.log('Not implemented yet!')
-    process.exit(0)
+    console.log('Not implemented yet!');
+    process.exit(0);
   }
 
-  console.log('Henlo')
+  console.log('Henlo');
 }
 
 function about (): void {
-  console.log('Proudly built by Borkenware.')
+  console.log('Proudly built by Borkenware.');
   // some day -- console.log('Proudly built by Borkenware, and ##{CONTRIBUTORS} contributors.')
-  console.log(`Spoonfeed is Honest Open ${Math.random().toFixed(3) === '0.420' ? 'Sauce' : 'Source'} Software, licensed under BSD-3-Clause.`)
-  console.log('https://github.com/borkenware/spoonfeed')
+  console.log(`Spoonfeed is Honest Open ${Math.random().toFixed(3) === '0.420' ? 'Sauce' : 'Source'} Software, licensed under BSD-3-Clause.`);
+  console.log('https://github.com/borkenware/spoonfeed');
 }
 
 function displayHelp (): void {
-  console.log('spoonfeed [arguments] <command>\n')
+  console.log('spoonfeed [arguments] <command>\n');
 
-  console.log(' - spoonfeed bundle')
-  console.log('   Bundles the documentation')
-  console.log('   Enable debug logging with --debug')
-  console.log()
+  console.log(' - spoonfeed bundle');
+  console.log('   Bundles the documentation');
+  console.log('   Enable debug logging with --debug');
+  console.log();
   /*
    * console.log(' - spoonfeed serve')
    * console.log('   Starts the dev server')
    * console.log('   Enable debug logging with --debug')
    * console.log()
    */
-  console.log(' - spoonfeed about')
-  console.log('   Prints information about Spoonfeed')
-  console.log()
-  console.log(' - spoonfeed help')
-  console.log('   Shows this help message')
+  console.log(' - spoonfeed about');
+  console.log('   Prints information about Spoonfeed');
+  console.log();
+  console.log(' - spoonfeed help');
+  console.log('   Shows this help message');
 }
 
 if (require.main?.filename === __filename) {
-  console.log(`Spoonfeed v${VERSION}`, '\n')
+  console.log(`Spoonfeed v${VERSION}`, '\n');
 
-  if (process.argv.includes('--debug')) log.setDebug(true)
-  const command = process.argv.length > 2 ? process.argv[process.argv.length - 1] : ''
+  if (process.argv.includes('--debug')) {
+    log.setDebug(true);
+  }
+  const command = process.argv.length > 2 ? process.argv[process.argv.length - 1] : '';
   switch (command) {
     case 'bundle':
-      bundle(false)
-      break
+      bundle(false);
+      break;
     case 'serve':
-      bundle(true)
-      break
+      bundle(true);
+      break;
     case 'about':
-      about()
-      break
+      about();
+      break;
     default:
       if (command && command !== 'help') {
-        console.log(`Invalid usage! Unknown command "${command}".`)
-        console.log('Valid usages are:\n')
+        console.log(`Invalid usage! Unknown command "${command}".`);
+        console.log('Valid usages are:\n');
       }
 
-      displayHelp()
-      break
+      displayHelp();
+      break;
   }
 }

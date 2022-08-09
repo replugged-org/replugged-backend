@@ -1,5 +1,5 @@
 import {
-    type RestUserPrivate
+  type RestUserPrivate
 } from '../../../types/users';
 import { createContext } from 'preact';
 

@@ -1,15 +1,15 @@
 import type {
-    FastifyInstance,
-    FastifyRequest,
-    FastifyReply
-} from 'fastify'
+  FastifyInstance,
+  FastifyRequest,
+  FastifyReply
+} from 'fastify';
 import type {
-    DatabaseUser,
-    User
+  DatabaseUser,
+  User
 } from '../../../types/users';
 import { createHash } from 'crypto';
 // import { UserFlags } from '../flags.js'
-import config from '../config.js'
+import config from '../config.js';
 
 // import settingsModule from './settings.js'
 import { isGhostUser, formatUser } from '../data/user.js';
@@ -23,40 +23,39 @@ const DATE_ZERO = new Date(0);
 //     'cdn.discordapp.com', 'media.discordapp.net',
 // ]
 
-async function sendUser(request: FastifyRequest, reply: FastifyReply, user: User, self?: boolean) {
-    const etag = `W/"${createHash('sha256').update(config.secret).update(user._id).update((user.updatedAt ?? DATE_ZERO).toISOString()).digest('base64url')}"`
+async function sendUser (request: FastifyRequest, reply: FastifyReply, user: User, self?: boolean) {
+  const etag = `W/"${createHash('sha256').update(config.secret).update(user._id).update((user.updatedAt ?? DATE_ZERO).toISOString()).digest('base64url')}"`;
 
-    reply.header('cache-control', 'public, max-age=0, must-revalidate')
-    if (request.headers['if-none-match'] === etag) {
-        reply.code(304).send()
-        return
-    }
+  reply.header('cache-control', 'public, max-age=0, must-revalidate');
+  if (request.headers['if-none-match'] === etag) {
+    reply.code(304).send();
+    return;
+  }
 
-    reply.header('etag', etag)
-    return formatUser(user, self)
+  reply.header('etag', etag);
+  return formatUser(user, self);
 }
 
-async function getUser(this: FastifyInstance, request: FastifyRequest<{ Params: { id: string } }>, reply: FastifyReply) {
-    const user = await this.mongo.db!.collection<DatabaseUser>('users').findOne({ _id: request.params.id })
-    if (!user || isGhostUser(user)) {
-        return sendUser(request, reply, {
-            _id: request.params.id,
-            username: 'Herobrine',
-            discriminator: '0001',
-            avatar: null,
-            flags: 0,
-            accounts: <any>{},
-            createdAt: DATE_ZERO,
-        })
-    }
+async function getUser (this: FastifyInstance, request: FastifyRequest<{ Params: { id: string } }>, reply: FastifyReply) {
+  const user = await this.mongo.db!.collection<DatabaseUser>('users').findOne({ _id: request.params.id });
+  if (!user || isGhostUser(user)) {
+    return sendUser(request, reply, {
+      _id: request.params.id,
+      username: 'Herobrine',
+      discriminator: '0001',
+      avatar: null,
+      flags: 0,
+      accounts: <any>{},
+      createdAt: DATE_ZERO
+    });
+  }
 
-    // await refreshDonatorState(this.mongo.client, user)
-    return sendUser(request, reply, user)
+  // await refreshDonatorState(this.mongo.client, user)
+  return sendUser(request, reply, user);
 }
 
-async function getSelf(this: FastifyInstance, request: FastifyRequest, reply: FastifyReply) {
-
-    return sendUser(request, reply, request.user!, true)
+async function getSelf (this: FastifyInstance, request: FastifyRequest, reply: FastifyReply) {
+  return sendUser(request, reply, request.user!, true);
 }
 
 // this endpoint can only be used to modify perks, but implements checks as a generic update to follow REST semantics (and future-proofing)
@@ -99,24 +98,29 @@ async function getSelf(this: FastifyInstance, request: FastifyRequest, reply: Fa
 //     notifyStateChange(newUser, 'perks')
 // }
 
-async function getSpotifyToken(this: FastifyInstance, request: FastifyRequest): Promise<unknown> {
-    const { spotify } = request.user!.accounts
-    if (!spotify) return { token: null }
+async function getSpotifyToken (this: FastifyInstance, request: FastifyRequest): Promise<unknown> {
+  const { spotify } = request.user!.accounts;
+  if (!spotify) {
+    return { token: null };
+  }
 
-    const users = this.mongo.db!.collection<DatabaseUser>('users')
-    if (Date.now() >= spotify.expiresAt) {
-        try {
-            const tokens = await refreshAuthTokens('spotify', spotify.refreshToken)
-            await users.updateOne({ _id: request.user!._id }, { $currentDate: { updatedAt: true }, $set: toMongoFields(tokens, 'spotify') })
-            return { token: tokens.accessToken }
-        } catch {
-            // todo: catch 5xx errors from spotify and report them instead
-            await users.updateOne({ _id: request.user!._id }, { $currentDate: { updatedAt: true }, $unset: { 'accounts.spotify': 1 } })
-            return { token: null, revoked: 'ACCESS_DENIED' }
-        }
+  const users = this.mongo.db!.collection<DatabaseUser>('users');
+  if (Date.now() >= spotify.expiresAt) {
+    try {
+      const tokens = await refreshAuthTokens('spotify', spotify.refreshToken);
+      await users.updateOne({ _id: request.user!._id }, { $currentDate: { updatedAt: true },
+        $set: toMongoFields(tokens, 'spotify') });
+      return { token: tokens.accessToken };
+    } catch {
+      // todo: catch 5xx errors from spotify and report them instead
+      await users.updateOne({ _id: request.user!._id }, { $currentDate: { updatedAt: true },
+        $unset: { 'accounts.spotify': 1 } });
+      return { token: null,
+        revoked: 'ACCESS_DENIED' };
     }
+  }
 
-    return { token: spotify.accessToken }
+  return { token: spotify.accessToken };
 }
 
 // async function refreshPledge(this: FastifyInstance, request: FastifyRequest, reply: FastifyReply) {
@@ -143,52 +147,52 @@ async function getSpotifyToken(this: FastifyInstance, request: FastifyRequest): 
 // }
 
 export default async function (fastify: FastifyInstance): Promise<void> {
-    fastify.route({
-        method: 'GET',
-        url: '/@me',
-        handler: getSelf,
-        config: { auth: { allowClient: true } },
-    })
+  fastify.route({
+    method: 'GET',
+    url: '/@me',
+    handler: getSelf,
+    config: { auth: { allowClient: true } }
+  });
 
-    fastify.route({
-        method: 'GET',
-        url: '/@me/spotify',
-        handler: getSpotifyToken,
-        config: { auth: { allowClient: true } },
-    })
+  fastify.route({
+    method: 'GET',
+    url: '/@me/spotify',
+    handler: getSpotifyToken,
+    config: { auth: { allowClient: true } }
+  });
 
-    fastify.route({
-        method: 'GET',
-        url: '/:id(\\d{17,})',
-        handler: getUser,
-    })
+  fastify.route({
+    method: 'GET',
+    url: '/:id(\\d{17,})',
+    handler: getUser
+  });
 
-    //   fastify.route({
-    //     method: 'PATCH',
-    //     url: '/@me',
-    //     handler: patchSelf,
-    //     config: { auth: { allowClient: true } },
-    //     schema: {
-    //       body: { $ref: 'https://powercord.dev/schemas/user/update' },
-    //       response: {
-    //         200: { $ref: 'https://powercord.dev/schemas/user' },
-    //         // todo: 4xx
-    //       },
-    //     },
-    //   })
+  //   fastify.route({
+  //     method: 'PATCH',
+  //     url: '/@me',
+  //     handler: patchSelf,
+  //     config: { auth: { allowClient: true } },
+  //     schema: {
+  //       body: { $ref: 'https://powercord.dev/schemas/user/update' },
+  //       response: {
+  //         200: { $ref: 'https://powercord.dev/schemas/user' },
+  //         // todo: 4xx
+  //       },
+  //     },
+  //   })
 
-    //   fastify.route({
-    //     method: 'POST',
-    //     url: '/@me/refresh-pledge',
-    //     handler: refreshPledge,
-    //     config: { auth: { allowClient: true } },
-    //     schema: {
-    //       response: {
-    //         200: { $ref: 'https://powercord.dev/schemas/user#/properties/cutieStatus' },
-    //         // todo: 4xx
-    //       },
-    //     },
-    //   })
+  //   fastify.route({
+  //     method: 'POST',
+  //     url: '/@me/refresh-pledge',
+  //     handler: refreshPledge,
+  //     config: { auth: { allowClient: true } },
+  //     schema: {
+  //       response: {
+  //         200: { $ref: 'https://powercord.dev/schemas/user#/properties/cutieStatus' },
+  //         // todo: 4xx
+  //       },
+  //     },
+  //   })
 
-    //   fastify.register(settingsModule, { prefix: '/@me/settings' })
+  //   fastify.register(settingsModule, { prefix: '/@me/settings' })
 }

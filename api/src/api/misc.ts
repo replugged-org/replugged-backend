@@ -1,4 +1,4 @@
-import type { FastifyInstance, FastifyRequest, FastifyReply } from 'fastify'
+import type { FastifyInstance, FastifyRequest, FastifyReply } from 'fastify';
 
 const plugXml = `
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 447 447">
@@ -14,7 +14,7 @@ const plugXml = `
   <path fill="#23272A" d="M95.4,329.5l-29-29c-2.7-2.7-2.7-7,0-9.7l29-29c2.7-2.7,7-2.7,9.7,0l29,29c2.7,2.7,2.7,7,0,9.7l-29,29 C102.4,332.1,98.1,332.1,95.4,329.5z M81,295.7l19.3,19.3l19.3-19.3l-19.3-19.3L81,295.7z"/>
   <path fill="#23272A" d="M143.7,445.3L81,382.6c-21.3-21.3-21.3-55.9,0-77.2c2.7-2.7,7-2.7,9.7,0c2.7,2.7,2.7,7,0,9.7 c-16,16-16,42,0,57.9l62.8,62.8c2.7,2.7,2.7,7,0,9.7S146.4,448,143.7,445.3z"/>
 </svg>
-`
+`;
 
 function makeHibiscus (color: string) {
   return `<!--
@@ -30,21 +30,21 @@ function makeHibiscus (color: string) {
   <path fill-rule="evenodd" clip-rule="evenodd" d="M161.194 71.3143C159.198 74.6695 156.281 77.8967 152.59 80.5871L147.748 84.1245C144.393 86.5649 140.812 88.264 137.331 89.2089C145.018 101.229 151.949 114.144 157.643 126.4C163.423 123.033 170.119 121.079 177.292 121.079C177.678 121.079 178.048 121.132 178.419 121.184L178.419 121.184C178.723 121.227 179.028 121.27 179.341 121.283C179.266 119.731 179.226 118.167 179.219 116.597C174.799 101.412 169.141 85.7645 161.194 71.3143Z" fill="black" fill-opacity="0.4"/>
   <path d="M162.132 54.3058C167.209 61.2788 162.938 73.0432 152.59 80.5871L147.748 84.1245C137.391 91.6582 124.882 92.1272 119.805 85.1542L91.4646 46.242C86.3877 39.269 90.6592 27.5046 101.007 19.9709L105.849 16.4334C116.196 8.89975 128.705 8.43081 133.782 15.4038L162.132 54.3058Z" fill="black" fill-opacity="0.5"/>
 </svg>
-`
+`;
 }
 
 function plug (request: FastifyRequest<{ Params: { color: string } }>, reply: FastifyReply): void {
-  reply.type('image/svg+xml').send(plugXml.replace(/7289DA/g, request.params.color))
+  reply.type('image/svg+xml').send(plugXml.replace(/7289DA/g, request.params.color));
 }
 
 function hibiscus (request: FastifyRequest<{ Params: { color: string } }>, reply: FastifyReply): void {
-  reply.type('image/svg+xml').send(makeHibiscus(request.params.color))
+  reply.type('image/svg+xml').send(makeHibiscus(request.params.color));
 }
 
 /** @deprecated */
 export default async function (fastify: FastifyInstance): Promise<void> {
-  fastify.get('/plug/:color([a-fA-F0-9]{6})', plug)
+  fastify.get('/plug/:color([a-fA-F0-9]{6})', plug);
 
   // "Polyfill" for new donator perks for tier 1 & legacy donators
-  fastify.get('/hibiscus/:color([a-fA-F0-9]{6}).svg', hibiscus)
+  fastify.get('/hibiscus/:color([a-fA-F0-9]{6}).svg', hibiscus);
 }

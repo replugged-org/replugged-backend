@@ -35,6 +35,7 @@ export interface ConfigDocumentsRegistry {
   source: 'registry'
   assets: string
   path: string
+  // eslint-disable-next-line no-use-before-define
   documents: RawDocumentRegistry
 }
 

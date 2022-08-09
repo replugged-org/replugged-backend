@@ -25,48 +25,50 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-let logDebug = false
+let logDebug = false;
 
 const Prefixes = {
   DEBUG: '\x1b[47m\x1b[30m DEBUG \x1b[0m',
   INFO: '\x1b[44m\x1b[30m INFO \x1b[0m',
   SUCCESS: '\x1b[42m\x1b[30m SUCCESS \x1b[0m',
   WARNING: '\x1b[43m\x1b[30m WARN \x1b[0m',
-  ERROR: '\x1b[41m\x1b[30m ERROR \x1b[0m',
-}
+  ERROR: '\x1b[41m\x1b[30m ERROR \x1b[0m'
+};
 
-function setDebug (d: boolean): void { logDebug = d }
+function setDebug (d: boolean): void {
+  logDebug = d;
+}
 
 function debug (message: string): void {
   if (logDebug) {
-    console.log(`${Prefixes.DEBUG}  ${message}`)
+    console.log(`${Prefixes.DEBUG}  ${message}`);
   }
 }
 
 function info (message: string): void {
-  console.log(`${Prefixes.INFO}  ${message}`)
+  console.log(`${Prefixes.INFO}  ${message}`);
 }
 
 function success (message: string): void {
-  console.log(`${Prefixes.SUCCESS}  ${message}`)
+  console.log(`${Prefixes.SUCCESS}  ${message}`);
 }
 
 function warn (message: string): void {
-  console.log(`${Prefixes.WARNING}  ${message}`)
+  console.log(`${Prefixes.WARNING}  ${message}`);
 }
 
 function error (message: string, err?: Error): void {
-  console.log(`${Prefixes.ERROR}  ${message}`)
+  console.log(`${Prefixes.ERROR}  ${message}`);
   if (err) {
-    console.log(error) // todo: better
+    console.log(error); // todo: better
   }
 }
 
 export default {
-  setDebug: setDebug,
-  debug: debug,
-  info: info,
-  success: success,
-  warn: warn,
-  error: error,
-}
+  setDebug,
+  debug,
+  info,
+  success,
+  warn,
+  error
+};

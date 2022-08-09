@@ -31,19 +31,19 @@ export interface ConfigDocumentsFs {
   path: string
 }
 
-export interface ConfigDocumentsRegistry {
-  source: 'registry'
-  assets: string
-  path: string
-  documents: RawDocumentRegistry
-}
-
 export interface RegistryCategory {
   category: string
   documents: string[]
 }
 
 export type RawDocumentRegistry = Array<RegistryCategory | string>
+
+export interface ConfigDocumentsRegistry {
+  source: 'registry'
+  assets: string
+  path: string
+  documents: RawDocumentRegistry
+}
 
 export type DocumentRegistry = {
   documentCount: number

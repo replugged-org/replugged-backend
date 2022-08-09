@@ -25,61 +25,67 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-import { join } from 'path'
-import { existsSync } from 'fs'
-import { readdir, lstat, unlink, rmdir } from 'fs/promises'
+import { join } from 'path';
+import { existsSync } from 'fs';
+import { readdir, lstat, unlink, rmdir } from 'fs/promises';
 
-const UNITS = [ 'ns', 'µs', 'ms', 's' ]
+const UNITS = [ 'ns', 'µs', 'ms', 's' ];
 
 export type ExtendedType = 'string' | 'number' | 'bigint' |
   'boolean' | 'symbol' | 'undefined' | 'object' | 'function' |
   'array' | 'null' | 'nan'
 
 export function extendedTypeof (obj: unknown): ExtendedType {
-  if (typeof obj === 'object' && Array.isArray(obj)) return 'array'
-  if (typeof obj === 'object' && obj === null) return 'null'
-  if (typeof obj === 'number' && isNaN(obj)) return 'nan'
+  if (typeof obj === 'object' && Array.isArray(obj)) {
+    return 'array';
+  }
+  if (typeof obj === 'object' && obj === null) {
+    return 'null';
+  }
+  if (typeof obj === 'number' && isNaN(obj)) {
+    return 'nan';
+  }
 
-  return typeof obj
+  return typeof obj;
 }
 
 export function formatDelta (from: bigint, to: bigint): string {
-  let passes = 0
-  let delta = Number(to - from)
+  let passes = 0;
+  let delta = Number(to - from);
   while (delta > 2000 && passes < 4) {
-    delta /= 1000
-    passes++
+    delta /= 1000;
+    passes++;
   }
 
-  return `${delta.toFixed(2)} ${UNITS[passes]}`
+  return `${delta.toFixed(2)} ${UNITS[passes]}`;
 }
 
 export function sluggify (string: string): string {
   return string.replace(/(^\d+-|\.(md|markdown)$)/ig, '')
     .replace(/[^a-z]+/ig, '-')
     .replace(/(^-+|-+$)/ig, '')
-    .toLowerCase()
+    .toLowerCase();
 }
 
 export function slugToTitle (slug: string): string {
   return slug.split('-')
     .map((s) => s[0].toUpperCase() + s.slice(1).toLowerCase())
-    .join(' ')
+    .join(' ');
 }
 
 export async function rmdirRf (path: string): Promise<void> {
   if (existsSync(path)) {
-    const files = await readdir(path)
+    const files = await readdir(path);
     for (const file of files) {
-      const curPath = join(path, file)
-      const stat = await lstat(curPath)
+      const curPath = join(path, file);
+      const stat = await lstat(curPath);
 
       if (stat.isDirectory()) {
-        await rmdirRf(curPath)
+        await rmdirRf(curPath);
       } else {
-        await unlink(curPath)
+        await unlink(curPath);
       }
     }
-    await rmdir(path)
+    await rmdir(path);
   }
 }

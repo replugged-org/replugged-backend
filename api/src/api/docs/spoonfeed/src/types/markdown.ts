@@ -60,10 +60,12 @@ export enum MarkdownType {
 }
 
 // Generic types
+/* eslint-disable no-use-before-define */
 export type MarkdownNode = EmptyMarkdownNode | SimpleMarkdownNode | ComposedMarkdownNode | HeadingMarkdownNode |
   NoteMarkdownNode | ListItemMarkdownNode | ListMarkdownNode | TableMarkdownNode | HttpItemMarkdownNode |
   HttpMarkdownNode | CodeBlockMarkdownNode | LinkMarkdownNode | EmailMarkdownNode | DocumentMarkdownNode |
   ImageMarkdownNode | VideoMarkdownNode
+/* eslint-enable no-use-before-define */
 
 export interface EmptyMarkdownNode {
   type: MarkdownType.RULER | MarkdownType.LINE_BREAK

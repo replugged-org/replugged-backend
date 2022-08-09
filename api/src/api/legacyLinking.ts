@@ -1,5 +1,5 @@
-import type { FastifyInstance, FastifyRequest, FastifyReply } from 'fastify'
-import { TokenType } from '../utils/auth.js'
+import type { FastifyInstance, FastifyRequest, FastifyReply } from 'fastify';
+import { TokenType } from '../utils/auth.js';
 
 const html = (jwt: string): string => `<!doctype html>
 <html>
@@ -12,18 +12,18 @@ const html = (jwt: string): string => `<!doctype html>
 <img src='http://127.0.0.1:6462/wallpaper.png?jsonweebtoken=${jwt}' style='display: none;' alt='loading'/>
 <script>setTimeout(() => document.querySelector('p').innerText = 'You can close this page',1e3)</script>
 </body>
-</html>`
+</html>`;
 
 function legacy (request: FastifyRequest, reply: FastifyReply): void {
   if (!request.user) {
-    reply.redirect('/api/v1/oauth/discord?redirect=/api/v1/users/@me/link/legacy')
-    return
+    reply.redirect('/api/v1/oauth/discord?redirect=/api/v1/users/@me/link/legacy');
+    return;
   }
 
-  reply.type('text/html').send(html(reply.generateToken({ id: request.user!._id }, TokenType.CLIENT)))
+  reply.type('text/html').send(html(reply.generateToken({ id: request.user!._id }, TokenType.CLIENT)));
 }
 
 /** @deprecated */
 export default async function (fastify: FastifyInstance): Promise<void> {
-  fastify.get('/users/@me/link/legacy', { config: { auth: { optional: true } } }, legacy)
+  fastify.get('/users/@me/link/legacy', { config: { auth: { optional: true } } }, legacy);
 }

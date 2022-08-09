@@ -56,7 +56,7 @@ export type MinimalUser = {
 
 export type DatabaseUser = User | GhostUser
 
-/// REST-specific types
+// / REST-specific types
 export type RestUser = {
   _id: User['_id']
   flags: User['flags']

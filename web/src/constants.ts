@@ -36,7 +36,7 @@ export const Endpoints = {
   BACKOFFICE_TAG: (id: string) => `/api/v1/backoffice/tags/${id}`,
   BACKOFFICE_GET_USERS_GUILD_PERKS: (user: string) => `/api/v1/backoffice/users/perks/guild/${user}`,
   BACKOFFICE_USER_COUNT: '/api/v1/backoffice/users/count'
-}
+};
 
 export const Routes = {
   HOME: '/',
@@ -89,4 +89,4 @@ export const Routes = {
   DICKSWORD: 'https://discord.gg/replugged',
   GITHUB: 'https://github.com/replugged-org',
   PATREON: 'https://google.com'
-}
+};
