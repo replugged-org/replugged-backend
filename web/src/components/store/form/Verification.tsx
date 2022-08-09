@@ -1,15 +1,16 @@
-import type { Attributes } from 'preact'
-import type { Eligibility } from '../../../../../types/store'
-import { h } from 'preact'
-import { useTitle } from 'hoofd/preact'
+import type { Attributes } from 'preact';
+import type { Eligibility } from '../../../../../types/store';
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+import { h } from 'preact';
+import { useTitle } from 'hoofd/preact';
 
-import FormLayout from './Layout'
-import { TextField, TextareaField, CheckboxField } from '../../util/Form'
+import FormLayout from './Layout';
+import { TextField, TextareaField, CheckboxField } from '../../util/Form';
 
 type FormProps = Attributes & { eligibility?: Eligibility }
 
 export default function VerificationForm ({ eligibility }: FormProps) {
-  useTitle('Get verified')
+  useTitle('Get verified');
 
   return (
     <FormLayout id='verification' title='Get verified' eligibility={eligibility}>
@@ -60,5 +61,5 @@ export default function VerificationForm ({ eligibility }: FormProps) {
         disabled
       />
     </FormLayout>
-  )
+  );
 }

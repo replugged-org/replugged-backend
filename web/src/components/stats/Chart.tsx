@@ -1,9 +1,10 @@
-import type { Point, Chart as ChartData, StatsAll, StatsDay } from './useStats'
-import { h } from 'preact'
-import { useState, useRef, useEffect, useMemo } from 'preact/hooks'
+import type { Point, Chart as ChartData, StatsAll, StatsDay } from './useStats';
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+import { h } from 'preact';
+import { useState, useRef, useEffect, useMemo } from 'preact/hooks';
 
-import style from './stats.module.css'
-import Tooltip from '../util/Tooltip'
+import style from './stats.module.css';
+import Tooltip from '../util/Tooltip';
 
 type Legend = Record<string, string>
 
@@ -37,10 +38,10 @@ type ChartProps = {
   defaultMode?: string
 }
 
-const HEIGHT_RATIO = 270 / 1210
-const REPLUGGED_EPOCH = 1658901600000
-const SHOWN_DATES = 7
-const MONTHS = [ 'Jan', 'Feb', 'Mar', 'Apr', 'May', 'June', 'July', 'Aug', 'Sept', 'Oct', 'Nov', 'Dec' ]
+const HEIGHT_RATIO = 270 / 1210;
+const REPLUGGED_EPOCH = 1658901600000;
+const SHOWN_DATES = 7;
+const MONTHS = [ 'Jan', 'Feb', 'Mar', 'Apr', 'May', 'June', 'July', 'Aug', 'Sept', 'Oct', 'Nov', 'Dec' ];
 
 function ChartLegend ({ legend, dataset: { dataset } }: LegendProps) {
   return (
@@ -55,20 +56,20 @@ function ChartLegend ({ legend, dataset: { dataset } }: LegendProps) {
         </div>
       ))}
     </div>
-  )
+  );
 }
 
 function ChartSide ({ width, height, dataset }: ChartSideProps) {
-  const topMargin = 15
-  const delta = (height - topMargin - 35) / 4
-  const linesDelta = dataset.max - dataset.min
+  const topMargin = 15;
+  const delta = (height - topMargin - 35) / 4;
+  const linesDelta = dataset.max - dataset.min;
   const lines = [
     dataset.min + linesDelta,
     dataset.min + (linesDelta / 4 * 3),
     dataset.min + (linesDelta / 4 * 2),
     dataset.min + (linesDelta / 4),
-    dataset.min,
-  ].map((a) => Math.round(a))
+    dataset.min
+  ].map((a) => Math.round(a));
 
   return (
     <g>
@@ -79,76 +80,80 @@ function ChartSide ({ width, height, dataset }: ChartSideProps) {
         </g>
       ))}
     </g>
-  )
+  );
 }
 
 function ChartBottom ({ reduced, mode, width, height }: ChartBottomProps) {
-  const now = Date.now()
-  const baseHeight = height - 35
-  const deltaX = (width - 50) / SHOWN_DATES
+  const now = Date.now();
+  const baseHeight = height - 35;
+  const deltaX = (width - 50) / SHOWN_DATES;
   const dates = useMemo(() => {
-    const res = []
-    let addHour = false
-    let addYear = false
-    let delta
+    const res = [];
+    let addHour = false;
+    let addYear = false;
+    let delta;
     switch (mode) {
       case 'day':
-        addHour = true
-        delta = (24 * 3600e3) / SHOWN_DATES
-        break
+        addHour = true;
+        delta = (24 * 3600e3) / SHOWN_DATES;
+        break;
       case 'week':
-        delta = (24 * 7 * 3600e3) / SHOWN_DATES
-        break
+        delta = (24 * 7 * 3600e3) / SHOWN_DATES;
+        break;
       case 'month':
-        addYear = true
-        delta = (24 * 30 * 3600e3) / SHOWN_DATES
-        break
+        addYear = true;
+        delta = (24 * 30 * 3600e3) / SHOWN_DATES;
+        break;
       default: // all time
-        addYear = true
-        delta = (now - REPLUGGED_EPOCH) / SHOWN_DATES
-        break
+        addYear = true;
+        delta = (now - REPLUGGED_EPOCH) / SHOWN_DATES;
+        break;
     }
 
     for (let i = 0; i < SHOWN_DATES; i++) {
-      const target = new Date(now - (delta * (i + 0.5)))
-      let str = `${MONTHS[target.getMonth()]} ${target.getDate()}`
-      if (addYear) str += `, ${target.getFullYear()}`
-      if (addHour) {
-        let hours = target.getHours()
-        let minutes = Math.round(target.getMinutes() / 30) * 30
-        if (minutes === 60) {
-          hours++
-          minutes = 0
-        }
-        str += ` ${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}`
+      const target = new Date(now - (delta * (i + 0.5)));
+      let str = `${MONTHS[target.getMonth()]} ${target.getDate()}`;
+      if (addYear) {
+        str += `, ${target.getFullYear()}`;
       }
-      res.unshift(str)
+      if (addHour) {
+        let hours = target.getHours();
+        let minutes = Math.round(target.getMinutes() / 30) * 30;
+        if (minutes === 60) {
+          hours++;
+          minutes = 0;
+        }
+        str += ` ${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}`;
+      }
+      res.unshift(str);
     }
 
-    return res
-  }, [ mode ])
+    return res;
+  }, [ mode ]);
 
   return (
     <g>
       {dates.map((d, i) => {
-        if (reduced && i % 2 !== 0) return null
-        const x = Math.round(50 + (deltaX * (i + 0.5)))
+        if (reduced && i % 2 !== 0) {
+          return null;
+        }
+        const x = Math.round(50 + (deltaX * (i + 0.5)));
         return (
           <g key={d}>
             <text className={style.gridText} x={x} y={baseHeight + 25} text-anchor='middle'>{d}</text>
             <line className={style.gridLine} x1={x} x2={x} y1={baseHeight} y2={baseHeight + 10}/>
           </g>
-        )
+        );
       })}
     </g>
-  )
+  );
 }
 
 function ChartLine ({ reduced, width, height, set, color, points }: ChartLineProps) {
-  const usableWidth = width - 60
-  const usableHeight = height - 50
-  const heightMargin = 15
-  const widthMargin = 60
+  const usableWidth = width - 60;
+  const usableHeight = height - 50;
+  const heightMargin = 15;
+  const widthMargin = 60;
 
   const mappedPoints = useMemo(
     () =>
@@ -157,12 +162,12 @@ function ChartLine ({ reduced, width, height, set, color, points }: ChartLinePro
         .map((p) => ({
           x: (p.x * usableWidth) + widthMargin,
           y: usableHeight - (p.y * usableHeight) + heightMargin,
-          value: p.value,
+          value: p.value
         })),
     [ width, height, points, reduced ]
-  )
+  );
 
-  const linePath = useMemo(() => mappedPoints.map((p) => `${p.x},${p.y}`).join(' '), [ mappedPoints ])
+  const linePath = useMemo(() => mappedPoints.map((p) => `${p.x},${p.y}`).join(' '), [ mappedPoints ]);
 
   return (
     <g data-dataset={set}>
@@ -173,7 +178,7 @@ function ChartLine ({ reduced, width, height, set, color, points }: ChartLinePro
         </Tooltip>
       ))}
     </g>
-  )
+  );
 }
 
 function ChartDataset ({ reduced, width, height, dataset }: ChartDatasetProps) {
@@ -184,34 +189,34 @@ function ChartDataset ({ reduced, width, height, dataset }: ChartDatasetProps) {
           <ChartLine key={key} set={key} width={width} height={height} color={color} points={points} reduced={reduced}/>
       )}
     </g>
-  )
+  );
 }
 
 export default function Chart (props: ChartProps) {
-  const ref = useRef<HTMLElement>(null)
-  const [ reduced, setReduced ] = useState(typeof window === 'undefined' ? false : window.innerWidth < 810)
-  const [ mode, setMode ] = useState(props.defaultMode || props.modes[0].key)
-  const [ [ width, height ], setSize ] = useState([ 0, 0 ])
-  const dataset = useMemo(() => props.dataset && props.dataset[mode as keyof typeof props.dataset], [ props.dataset, mode ])
+  const ref = useRef<HTMLElement>(null);
+  const [ reduced, setReduced ] = useState(typeof window === 'undefined' ? false : window.innerWidth < 810);
+  const [ mode, setMode ] = useState(props.defaultMode || props.modes[0].key);
+  const [ [ width, height ], setSize ] = useState([ 0, 0 ]);
+  const dataset = useMemo(() => props.dataset && props.dataset[mode as keyof typeof props.dataset], [ props.dataset, mode ]);
 
   useEffect(() => {
     const computeSize = () => {
       if (ref.current) {
-        const { width: w } = ref.current.getBoundingClientRect()
-        setSize([ w, Math.round((w - 80) * HEIGHT_RATIO) + 50 ])
+        const { width: w } = ref.current.getBoundingClientRect();
+        setSize([ w, Math.round((w - 80) * HEIGHT_RATIO) + 50 ]);
 
         if (!reduced && window.innerWidth < 810) {
-          setReduced(true)
+          setReduced(true);
         } else if (reduced && window.innerWidth > 810) {
-          setReduced(false)
+          setReduced(false);
         }
       }
-    }
+    };
 
-    computeSize()
-    window.addEventListener('resize', computeSize)
-    return () => window.removeEventListener('resize', computeSize)
-  }, [ ref.current, reduced ])
+    computeSize();
+    window.addEventListener('resize', computeSize);
+    return () => window.removeEventListener('resize', computeSize);
+  }, [ ref.current, reduced ]);
 
   return (
     <section className={style.chart} ref={ref}>
@@ -236,5 +241,5 @@ export default function Chart (props: ChartProps) {
         {dataset && <ChartDataset reduced={reduced} width={width} height={height} dataset={dataset}/>}
       </svg>
     </section>
-  )
+  );
 }

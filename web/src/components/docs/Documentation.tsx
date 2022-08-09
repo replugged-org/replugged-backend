@@ -1,21 +1,22 @@
-import type { Attributes } from 'preact'
-import { h, Fragment } from 'preact'
-import { useState, useEffect, useMemo } from 'preact/hooks'
-import { Link } from 'preact-router/match'
+import type { Attributes } from 'preact';
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+import { h, Fragment } from 'preact';
+import { useState, useEffect, useMemo } from 'preact/hooks';
+import { Link } from 'preact-router/match';
 
-import Markdown from './Markdown'
-import Spinner from '../util/Spinner'
-import Redirect from '../util/Redirect'
-import LayoutWithSidebar from '../layout/LayoutWithSidebar'
+import Markdown from './Markdown';
+import Spinner from '../util/Spinner';
+import Redirect from '../util/Redirect';
+import LayoutWithSidebar from '../layout/LayoutWithSidebar';
 
-import { Endpoints, Routes } from '../../constants'
+import { Endpoints, Routes } from '../../constants';
 
-import style from './documentation.module.css'
+import style from './documentation.module.css';
 
 type DocProps = { categoryId?: string, documentId?: string } & Attributes
-type SidebarProps = { categories: Category[] }
 export type Document = { id: string, title: string, parts: string[] }
 export type Category = { id: string, name: string, docs: Document[] }
+type SidebarProps = { categories: Category[] }
 
 function Sidebar ({ categories }: SidebarProps) {
   return <>
@@ -35,37 +36,37 @@ function Sidebar ({ categories }: SidebarProps) {
         ))}
       </Fragment>
     ))}
-  </>
+  </>;
 }
 
-let cache: Category[] | null = null
+let cache: Category[] | null = null;
 export default function Documentation ({ categoryId, documentId }: DocProps) {
-  const docKey = useMemo(() => `${categoryId}/${documentId}`, [ categoryId, documentId ])
-  const [ categories, setCategories ] = useState(cache)
-  const category = useMemo(() => categories?.find((c) => c.id === categoryId), [ categories, categoryId ])
+  const docKey = useMemo(() => `${categoryId}/${documentId}`, [ categoryId, documentId ]);
+  const [ categories, setCategories ] = useState(cache);
+  const category = useMemo(() => categories?.find((c) => c.id === categoryId), [ categories, categoryId ]);
 
   useEffect(() => {
     if (!categories) {
       fetch(Endpoints.DOCS_CATEGORIES)
         .then((r) => r.json())
-        .then((cats) => setCategories(cache = cats))
+        .then((cats) => setCategories(cache = cats));
     }
-  }, [])
+  }, []);
 
   if (!categories) {
     return (
       <main>
         <Spinner/>
       </main>
-    )
+    );
   }
 
   if (!category) {
-    return <Redirect to={Routes.DOCS_ITEM(categories[0].id, categories[0].docs[0].id)}/>
+    return <Redirect to={Routes.DOCS_ITEM(categories[0].id, categories[0].docs[0].id)}/>;
   }
 
   if (!documentId) {
-    return <Redirect to={Routes.DOCS_ITEM(categoryId!, category.docs[0].id)}/>
+    return <Redirect to={Routes.DOCS_ITEM(categoryId!, category.docs[0].id)}/>;
   }
 
   return (
@@ -82,5 +83,5 @@ export default function Documentation ({ categoryId, documentId }: DocProps) {
         </div>
       </Fragment>
     </LayoutWithSidebar>
-  )
+  );
 }

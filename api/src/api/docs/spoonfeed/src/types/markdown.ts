@@ -62,9 +62,9 @@ export enum MarkdownType {
 // Generic types
 /* eslint-disable no-use-before-define */
 export type MarkdownNode = EmptyMarkdownNode | SimpleMarkdownNode | ComposedMarkdownNode | HeadingMarkdownNode |
-  NoteMarkdownNode | ListItemMarkdownNode | ListMarkdownNode | TableMarkdownNode | HttpItemMarkdownNode |
-  HttpMarkdownNode | CodeBlockMarkdownNode | LinkMarkdownNode | EmailMarkdownNode | DocumentMarkdownNode |
-  ImageMarkdownNode | VideoMarkdownNode
+NoteMarkdownNode | ListItemMarkdownNode | ListMarkdownNode | TableMarkdownNode | HttpItemMarkdownNode |
+HttpMarkdownNode | CodeBlockMarkdownNode | LinkMarkdownNode | EmailMarkdownNode | DocumentMarkdownNode |
+ImageMarkdownNode | VideoMarkdownNode
 /* eslint-enable no-use-before-define */
 
 export interface EmptyMarkdownNode {
@@ -78,7 +78,7 @@ export interface SimpleMarkdownNode {
 
 export interface ComposedMarkdownNode {
   type: MarkdownType.PARAGRAPH | MarkdownType.QUOTE | MarkdownType.BOLD |
-    MarkdownType.ITALIC | MarkdownType.UNDERLINE | MarkdownType.STRIKE_THROUGH
+  MarkdownType.ITALIC | MarkdownType.UNDERLINE | MarkdownType.STRIKE_THROUGH
   content: MarkdownNode[]
 }
 

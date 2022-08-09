@@ -1,19 +1,20 @@
-import type { Ref } from 'preact'
-import type { RestAdminUser } from '../../../../../types/users'
-import { useCallback, useEffect, useRef, useState } from 'preact/hooks'
-import { h } from 'preact'
+import type { Ref } from 'preact';
+import type { RestAdminUser } from '../../../../../types/users';
+import { useCallback, useEffect, useRef, useState } from 'preact/hooks';
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+import { h } from 'preact';
 
-import Modal from '../../util/Modal'
-import { CheckboxField, SelectField, TextField } from '../../util/Form'
-import { Endpoints } from '../../../constants'
+import Modal from '../../util/Modal';
+import { CheckboxField, SelectField, TextField } from '../../util/Form';
+import { Endpoints } from '../../../constants';
 
-import style from '../admin.module.css'
-import Tabs from '../../util/Tabs'
+import style from '../admin.module.css';
+import Tabs from '../../util/Tabs';
 
 type ManageModalProps = { user: RestAdminUser, onClose: () => void }
 type FormChunkProps = { user: RestAdminUser, formRef: Ref<HTMLFormElement> }
 
-function FormProperties({ user, formRef, ...props }: FormChunkProps) {
+function FormProperties ({ user, formRef, ...props }: FormChunkProps) {
   return (
     <form ref={formRef} onSubmit={(e) => e.preventDefault()} {...props}>
       <div className={style.form2}>
@@ -58,17 +59,21 @@ function FormProperties({ user, formRef, ...props }: FormChunkProps) {
         label='Donator tier'
         value={String(user.patronTier ?? 0)}
         options={[
-          { id: '0', name: 'Not donating' },
-          { id: '1', name: '$1 Donator' },
-          { id: '2', name: '$5 Donator' },
-          { id: '3', name: '$10 Donator' },
+          { id: '0',
+            name: 'Not donating' },
+          { id: '1',
+            name: '$1 Donator' },
+          { id: '2',
+            name: '$5 Donator' },
+          { id: '3',
+            name: '$10 Donator' }
         ]}
       />
     </form>
-  )
+  );
 }
 
-function FormPerks({ user, formRef, ...props }: FormChunkProps) {
+function FormPerks ({ user, formRef, ...props }: FormChunkProps) {
   return (
     <form ref={formRef} onSubmit={(e) => e.preventDefault()} {...props}>
       <TextField
@@ -89,7 +94,7 @@ function FormPerks({ user, formRef, ...props }: FormChunkProps) {
         value={user?.cutiePerks?.title ?? ''}
       />
     </form>
-  )
+  );
 }
 
 type DatabaseBadge = {
@@ -102,13 +107,13 @@ type DatabaseBadge = {
 }
 
 
-function FormGuildBadge({ user, formRef, ...props }: FormChunkProps) {
-  const [perks, setPerks] = useState<DatabaseBadge | null>(null)
+function FormGuildBadge ({ user, formRef, ...props }: FormChunkProps) {
+  const [ perks, setPerks ] = useState<DatabaseBadge | null>(null);
   useEffect(() => {
     fetch(Endpoints.BACKOFFICE_GET_USERS_GUILD_PERKS(user._id))
       .then((r) => r.json())
       .then((p) => setPerks(p));
-  }, [])
+  }, []);
 
   return (
     <form ref={formRef} onSubmit={(e) => e.preventDefault()} {...props}>
@@ -129,49 +134,51 @@ function FormGuildBadge({ user, formRef, ...props }: FormChunkProps) {
         value={perks?.name ?? ''}
       />
     </form>
-  )
+  );
 }
 
-export function ManageEdit({ user, onClose }: ManageModalProps) {
-  const [processing, setProcessing] = useState(false)
-  const formPropertiesRef = useRef<HTMLFormElement>(null)
-  const formPerksRef = useRef<HTMLFormElement>(null)
-  const formGuildPerksRef = useRef<HTMLFormElement>(null)
+export function ManageEdit ({ user, onClose }: ManageModalProps) {
+  const [ processing, setProcessing ] = useState(false);
+  const formPropertiesRef = useRef<HTMLFormElement>(null);
+  const formPerksRef = useRef<HTMLFormElement>(null);
+  const formGuildPerksRef = useRef<HTMLFormElement>(null);
 
   const onSave = useCallback(() => {
-    if (!formPropertiesRef.current && !formPerksRef.current && !formGuildPerksRef.current) return
-    const data: Record<string, unknown> = {}
-    setProcessing(true)
+    if (!formPropertiesRef.current && !formPerksRef.current && !formGuildPerksRef.current) {
+      return;
+    }
+    const data: Record<string, unknown> = {};
+    setProcessing(true);
 
     if (formPropertiesRef.current) {
-      data.patronTier = Number(formPropertiesRef.current.patronTier.value)
-      data['badges.developer'] = formPropertiesRef.current.badgeDeveloper.checked
-      data['badges.staff'] = formPropertiesRef.current.badgeStaff.checked
-      data['badges.support'] = formPropertiesRef.current.badgeSupport.checked
-      data['badges.contributor'] = formPropertiesRef.current.badgeContributor.checked
-      data['badges.hunter'] = formPropertiesRef.current.badgeHunter.checked
-      data['badges.early'] = formPropertiesRef.current.badgeEarly.checked
-      data['badges.translator'] = formPropertiesRef.current.badgeTranslator.checked
+      data.patronTier = Number(formPropertiesRef.current.patronTier.value);
+      data['badges.developer'] = formPropertiesRef.current.badgeDeveloper.checked;
+      data['badges.staff'] = formPropertiesRef.current.badgeStaff.checked;
+      data['badges.support'] = formPropertiesRef.current.badgeSupport.checked;
+      data['badges.contributor'] = formPropertiesRef.current.badgeContributor.checked;
+      data['badges.hunter'] = formPropertiesRef.current.badgeHunter.checked;
+      data['badges.early'] = formPropertiesRef.current.badgeEarly.checked;
+      data['badges.translator'] = formPropertiesRef.current.badgeTranslator.checked;
     }
 
     if (formPerksRef.current) {
-      data['badges.custom.color'] = formPerksRef.current.color.value || null
-      data['badges.custom.icon'] = formPerksRef.current.icon.value || null
-      data['badges.custom.name'] = formPerksRef.current.tooltip.value || null
+      data['badges.custom.color'] = formPerksRef.current.color.value || null;
+      data['badges.custom.icon'] = formPerksRef.current.icon.value || null;
+      data['badges.custom.name'] = formPerksRef.current.tooltip.value || null;
     }
 
     if (formGuildPerksRef.current) {
-      data['badges.guild.id'] = formGuildPerksRef.current.color.value || null
-      data['badges.guild.icon'] = formGuildPerksRef.current.icon.value || null
-      data['badges.guild.name'] = formGuildPerksRef.current.tooltip.value || null
+      data['badges.guild.id'] = formGuildPerksRef.current.color.value || null;
+      data['badges.guild.icon'] = formGuildPerksRef.current.icon.value || null;
+      data['badges.guild.name'] = formGuildPerksRef.current.tooltip.value || null;
     }
 
     fetch(Endpoints.BACKOFFICE_USER(user._id), {
       method: 'PATCH',
       headers: { 'content-type': 'application/json' },
-      body: JSON.stringify(data),
-    }).then(() => onClose())
-  }, [])
+      body: JSON.stringify(data)
+    }).then(() => onClose());
+  }, []);
 
   return (
     <Modal
@@ -193,16 +200,20 @@ export function ManageEdit({ user, onClose }: ManageModalProps) {
         </div>
       </Tabs>
     </Modal>
-  )
+  );
 }
 
-export function ManageModeration({ user, onClose }: ManageModalProps) {
-  const [processing, setProcessing] = useState(false)
-  const formRef = useRef<HTMLFormElement>(null)
+export function ManageModeration ({ user, onClose }: ManageModalProps) {
+  const [ processing, setProcessing ] = useState(false);
+  const formRef = useRef<HTMLFormElement>(null);
   const onApply = useCallback((e?: Event) => {
-    if (e) e.preventDefault()
-    if (!formRef.current) return
-    setProcessing(true)
+    if (e) {
+      e.preventDefault();
+    }
+    if (!formRef.current) {
+      return;
+    }
+    setProcessing(true);
 
     const userbans = {
       publish: formRef.current.publish.checked,
@@ -210,23 +221,23 @@ export function ManageModeration({ user, onClose }: ManageModalProps) {
       hosting: formRef.current.hosting.checked,
       reporting: formRef.current.reporting.checked,
       sync: formRef.current.sync.checked,
-      events: formRef.current.events.checked,
-    }
+      events: formRef.current.events.checked
+    };
 
     if (!Object.values(userbans).filter((b) => b).length) {
       fetch(Endpoints.BACKOFFICE_BAN(user._id), {
         method: 'DELETE',
-        headers: { 'content-type': 'application/json' },
-      }).then(() => onClose())
-      return
+        headers: { 'content-type': 'application/json' }
+      }).then(() => onClose());
+      return;
     }
 
     fetch(Endpoints.BACKOFFICE_BAN(user._id), {
       method: 'PUT',
       headers: { 'content-type': 'application/json' },
-      body: JSON.stringify(userbans),
-    }).then(() => onClose())
-  }, [])
+      body: JSON.stringify(userbans)
+    }).then(() => onClose());
+  }, []);
 
   return (
     <Modal title={`User bans - ${user.username}#${user.discriminator}`} onClose={onClose} onConfirm={onApply} confirmText='Apply' processing={processing}>
@@ -269,27 +280,27 @@ export function ManageModeration({ user, onClose }: ManageModalProps) {
         />
       </form>
     </Modal>
-  )
+  );
 }
 
-export function ManageDelete({ user, onClose }: ManageModalProps) {
-  const [processing, setProcessing] = useState(false)
-  const formRef = useRef<HTMLFormElement>(null)
+export function ManageDelete ({ user, onClose }: ManageModalProps) {
+  const [ processing, setProcessing ] = useState(false);
+  const formRef = useRef<HTMLFormElement>(null);
   const onYeet = useCallback(() => {
-    setProcessing(true)
+    setProcessing(true);
     fetch(Endpoints.BACKOFFICE_USER(user._id), { method: 'DELETE' })
       .then(() => {
         if (formRef.current?.ban.checked) {
           fetch(Endpoints.BACKOFFICE_BAN(user._id), {
             method: 'POST',
             headers: { 'content-type': 'application/json' },
-            body: JSON.stringify({ account: true }),
-          }).then(() => onClose())
+            body: JSON.stringify({ account: true })
+          }).then(() => onClose());
         } else {
-          onClose()
+          onClose();
         }
-      })
-  }, [])
+      });
+  }, []);
 
   return (
     <Modal title='Delete an account' onClose={onClose} onConfirm={onYeet} confirmText='Yeet' processing={processing} color='red'>
@@ -304,5 +315,5 @@ export function ManageDelete({ user, onClose }: ManageModalProps) {
         />
       </form>
     </Modal>
-  )
+  );
 }

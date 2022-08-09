@@ -1,11 +1,12 @@
-import { h } from 'preact'
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+import { h } from 'preact';
 
-import ArrowHeadBackDouble from 'feather-icons/dist/icons/chevrons-left.svg'
-import ArrowHeadBack from 'feather-icons/dist/icons/chevron-left.svg'
-import ArrowHeadNext from 'feather-icons/dist/icons/chevron-right.svg'
-import ArrowHeadNextDouble from 'feather-icons/dist/icons/chevrons-right.svg'
+import ArrowHeadBackDouble from 'feather-icons/dist/icons/chevrons-left.svg';
+import ArrowHeadBack from 'feather-icons/dist/icons/chevron-left.svg';
+import ArrowHeadNext from 'feather-icons/dist/icons/chevron-right.svg';
+import ArrowHeadNextDouble from 'feather-icons/dist/icons/chevrons-right.svg';
 
-import style from './paginator.module.css'
+import style from './paginator.module.css';
 
 type PaginatorProps = {
   current: number
@@ -14,8 +15,8 @@ type PaginatorProps = {
 }
 
 export default function Paginator ({ current, total, setPage }: PaginatorProps) {
-  const prevLocked = current === 1
-  const nextLocked = current === total
+  const prevLocked = current === 1;
+  const nextLocked = current === total;
 
   return (
     <div className={style.wrapper}>
@@ -35,5 +36,5 @@ export default function Paginator ({ current, total, setPage }: PaginatorProps) 
         </button>
       </div>
     </div>
-  )
+  );
 }

@@ -3,18 +3,18 @@ import { DiscordEmbed } from '../../../../types/discord';
 import { UserFlags } from '../../flags.js';
 
 export type DatabaseTag = {
-    _id: string
-    content: string
-    embed?: DiscordEmbed
+  _id: string
+  content: string
+  embed?: DiscordEmbed
 };
 
 type RouteParams = {
-    id: string
+  id: string
 }
 
 type ReadAllQuery = {
-    page: number
-    limit: number
+  page: number
+  limit: number
 }
 
 async function read (this: FastifyInstance, request: FastifyRequest<{ Params: RouteParams }>, reply: FastifyReply) {
@@ -60,7 +60,7 @@ async function del (this: FastifyInstance, request: FastifyRequest<{ Params: Rou
     return;
   }
 
-    this.mongo.db!.collection('tags').deleteOne({ _id: request.params.id });
+  this.mongo.db!.collection('tags').deleteOne({ _id: request.params.id });
 }
 
 export default async function (fastify: FastifyInstance): Promise<void> {

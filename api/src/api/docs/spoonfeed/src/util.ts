@@ -32,8 +32,8 @@ import { readdir, lstat, unlink, rmdir } from 'fs/promises';
 const UNITS = [ 'ns', 'µs', 'ms', 's' ];
 
 export type ExtendedType = 'string' | 'number' | 'bigint' |
-  'boolean' | 'symbol' | 'undefined' | 'object' | 'function' |
-  'array' | 'null' | 'nan'
+'boolean' | 'symbol' | 'undefined' | 'object' | 'function' |
+'array' | 'null' | 'nan'
 
 export function extendedTypeof (obj: unknown): ExtendedType {
   if (typeof obj === 'object' && Array.isArray(obj)) {

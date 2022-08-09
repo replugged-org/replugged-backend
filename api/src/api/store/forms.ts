@@ -10,32 +10,32 @@ import { dispatchHonk } from '../../utils/discord.js';
 
 // todo: see if this can deduped easily, schemas also contain the structure
 type PublishBody = {
-    repoUrl: string
-    bdAlternative: string
-    reviewNotes: string
-    complianceGuidelines: boolean
-    complianceLegal: boolean
-    type: string,
-    descripion: string
+  repoUrl: string
+  bdAlternative: string
+  reviewNotes: string
+  complianceGuidelines: boolean
+  complianceLegal: boolean
+  type: string,
+  descripion: string
 }
 
 type VerificationBody = {
-    workUrl: string
-    workAbout: string
-    developerAbout: string
-    workFuture: string
-    why: string
-    complianceCute: boolean
+  workUrl: string
+  workAbout: string
+  developerAbout: string
+  workFuture: string
+  why: string
+  complianceCute: boolean
 }
 
 type HostingBody = {
-    repoUrl: string
-    purpose: string
-    technical: string
-    subdomain: string
-    reviewNotes: string
-    complianceSecurity: boolean
-    compliancePrivacy: boolean
+  repoUrl: string
+  purpose: string
+  technical: string
+  subdomain: string
+  reviewNotes: string
+  complianceSecurity: boolean
+  compliancePrivacy: boolean
 }
 
 const BD_URL_RE = /^(?:https?:\/\/)?betterdiscord\.app\/(plugin|theme)\/([^/]+)/i;
@@ -145,9 +145,9 @@ function stringifyForm (data: Record<string, unknown>): string {
 }
 
 type EmbedField = {
-    inline?: boolean
-    name: string
-    value: string
+  inline?: boolean
+  name: string
+  value: string
 }
 
 function fieldifyForm (data: Record<string, unknown>): EmbedField[] {

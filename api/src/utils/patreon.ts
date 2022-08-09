@@ -136,7 +136,7 @@ export async function updateDonatorState (mongo: MongoClient, user: User, manual
   const statusChange = user.cutieStatus?.pledgeTier !== mongoUpdate.$set!['cutieStatus.pledgeTier'];
   // @ts-ignore
   if (manual) {
- mongoUpdate.$set!['cutieStatus.lastManualRefresh'] = Date.now();
+    mongoUpdate.$set!['cutieStatus.lastManualRefresh'] = Date.now();
   }
 
   const res = await collection.findOneAndUpdate({ _id: user._id }, mongoUpdate, { returnDocument: 'after' });

@@ -1,31 +1,40 @@
-import type { Attributes, ComponentChildren } from 'preact'
-import { h, cloneElement, toChildArray } from 'preact'
-import { useMemo, useState } from 'preact/hooks'
+import type { Attributes, ComponentChildren } from 'preact';
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+import { h, cloneElement, toChildArray } from 'preact';
+import { useMemo, useState } from 'preact/hooks';
 
-import style from './tabs.module.css'
+import style from './tabs.module.css';
 
 type TabProps = Attributes & {
   children: ComponentChildren
 }
 
 export default function Tabs ({ children: rawChildren }: TabProps) {
-  const [ selected, setSelected ] = useState<string | null>(null)
-  const children = toChildArray(rawChildren)
+  const [ selected, setSelected ] = useState<string | null>(null);
+  const children = toChildArray(rawChildren);
 
   const tabs = useMemo(() => {
-    const res = []
+    const res = [];
     for (const child of children) {
-      if (typeof child !== 'object') continue
+      if (typeof child !== 'object') {
+        continue;
+      }
       // @ts-ignore -- todo
-      if (!('data-tab-id' in child.props) || typeof child.props['data-tab-id'] !== 'string') continue
+      if (!('data-tab-id' in child.props) || typeof child.props['data-tab-id'] !== 'string') {
+        continue;
+      }
       // @ts-ignore -- todo
-      if (!('data-tab-name' in child.props) || typeof child.props['data-tab-name'] !== 'string') continue
+      if (!('data-tab-name' in child.props) || typeof child.props['data-tab-name'] !== 'string') {
+        continue;
+      }
       // @ts-ignore -- todo
-      res.push({ id: child.props['data-tab-id'], name: child.props['data-tab-name'], element: child })
+      res.push({ id: child.props['data-tab-id'],
+        name: child.props['data-tab-name'],
+        element: child });
     }
 
-    return res
-  }, [ rawChildren ])
+    return res;
+  }, [ rawChildren ]);
 
   return (
     <div className={style.container}>
@@ -45,8 +54,8 @@ export default function Tabs ({ children: rawChildren }: TabProps) {
       {tabs.map(({ id, element }, i) => cloneElement(element, {
         id: `${id}-tab`,
         role: 'tabpanel',
-        'aria-hidden': (selected || i !== 0) && (id !== selected),
+        'aria-hidden': (selected || i !== 0) && (id !== selected)
       }))}
     </div>
-  )
+  );
 }

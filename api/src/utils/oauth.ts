@@ -3,10 +3,10 @@ import { fetch } from 'undici';
 import config from '../config.js';
 
 export type OAuthToken = {
-    tokenType: string
-    accessToken: string
-    refreshToken?: string
-    expiresAt: number
+  tokenType: string
+  accessToken: string
+  refreshToken?: string
+  expiresAt: number
 }
 
 export const OAuthEndpoints = <const>{

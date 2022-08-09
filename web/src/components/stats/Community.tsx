@@ -1,12 +1,12 @@
-import type { Attributes } from 'preact'
-import type { CommunityStats } from './useStats'
-import { h, Fragment } from 'preact'
-import { useTitle } from 'hoofd/preact'
+import type { CommunityStats } from './useStats';
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+import { h, Fragment } from 'preact';
+import { useTitle } from 'hoofd/preact';
 
-import Chart from './Chart'
-import useStats from './useStats'
+import Chart from './Chart';
+import useStats from './useStats';
 
-import style from './stats.module.css'
+import style from './stats.module.css';
 
 function Replugged ({ charts }: { charts?: CommunityStats }) {
   return (
@@ -15,9 +15,12 @@ function Replugged ({ charts }: { charts?: CommunityStats }) {
         title='Registered Replugged accounts'
         dataset={charts ? charts.users : false}
         modes={[
-          { name: 'All Time', key: 'allTime' },
-          { name: 'Last Month', key: 'month' },
-          { name: 'Last Week', key: 'week' },
+          { name: 'All Time',
+            key: 'allTime' },
+          { name: 'Last Month',
+            key: 'month' },
+          { name: 'Last Week',
+            key: 'week' }
         ]}
       />
       <div className={style.group}>
@@ -54,23 +57,30 @@ function Replugged ({ charts }: { charts?: CommunityStats }) {
         Code contributors, translators, bug hunters.
       </p>
     </>
-  )
+  );
 }
 
 function Community ({ charts }: { charts?: CommunityStats }) {
-  if (!charts?.guild) return null
+  if (!charts?.guild) {
+    return null;
+  }
 
   return (
     <>
       <h2 className={style.sectionTitle}>Replugged's Community Server</h2>
       <Chart
         title='Online people'
-        legend={{ online: 'Online', idle: 'Idle', dnd: 'Do Not Disturb' }}
+        legend={{ online: 'Online',
+          idle: 'Idle',
+          dnd: 'Do Not Disturb' }}
         dataset={charts && charts.guild.presences}
         modes={[
-          { name: 'Last Month', key: 'month' },
-          { name: 'Last Week', key: 'week' },
-          { name: 'Last Day', key: 'day' },
+          { name: 'Last Month',
+            key: 'month' },
+          { name: 'Last Week',
+            key: 'week' },
+          { name: 'Last Day',
+            key: 'day' }
         ]}
       />
 
@@ -78,29 +88,36 @@ function Community ({ charts }: { charts?: CommunityStats }) {
         title='Server members'
         dataset={charts && charts.guild.users}
         modes={[
-          { name: 'Last Month', key: 'month' },
-          { name: 'Last Week', key: 'week' },
-          { name: 'Last Day', key: 'day' },
+          { name: 'Last Month',
+            key: 'month' },
+          { name: 'Last Week',
+            key: 'week' },
+          { name: 'Last Day',
+            key: 'day' }
         ]}
       />
 
       <Chart
         title='Messages seen'
-        legend={{ sentMessages: 'Messages Sent', deletedMessages: 'Messages Deleted' }}
+        legend={{ sentMessages: 'Messages Sent',
+          deletedMessages: 'Messages Deleted' }}
         dataset={charts && charts.guild.messages}
         modes={[
-          { name: 'Last Month', key: 'month' },
-          { name: 'Last Week', key: 'week' },
-          { name: 'Last Day', key: 'day' },
+          { name: 'Last Month',
+            key: 'month' },
+          { name: 'Last Week',
+            key: 'week' },
+          { name: 'Last Day',
+            key: 'day' }
         ]}
       />
     </>
-  )
+  );
 }
 
-export default function Stats (_: Attributes) {
-  useTitle('Statistics')
-  const charts = useStats()
+export default function Stats () {
+  useTitle('Statistics');
+  const charts = useStats();
 
   return (
     <main>
@@ -115,5 +132,5 @@ export default function Stats (_: Attributes) {
       <Replugged charts={charts}/>
       <Community charts={charts}/>
     </main>
-  )
+  );
 }

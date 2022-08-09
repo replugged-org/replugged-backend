@@ -1,54 +1,54 @@
-import type { Attributes } from 'preact'
-import type { EligibilityStatus } from '../../../../types/store'
-import { h, Fragment } from 'preact'
-import { useContext, useEffect, useState } from 'preact/hooks'
-import { useTitleTemplate } from 'hoofd/preact'
-import { Router } from 'preact-router'
-import { Link } from 'preact-router/match'
-import { UserFlags } from '../../../../shared/flags'
+import type { Attributes } from 'preact';
+import type { EligibilityStatus } from '../../../../types/store';
+import { h, Fragment } from 'preact';
+import { useContext, useEffect, useState } from 'preact/hooks';
+import { useTitleTemplate } from 'hoofd/preact';
+import { Router } from 'preact-router';
+import { Link } from 'preact-router/match';
+import { UserFlags } from '../../../../shared/flags';
 
-import Redirect from '../util/Redirect'
-import LayoutWithSidebar from '../layout/LayoutWithSidebar'
-import MarkdownDocument from '../docs/Markdown'
-import Store from './Store'
-import PublishForm from './form/Publish'
-import VerificationForm from './form/Verification'
-import HostingForm from './form/Hosting'
+import Redirect from '../util/Redirect';
+import LayoutWithSidebar from '../layout/LayoutWithSidebar';
+import MarkdownDocument from '../docs/Markdown';
+import Store from './Store';
+import PublishForm from './form/Publish';
+import VerificationForm from './form/Verification';
+import HostingForm from './form/Hosting';
 
-import UserContext from '../UserContext'
-import { Endpoints, Routes } from '../../constants'
+import UserContext from '../UserContext';
+import { Endpoints, Routes } from '../../constants';
 
-import Upload from 'feather-icons/dist/icons/upload.svg'
-import HardDisk from 'feather-icons/dist/icons/hard-drive.svg'
-import Package from 'feather-icons/dist/icons/package.svg'
-import Plugin from '../../assets/icons/plugin.svg'
-import Theme from '../../assets/icons/brush.svg'
-import Yifi from '../../assets/icons/bulb.svg' // private jokes best jokes alexclickYifi
-import Staff from '../../assets/badges/staff.svg'
-import Verified from '../../assets/icons/verified.svg'
+import Upload from 'feather-icons/dist/icons/upload.svg';
+import Package from 'feather-icons/dist/icons/package.svg';
+import Plugin from '../../assets/icons/plugin.svg';
+import Theme from '../../assets/icons/brush.svg';
+import Staff from '../../assets/badges/staff.svg';
 
-import style from './storefront.module.css'
+import style from './storefront.module.css';
 
 type StoreProps = Attributes & { url?: string }
 type ItemProps = Attributes & { icon: any, href: string, label: string }
 
-let eligibilityCache: EligibilityStatus | null = null
+const eligibilityCache: EligibilityStatus | null = null;
 function useEligibility () {
-  const [ eligibility, setEligibility ] = useState(eligibilityCache)
+  const [ eligibility, setEligibility ] = useState(eligibilityCache);
   useEffect(() => {
     if (!eligibility) {
       fetch(Endpoints.STORE_FORM_ELIGIBILITY).then((res) => {
         if (res.status !== 200) {
-          setEligibility({ publish: 0, verification: 1, hosting: 1, reporting: 1 })
-          return
+          setEligibility({ publish: 0,
+            verification: 1,
+            hosting: 1,
+            reporting: 1 });
+          return;
         }
 
-        res.json().then((e) => setEligibility(e))
-      })
+        res.json().then((e) => setEligibility(e));
+      });
     }
-  }, [])
+  }, []);
 
-  return eligibility
+  return eligibility;
 }
 
 function Item ({ icon, href, label }: ItemProps) {
@@ -58,7 +58,7 @@ function Item ({ icon, href, label }: ItemProps) {
         {h(icon, null)}
         <span>{label}</span>
       </a>
-    )
+    );
   }
 
   return (
@@ -66,11 +66,11 @@ function Item ({ icon, href, label }: ItemProps) {
       {h(icon, null)}
       <span>{label}</span>
     </Link>
-  )
+  );
 }
 
 function Sidebar () {
-  const user = useContext(UserContext)
+  const user = useContext(UserContext);
 
   return (
     <Fragment>
@@ -92,12 +92,12 @@ function Sidebar () {
         <a href={Routes.STORE_COPYRIGHT}>Copyright policy</a>
       </div>
     </Fragment>
-  )
+  );
 }
 
 export default function Storefront (props: StoreProps) {
-  const eligibility = useEligibility()
-  useTitleTemplate('%s • Replugged Store')
+  const eligibility = useEligibility();
+  useTitleTemplate('%s • Replugged Store');
 
   return (
     <LayoutWithSidebar>
@@ -116,5 +116,5 @@ export default function Storefront (props: StoreProps) {
         <Redirect default to={Routes.STORE_PLUGINS}/>
       </Router>
     </LayoutWithSidebar>
-  )
+  );
 }

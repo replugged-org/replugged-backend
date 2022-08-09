@@ -1,17 +1,18 @@
-import { h } from 'preact'
-import Prism from 'prismjs'
-import 'prismjs/components/prism-javascript'
-import 'prismjs/components/prism-css'
-import 'prismjs/components/prism-scss'
-import 'prismjs/components/prism-json'
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+import { h } from 'preact';
+import Prism from 'prismjs';
+import 'prismjs/components/prism-javascript';
+import 'prismjs/components/prism-css';
+import 'prismjs/components/prism-scss';
+import 'prismjs/components/prism-json';
 
-import 'prismjs/themes/prism-tomorrow.css'
-import style from './markdown.module.css'
+import 'prismjs/themes/prism-tomorrow.css';
+import style from './markdown.module.css';
 
 type PrismProps = { language?: string | null, code: string }
 
 export default function PrismComponent ({ language, code }: PrismProps) {
-  let lines = []
+  let lines = [];
   if (language && Prism.languages[language]) {
     // [Cynthia] This allows to be 100% certain spans don't go across multiple lines, so we can safely split
     lines = Prism.highlight(code, Prism.languages[language], language)
@@ -19,9 +20,9 @@ export default function PrismComponent ({ language, code }: PrismProps) {
         /<span class="([a-z ]+)">([^<]*)<\/span>/g,
         (_: any, className: any, contents: any) => contents.split('\n').map((l: string) => `<span class="${className}">${l}</span>`).join('\n')
       )
-      .split('\n')
+      .split('\n');
   } else {
-    lines = code.replace(/</g, '&lt;').replace(/>/g, '&gt;').split('\n')
+    lines = code.replace(/</g, '&lt;').replace(/>/g, '&gt;').split('\n');
   }
 
   return (
@@ -35,10 +36,10 @@ export default function PrismComponent ({ language, code }: PrismProps) {
         ))}
       </code>
     </pre>
-  )
+  );
 }
 
 if (!import.meta.env.SSR) {
   // @ts-ignore -- Cleanup
-  delete window.Prism
+  delete window.Prism;
 }

@@ -1,11 +1,11 @@
-import type { Attributes } from 'preact'
-import { h } from 'preact'
-import { useTitle } from 'hoofd/preact'
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+import { h } from 'preact';
+import { useTitle } from 'hoofd/preact';
 
-import style from '../docs/markdown.module.css'
+import style from '../docs/markdown.module.css';
 
-export default function Terms (_: Attributes) {
-  useTitle('Terms of Service')
+export default function Terms () {
+  useTitle('Terms of Service');
 
   return (
     <main className={`${style.markdown} serious`}>
@@ -45,5 +45,5 @@ export default function Terms (_: Attributes) {
       <h2>Contact Us</h2>
       <p>If you have any questions about these Terms, please contact us.</p>
     </main>
-  )
+  );
 }

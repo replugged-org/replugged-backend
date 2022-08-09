@@ -1,16 +1,17 @@
-import type { Attributes } from 'preact'
-import type { Eligibility } from '../../../../../types/store'
-import { h } from 'preact'
-import { useTitle } from 'hoofd/preact'
+import type { Attributes } from 'preact';
+import type { Eligibility } from '../../../../../types/store';
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+import { h } from 'preact';
+import { useTitle } from 'hoofd/preact';
 
-import FormLayout from './Layout'
-import { TextField, TextareaField, CheckboxField, SelectField } from '../../util/Form'
-import { Routes } from '../../../constants'
+import FormLayout from './Layout';
+import { TextField, TextareaField, CheckboxField, SelectField } from '../../util/Form';
+import { Routes } from '../../../constants';
 
 type FormProps = Attributes & { eligibility?: Eligibility }
 
-export default function PublishForm({ eligibility }: FormProps) {
-  useTitle('Publish your work')
+export default function PublishForm ({ eligibility }: FormProps) {
+  useTitle('Publish your work');
 
   return (
     <FormLayout id='publish' title='Publish your work' eligibility={eligibility}>
@@ -18,8 +19,10 @@ export default function PublishForm({ eligibility }: FormProps) {
         name='type'
         label='Type'
         options={[
-          { name: 'Plugin', id: 'plugin' },
-          { name: 'Theme', id: 'theme' }
+          { name: 'Plugin',
+            id: 'plugin' },
+          { name: 'Theme',
+            id: 'theme' }
         ]}
         value="Please choose one"
         note={'What is it that you\'re submitting, a theme or plugin.'}
@@ -59,5 +62,5 @@ export default function PublishForm({ eligibility }: FormProps) {
         label='By publishing this work, I grant Replugged the non-transferable right to redistribute verbatim copies of my work and allow its use along with Replugged if these are not already granted by the license applied to the work'
       />
     </FormLayout>
-  )
+  );
 }

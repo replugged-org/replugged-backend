@@ -1,13 +1,12 @@
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+import { h } from 'preact';
+import { useTitle } from 'hoofd/preact';
+import { Routes } from '../../constants';
 
-import type { Attributes } from 'preact'
-import { h } from 'preact'
-import { useTitle } from 'hoofd/preact'
-import { Routes } from '../../constants'
+import style from '../docs/markdown.module.css';
 
-import style from '../docs/markdown.module.css'
-
-export default function Privacy (_: Attributes) {
-  useTitle('Privacy Policy')
+export default function Privacy () {
+  useTitle('Privacy Policy');
 
   return (
     <main className={`${style.markdown} serious`}>
@@ -98,5 +97,5 @@ export default function Privacy (_: Attributes) {
         <li>By visiting our Discord server: <a href={Routes.DICKSWORD} target='_blank' rel='noreferrer'>{Routes.DICKSWORD}</a></li>
       </ul>
     </main>
-  )
+  );
 }

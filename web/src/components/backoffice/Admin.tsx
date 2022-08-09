@@ -1,50 +1,52 @@
-import { h, Fragment } from 'preact'
-import { useState, useEffect } from 'preact/hooks'
-import { useTitleTemplate } from 'hoofd/preact'
-import Router from 'preact-router'
-import { Link } from 'preact-router/match'
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+import { h, Fragment } from 'preact';
+import { useState, useEffect } from 'preact/hooks';
+import { useTitleTemplate } from 'hoofd/preact';
+import Router from 'preact-router';
+import { Link } from 'preact-router/match';
 
-import LayoutWithSidebar from '../layout/LayoutWithSidebar'
-import Redirect from '../util/Redirect'
-import { SoonRoute } from '../util/Soon'
-import Users from './UsersOld/Manage'
-import UsersManage from './Users/Manage'
-import Forms from './Store/Forms'
+import LayoutWithSidebar from '../layout/LayoutWithSidebar';
+import Redirect from '../util/Redirect';
+import { SoonRoute } from '../util/Soon';
+import Users from './UsersOld/Manage';
+import UsersManage from './Users/Manage';
+import Forms from './Store/Forms';
 
-import { Endpoints, Routes } from '../../constants'
+import { Endpoints, Routes } from '../../constants';
 
-import Smile from 'feather-icons/dist/icons/smile.svg'
-import Shield from 'feather-icons/dist/icons/shield.svg'
-import Activity from 'feather-icons/dist/icons/activity.svg'
+import Smile from 'feather-icons/dist/icons/smile.svg';
+import Shield from 'feather-icons/dist/icons/shield.svg';
+import Activity from 'feather-icons/dist/icons/activity.svg';
 
-import Package from 'feather-icons/dist/icons/package.svg'
-import Tag from 'feather-icons/dist/icons/tag.svg'
-import Layout from 'feather-icons/dist/icons/layout.svg'
-import Alert from 'feather-icons/dist/icons/alert-octagon.svg'
+import Package from 'feather-icons/dist/icons/package.svg';
+import Tag from 'feather-icons/dist/icons/tag.svg';
+import Layout from 'feather-icons/dist/icons/layout.svg';
+import Alert from 'feather-icons/dist/icons/alert-octagon.svg';
 
-import Inbox from 'feather-icons/dist/icons/inbox.svg'
-import Flag from 'feather-icons/dist/icons/flag.svg'
+import Inbox from 'feather-icons/dist/icons/inbox.svg';
+import Flag from 'feather-icons/dist/icons/flag.svg';
 
-import CodeSandbox from 'feather-icons/dist/icons/codesandbox.svg'
+import CodeSandbox from 'feather-icons/dist/icons/codesandbox.svg';
 
-import style from './admin.module.css'
+import style from './admin.module.css';
 
-function Sidebar() {
+function Sidebar () {
   // Unread badges
-  const [unread, setUnread] = useState({ forms: 0, reports: 0 })
-  const [totalUsers, setTotalUsers] = useState<number>(0)
+  const [ unread, setUnread ] = useState({ forms: 0,
+    reports: 0 });
+  const [ totalUsers, setTotalUsers ] = useState<number>(0);
   useEffect(() => {
     fetch(Endpoints.BACKOFFICE_FORMS_COUNT).then((r) => r.json()).then((d) => {
       setUnread({
         forms: d.publish + d.verification + d.hosting,
-        reports: d.reports,
-      })
-    })
+        reports: d.reports
+      });
+    });
 
     fetch(Endpoints.BACKOFFICE_USER_COUNT).then((r) => r.json()).then((d) => {
       setTotalUsers(d);
-    })
-  }, [])
+    });
+  }, []);
 
   return (
     <Fragment>
@@ -98,11 +100,11 @@ function Sidebar() {
         <span>Super Secret Event</span>
       </Link>
     </Fragment>
-  )
+  );
 }
 
-export default function Admin() {
-  useTitleTemplate('Replugged Admin')
+export default function Admin () {
+  useTitleTemplate('Replugged Admin');
 
   return (
     <LayoutWithSidebar>
@@ -144,5 +146,5 @@ export default function Admin() {
         <Redirect default to={Routes.BACKOFFICE_USERS} />
       </Router>
     </LayoutWithSidebar>
-  )
+  );
 }
