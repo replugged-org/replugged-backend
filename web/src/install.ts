@@ -68,6 +68,7 @@ function tryPort (port: number): Promise<WebSocket> {
         return;
       }
 
+      ws.onclose = null;
       ws.onmessage = null;
       ws.onerror = null;
 
@@ -76,6 +77,9 @@ function tryPort (port: number): Promise<WebSocket> {
     ws.onerror = () => {
       ws.onmessage = null;
       ws.onerror = null;
+      reject();
+    };
+    ws.onclose = () => {
       reject();
     };
   });
@@ -111,47 +115,36 @@ function rpcInstall (ws: WebSocket, address: string): Promise<Info> {
 }
 
 export default async function install (url: string): Promise<Response> {
-  let ws: WebSocket | null = null;
   for (let port = min_port; port <= max_port; port++) {
     try {
-      ws = await tryPort(port);
-      break;
-    } catch (e) {}
-  }
-
-  if (!ws) {
-    return {
-      code: InstallResponseType.UNREACHABLE
-    };
-  }
-
-  try {
-    const info = await rpcInstall(ws, url);
-    if (info.isInstalled) {
-      return {
-        info,
-        code: InstallResponseType.ALREADY_INSTALLED
-      };
-    }
-    return {
-      info,
-      code: InstallResponseType.SUCCESS
-    };
-  } catch (error) {
-    if (isRPCError(error)) {
-      if (error.data.code === RPCErrorCode.INVALID_PAYLOAD) {
+      const ws = await tryPort(port);
+      const info = await rpcInstall(ws, url);
+      if (info.isInstalled) {
         return {
-          code: InstallResponseType.NOT_FOUND
+          info,
+          code: InstallResponseType.ALREADY_INSTALLED
         };
       }
-
-      console.error(new Error(`RPC Error ${error.data.code}: ${error.data.message}`));
       return {
-        code: InstallResponseType.UNREACHABLE
+        info,
+        code: InstallResponseType.SUCCESS
       };
+    } catch (error) {
+      if (isRPCError(error)) {
+        if (error.data.code === RPCErrorCode.INVALID_PAYLOAD) {
+          return {
+            code: InstallResponseType.NOT_FOUND
+          };
+        }
+        console.error(new Error(`RPC Error ${error.data.code}: ${error.data.message}`));
+        return {
+          code: InstallResponseType.UNREACHABLE
+        };
+      }
     }
-    return {
-      code: InstallResponseType.UNREACHABLE
-    };
   }
+
+  return {
+    code: InstallResponseType.UNREACHABLE
+  };
 }
