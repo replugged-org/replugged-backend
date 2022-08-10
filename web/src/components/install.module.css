@@ -21,3 +21,11 @@
 		height: calc(100% - 107px);
 	}
 }
+
+.buttons {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	gap: 15px;
+	padding-top: 20px;
+}
