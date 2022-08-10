@@ -57,31 +57,44 @@ function isRPCError (value: unknown): value is RPCError {
 }
 
 const min_port = 6463;
-const max_port = 6473;
+const max_port = 6472;
 
 function tryPort (port: number): Promise<WebSocket> {
   const ws = new WebSocket(`ws://127.0.0.1:${port}/?v=1`);
   return new Promise((resolve, reject) => {
-    ws.onmessage = (event) => {
+    let didFinish = false;
+    ws.addEventListener('message', (event) => {
+      if (didFinish) {
+        return;
+      }
+
       const message = JSON.parse(event.data) as RPCMessage;
       if (message.evt !== 'READY') {
         return;
       }
 
-      ws.onclose = null;
-      ws.onmessage = null;
-      ws.onerror = null;
+      didFinish = true;
 
       resolve(ws);
-    };
-    ws.onerror = () => {
-      ws.onmessage = null;
-      ws.onerror = null;
+    });
+    ws.addEventListener('error', () => {
+      if (didFinish) {
+        return;
+      }
+
+      didFinish = true;
+
       reject();
-    };
-    ws.onclose = () => {
+    });
+    ws.addEventListener('close', () => {
+      if (didFinish) {
+        return;
+      }
+
+      didFinish = true;
+
       reject();
-    };
+    });
   });
 }
 
@@ -95,13 +108,13 @@ function rpcInstall (ws: WebSocket, address: string): Promise<Info> {
   }));
 
   return new Promise((resolve, reject) => {
-    ws.onmessage = (event) => {
+    ws.addEventListener('message', (event) => {
       const message = JSON.parse(event.data) as RPCMessage;
       if (message.nonce !== nonce) {
         return;
       }
 
-      ws.onmessage = null;
+      ws.close();
 
       if (message.evt === 'ERROR') {
         const error = message as RPCError;
@@ -110,7 +123,7 @@ function rpcInstall (ws: WebSocket, address: string): Promise<Info> {
         const info = message.data as Info;
         resolve(info);
       }
-    };
+    });
   });
 }
 
