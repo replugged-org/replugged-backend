@@ -57,27 +57,44 @@ function isRPCError (value: unknown): value is RPCError {
 }
 
 const min_port = 6463;
-const max_port = 6473;
+const max_port = 6472;
 
 function tryPort (port: number): Promise<WebSocket> {
   const ws = new WebSocket(`ws://127.0.0.1:${port}/?v=1`);
   return new Promise((resolve, reject) => {
-    ws.onmessage = (event) => {
+    let didFinish = false;
+    ws.addEventListener('message', (event) => {
+      if (didFinish) {
+        return;
+      }
+
       const message = JSON.parse(event.data) as RPCMessage;
       if (message.evt !== 'READY') {
         return;
       }
 
-      ws.onmessage = null;
-      ws.onerror = null;
+      didFinish = true;
 
       resolve(ws);
-    };
-    ws.onerror = () => {
-      ws.onmessage = null;
-      ws.onerror = null;
+    });
+    ws.addEventListener('error', () => {
+      if (didFinish) {
+        return;
+      }
+
+      didFinish = true;
+
       reject();
-    };
+    });
+    ws.addEventListener('close', () => {
+      if (didFinish) {
+        return;
+      }
+
+      didFinish = true;
+
+      reject();
+    });
   });
 }
 
@@ -91,13 +108,13 @@ function rpcInstall (ws: WebSocket, address: string): Promise<Info> {
   }));
 
   return new Promise((resolve, reject) => {
-    ws.onmessage = (event) => {
+    ws.addEventListener('message', (event) => {
       const message = JSON.parse(event.data) as RPCMessage;
       if (message.nonce !== nonce) {
         return;
       }
 
-      ws.onmessage = null;
+      ws.close();
 
       if (message.evt === 'ERROR') {
         const error = message as RPCError;
@@ -106,52 +123,41 @@ function rpcInstall (ws: WebSocket, address: string): Promise<Info> {
         const info = message.data as Info;
         resolve(info);
       }
-    };
+    });
   });
 }
 
 export default async function install (url: string): Promise<Response> {
-  let ws: WebSocket | null = null;
   for (let port = min_port; port <= max_port; port++) {
     try {
-      ws = await tryPort(port);
-      break;
-    } catch (e) {}
-  }
-
-  if (!ws) {
-    return {
-      code: InstallResponseType.UNREACHABLE
-    };
-  }
-
-  try {
-    const info = await rpcInstall(ws, url);
-    if (info.isInstalled) {
-      return {
-        info,
-        code: InstallResponseType.ALREADY_INSTALLED
-      };
-    }
-    return {
-      info,
-      code: InstallResponseType.SUCCESS
-    };
-  } catch (error) {
-    if (isRPCError(error)) {
-      if (error.data.code === RPCErrorCode.INVALID_PAYLOAD) {
+      const ws = await tryPort(port);
+      const info = await rpcInstall(ws, url);
+      if (info.isInstalled) {
         return {
-          code: InstallResponseType.NOT_FOUND
+          info,
+          code: InstallResponseType.ALREADY_INSTALLED
         };
       }
-
-      console.error(new Error(`RPC Error ${error.data.code}: ${error.data.message}`));
       return {
-        code: InstallResponseType.UNREACHABLE
+        info,
+        code: InstallResponseType.SUCCESS
       };
+    } catch (error) {
+      if (isRPCError(error)) {
+        if (error.data.code === RPCErrorCode.INVALID_PAYLOAD) {
+          return {
+            code: InstallResponseType.NOT_FOUND
+          };
+        }
+        console.error(new Error(`RPC Error ${error.data.code}: ${error.data.message}`));
+        return {
+          code: InstallResponseType.UNREACHABLE
+        };
+      }
     }
-    return {
-      code: InstallResponseType.UNREACHABLE
-    };
   }
+
+  return {
+    code: InstallResponseType.UNREACHABLE
+  };
 }
