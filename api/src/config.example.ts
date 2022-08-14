@@ -10,7 +10,8 @@ export default {
     clientSecret: '',
     botToken: '',
     ids: {
-      serverId: '1000926524452647132'
+      serverId: '1000926524452647132',
+      formChannelId: '1003055963454054544'
     },
     roles: {
       user: '1000955925542207538',
@@ -22,7 +23,8 @@ export default {
   },
   github: {
     clientID: '',
-    clientSecret: ''
+    clientSecret: '',
+    token: ''
   },
   spotify: {
     clientID: '',

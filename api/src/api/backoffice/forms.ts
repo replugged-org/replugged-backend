@@ -52,7 +52,7 @@ async function update (this: FastifyInstance, request: FastifyRequest<{Params: R
 
 async function finishFormUpdate (request: FastifyRequest, _reply: FastifyReply, form: StoreForm) {
   const user = request.user as User;
-  const message = await fetchHonkMessage(config.honks.formsChannel, form.messageId);
+  const message = await fetchHonkMessage(config.discord.ids.formsChannelId, form.messageId);
 
   const modMessage = form.approved
     ? `Form **approved** by ${user.username}#${user.discriminator}`
@@ -63,9 +63,9 @@ async function finishFormUpdate (request: FastifyRequest, _reply: FastifyReply, 
     : DmMessages[form.kind].rejected;
 
   if (message.thread) {
-    await dispatchHonk(config.honks.formsChannel, { content: modMessage }, `thread_id=${message.thread.id}`);
+    await dispatchHonk(config.discord.ids.formsChannelId, { content: modMessage }, `thread_id=${message.thread.id}`);
   } else {
-    await editHonkMessage(config.honks.formsChannel, message.id, { content: `${message.content}\n\n${modMessage}` });
+    await editHonkMessage(config.discord.ids.formsChannelId, message.id, { content: `${message.content}\n\n${modMessage}` });
   }
 
   const couldDm = await sendDm(

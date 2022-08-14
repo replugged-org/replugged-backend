@@ -178,7 +178,7 @@ async function finalizeForm (db: Db, user: User, kind: string, data: Record<stri
   const inserted = await collection.insertOne({ submitter: user._id,
     kind,
     ...data });
-  const msg = await dispatchHonk(config.honks.formsChannel, {
+  const msg = await dispatchHonk(config.discord.ids.formsChannelId, {
     content: '',
     embeds: [
       {

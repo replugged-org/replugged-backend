@@ -134,8 +134,8 @@ export async function updateDonatorState (mongo: MongoClient, user: User, manual
 
   const mongoUpdate = await prepareUpdateData(patreonAccount);
   const statusChange = user.cutieStatus?.pledgeTier !== mongoUpdate.$set!['cutieStatus.pledgeTier'];
-  // @ts-ignore
   if (manual) {
+    // @ts-ignore
     mongoUpdate.$set!['cutieStatus.lastManualRefresh'] = Date.now();
   }
 

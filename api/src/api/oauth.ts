@@ -6,7 +6,7 @@ import { randomBytes } from 'crypto';
 import config from '../config.js';
 import { UserFlags } from '../flags.js';
 import { getAuthorizationUrl, getAuthTokens, fetchAccount, toMongoFields } from '../utils/oauth.js';
-import { deleteUser, UserDeletionCause } from '../data/user.js';
+import { deleteUser } from '../data/user.js';
 import { addRole, fetchMember, removeRole } from '../utils/discord.js';
 import { TokenType } from '../utils/auth.js';
 import { prepareUpdateData, notifyStateChange } from '../utils/patreon.js';
@@ -225,7 +225,7 @@ async function unlink (this: FastifyInstance, request: FastifyRequest, reply: Re
       return;
     }
 
-    await deleteUser(this.mongo.client, request.user!._id, UserDeletionCause.REQUESTED);
+    await deleteUser(this.mongo.client, request.user!._id);
 
     const member = await fetchMember(request.user!._id);
 
