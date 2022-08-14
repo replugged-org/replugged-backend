@@ -1,7 +1,7 @@
 export default {
   mango: 'mongodb://127.0.0.1:27017',
   secret: '',
-  domain: 'replugged.dev',
+  domain: 'https://replugged.dev',
   api: {
     port: 8080
   },
