@@ -88,6 +88,7 @@ export const Routes = {
 
   // External links
   DICKSWORD: 'https://discord.gg/replugged',
-  GITHUB: 'https://github.com/replugged-org',
+  GITHUB: 'https://github.com/replugged-org/replugged',
+  TRANSLATIONS: 'https://i18n.replugged.dev/projects/replugged/replugged',
   PATREON: 'https://google.com'
 };
