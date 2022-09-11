@@ -90,5 +90,5 @@ export const Routes = {
   DICKSWORD: 'https://discord.gg/replugged',
   GITHUB: 'https://github.com/replugged-org/replugged',
   TRANSLATIONS: 'https://i18n.replugged.dev/projects/replugged/replugged',
-  PATREON: 'https://google.com'
+  PATREON: 'https://patreon.com/replugged'
 };

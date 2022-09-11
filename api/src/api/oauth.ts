@@ -318,6 +318,14 @@ export default async function (fastify: FastifyInstance): Promise<void> {
     }
   });
 
+  fastify.register(oauthPlugin, {
+    prefix: '/patreon',
+    data: {
+      platform: 'patreon',
+      scopes: [ 'identity', 'identity[email]' ]
+    }
+  });
+
   // api:v2
   if (fastify.prefix.startsWith('/v3')) {
     fastify.register(oauthPlugin, {
@@ -326,14 +334,6 @@ export default async function (fastify: FastifyInstance): Promise<void> {
         isRestricted: true,
         platform: 'github',
         scopes: []
-      }
-    });
-
-    fastify.register(oauthPlugin, {
-      prefix: '/patreon',
-      data: {
-        platform: 'patreon',
-        scopes: [ 'identity', 'identity[email]' ]
       }
     });
   }
