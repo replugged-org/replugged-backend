@@ -39,7 +39,10 @@ function refreshUserPledge(this: FastifyInstance, request: FastifyRequest, reply
   // todo
 }
 
-async function read (this: FastifyInstance, request: FastifyRequest<{ Params: RouteParams }>, reply: FastifyReply) {
+async function read(this: FastifyInstance, request: FastifyRequest<{ Params: RouteParams }>, reply: FastifyReply) {
+  // Should be able to be accessed from Discord
+  reply.header("Access-Control-Allow-Origin", "*");
+
   const filter = {
     flags: { $bitsAllClear: UserFlags.GHOST },
     _id: request.params.id
@@ -283,7 +286,7 @@ export default async function (fastify: FastifyInstance): Promise<void> {
     config: {
       auth: {
         permissions: UserFlags.STAFF
-      }
+      },
     }
   });
 
