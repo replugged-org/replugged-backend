@@ -38,9 +38,6 @@ async function sendUser (request: FastifyRequest, reply: FastifyReply, user: Use
 }
 
 async function getUser (this: FastifyInstance, request: FastifyRequest<{ Params: { id: string } }>, reply: FastifyReply) {
-  // Should be able to be accessed from Discord
-  reply.header("Access-Control-Allow-Origin", "*");
-
   const user = await this.mongo.db!.collection<DatabaseUser>('users').findOne({ _id: request.params.id });
   if (!user || isGhostUser(user)) {
     return sendUser(request, reply, {
