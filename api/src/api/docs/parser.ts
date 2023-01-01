@@ -8,7 +8,8 @@ export type Document = { title: string | null, hash: string, contents: MarkdownN
 
 export default function (markdown: string): Document {
   const parsed = parseMarkup(markdown);
-  const title = flattenToText(parsed.find((node) => node.type === MarkdownType.HEADING && node.level === 1)!);
+  const el = parsed.find((node) => node.type === MarkdownType.HEADING && node.level === 1);
+  const title = el ? flattenToText(el) : null;
 
   return {
     title,
