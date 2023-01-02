@@ -12,6 +12,7 @@ type GetDocParams = { category: string, document: string }
 type Category = { name: string, docs: Map<string, Document> }
 const docsStore = new Map<string, Category>();
 const remoteCache = new Map<string, Document>();
+const remoteCacheFetched = new Map<string, number>();
 const docsCategories: string[] = [];
 let categoriesEtag: string = '';
 
@@ -47,7 +48,7 @@ function getDocument (this: FastifyInstance, request: FastifyRequest<{ Params: G
 
   const doc = cat.docs.get(document)!;
   const etag = `W/"${doc.hash}"`;
-  reply.header('cache-control', 'public, max-age=3600');
+  reply.header('cache-control', `public, max-age=${15 * 60}`);
   if (request.headers['if-none-match'] === etag) {
     reply.code(304).send();
     return;
@@ -57,11 +58,22 @@ function getDocument (this: FastifyInstance, request: FastifyRequest<{ Params: G
   reply.send(doc);
 }
 
+async function fetchRemoteDocument (url: string): Promise<void> {
+  const md = await fetch(url).then((r) => r.text());
+  remoteCache.set(url, markdown(md));
+  remoteCacheFetched.set(url, Date.now());
+}
+
 async function getRemoteDocument (url: string): Promise<Document> {
   if (!remoteCache.has(url)) {
-    const md = await fetch(url).then((r) => r.text());
-    remoteCache.set(url, markdown(md));
-    setTimeout(() => remoteCache.delete(url), 300e3);
+    // If not cached, fetch and wait
+    await fetchRemoteDocument(url);
+  } else if (Date.now() - remoteCacheFetched.get(url)! > 1000 * 60 * 15) {
+    // If older than 15m, refetch and wait
+    await fetchRemoteDocument(url);
+  } else if (Date.now() - remoteCacheFetched.get(url)! > 1000 * 60 * 5) {
+    // If older than 5m, refetch but don't wait
+    void fetchRemoteDocument(url);
   }
 
   return remoteCache.get(url)!;
