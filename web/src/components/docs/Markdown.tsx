@@ -1,11 +1,11 @@
 import type { ComponentChildren, Attributes } from 'preact';
-import type { MarkdownNode } from '@borkenware/spoonfeed/src/types/markdown';
+import type { MarkdownNode } from '../../../../spoonfeed/src/types/markdown';
 
 import { h } from 'preact';
 import { useEffect, useState } from 'preact/hooks';
 import { useTitle } from 'hoofd/preact';
-import { MarkdownType } from '@borkenware/spoonfeed/src/types/markdown';
-import { flattenToText } from '@borkenware/spoonfeed/src/markdown/util';
+import { MarkdownType } from '../../../../spoonfeed/src/types/markdown';
+import { flattenToText } from '../../../../spoonfeed/src/markdown/util';
 
 import Spinner from '../util/Spinner';
 import NotFound from '../NotFound';
