@@ -55,7 +55,6 @@ function tryPort (port: number): Promise<WebSocket> {
   return new Promise((resolve, reject) => {
     let didFinish = false;
     ws.addEventListener('message', (event) => {
-      console.log('MESSAGE', event);
       if (didFinish) {
         return;
       }
