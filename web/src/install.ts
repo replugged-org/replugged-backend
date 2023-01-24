@@ -5,65 +5,57 @@ export enum InstallResponseType {
   UNREACHABLE = 'UNREACHABLE',
 }
 
-
-type Info = {
-  type: 'plugin' | 'theme',
-  url: string,
-  username: string,
-  repoName: string,
-  branch?: string,
-  isInstalled: boolean,
-}
-
-enum RPCErrorCode {
-  UNKNOWN_ERROR = 1000,
-  INVALID_PAYLOAD = 4000,
-  INVALID_COMMAND = 4002,
-  INVALID_PERMISSIONS = 4006,
-  INVALID_CLIENTID = 4007,
-}
 type RPCMessage = {
   cmd: string,
   data: any,
   evt: string | null,
   nonce: string | null,
 }
-type RPCErrorData = {
-  code: RPCErrorCode,
-  message: string,
-}
-type RPCError = Omit<RPCMessage, 'data'> & {
-  data: RPCErrorData
+
+type Manifest = Record<string, unknown> & {
+  name: string,
 }
 
 type Response = {
-  code: InstallResponseType.SUCCESS | InstallResponseType.ALREADY_INSTALLED,
-  info: Info
+  kind: 'SUCCESS';
+  manifest: Manifest;
+}
+| {
+  kind: 'FAILED';
+  manifest?: Manifest;
+}
+| {
+  kind: 'ALREADY_INSTALLED';
+  manifest: Manifest;
+}
+| {
+  kind: 'CANCELLED';
+  manifest: Manifest;
+} | Record<string, unknown> & {
+  kind: 'ERROR';
 } | {
-  code: InstallResponseType.NOT_FOUND | InstallResponseType.UNREACHABLE,
+  kind: 'UNREACHABLE';
 }
 
-function isRPCMessage (value: unknown): value is RPCMessage {
-  if (typeof value !== 'object' || !value) {
-    return false;
-  }
-  return 'cmd' in value && 'evt' in value && 'nonce' in value;
-}
-function isRPCError (value: unknown): value is RPCError {
-  if (!isRPCMessage(value)) {
-    return false;
-  }
-  return value.evt === 'ERROR';
+export type InstallData = {
+  identifier: string,
+  source?: string,
+  id?: string
 }
 
 const min_port = 6463;
 const max_port = 6472;
 
+function random (): string {
+  return Math.random().toString(16).slice(2);
+}
+
 function tryPort (port: number): Promise<WebSocket> {
-  const ws = new WebSocket(`ws://127.0.0.1:${port}/?v=1`);
+  const ws = new WebSocket(`ws://127.0.0.1:${port}/?v=1&client_id=REPLUGGED-${random()}`);
   return new Promise((resolve, reject) => {
     let didFinish = false;
     ws.addEventListener('message', (event) => {
+      console.log('MESSAGE', event);
       if (didFinish) {
         return;
       }
@@ -98,16 +90,16 @@ function tryPort (port: number): Promise<WebSocket> {
   });
 }
 
-function rpcInstall (ws: WebSocket, address: string): Promise<Info> {
-  const nonce = Math.random().toString(16).slice(2);
+function rpcInstall (ws: WebSocket, data: InstallData): Promise<Response> {
+  const nonce = random();
 
   ws.send(JSON.stringify({
-    cmd: 'PC_INSTALL',
-    args: { address },
+    cmd: 'REPLUGGED_INSTALL',
+    args: data,
     nonce
   }));
 
-  return new Promise((resolve, reject) => {
+  return new Promise((resolve) => {
     ws.addEventListener('message', (event) => {
       const message = JSON.parse(event.data) as RPCMessage;
       if (message.nonce !== nonce) {
@@ -116,48 +108,29 @@ function rpcInstall (ws: WebSocket, address: string): Promise<Info> {
 
       ws.close();
 
-      if (message.evt === 'ERROR') {
-        const error = message as RPCError;
-        reject(error);
-      } else {
-        const info = message.data as Info;
-        resolve(info);
-      }
+      resolve(message.data);
     });
   });
 }
 
-export default async function install (url: string): Promise<Response> {
+type InstallProps = {
+  data: InstallData
+  onConnect: () => void,
+  onFinish: (response: Response) => void,
+}
+
+export default async function install ({ data, onConnect, onFinish }: InstallProps): Promise<void> {
   for (let port = min_port; port <= max_port; port++) {
     try {
       const ws = await tryPort(port);
-      const info = await rpcInstall(ws, url);
-      if (info.isInstalled) {
-        return {
-          info,
-          code: InstallResponseType.ALREADY_INSTALLED
-        };
-      }
-      return {
-        info,
-        code: InstallResponseType.SUCCESS
-      };
-    } catch (error) {
-      if (isRPCError(error)) {
-        if (error.data.code === RPCErrorCode.INVALID_PAYLOAD) {
-          return {
-            code: InstallResponseType.NOT_FOUND
-          };
-        }
-        console.error(new Error(`RPC Error ${error.data.code}: ${error.data.message}`));
-        return {
-          code: InstallResponseType.UNREACHABLE
-        };
-      }
-    }
+      onConnect();
+      const info = await rpcInstall(ws, data);
+      onFinish(info);
+      return;
+    } catch {}
   }
 
-  return {
-    code: InstallResponseType.UNREACHABLE
-  };
+  onFinish({
+    kind: 'UNREACHABLE'
+  });
 }
