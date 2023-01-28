@@ -34,12 +34,10 @@ export default function InstallPage ({ matches: data }: Props) {
     install({
       data,
       onConnect: () => {
-        console.log('CONNECT');
         setTitle('Connected to Replugged');
         setDescription('Please confirm the addon installation in Discord.');
       },
       onFinish: (res) => {
-        console.log(res);
         switch (res.kind) {
           case 'SUCCESS':
             setTitle('Success!');
