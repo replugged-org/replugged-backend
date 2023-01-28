@@ -21,6 +21,29 @@ export default function InstallPage ({ matches: data }: Props) {
 
   const [ title, setTitle ] = useState('Loading...');
   const [ description, setDescription ] = useState<string | JSX.Element>('');
+  const [ connectedTime, setConnectedTime ] = useState<number | null>(null);
+  const [ isFinished, setIsFinished ] = useState(false);
+
+  const setConnectedText = () => {
+    setTitle('Connected to Replugged');
+    setDescription('Please confirm the addon installation in Discord.');
+    setConnectedTime(null);
+  };
+  useEffect(() => {
+    let timeout: NodeJS.Timeout;
+    if (connectedTime && !isFinished) {
+      const time = 100 - (Date.now() - connectedTime);
+      if (time <= 0) {
+        setConnectedText();
+      } else {
+        timeout = setTimeout(setConnectedText, time);
+      }
+    }
+
+    return () => {
+      clearTimeout(timeout);
+    };
+  }, [ connectedTime, isFinished, title, description ]);
 
   const makeRequest = () => {
     if (!data.identifier) {
@@ -30,14 +53,17 @@ export default function InstallPage ({ matches: data }: Props) {
 
     setTitle('Connecting to Replugged...');
     setDescription('Please wait while we connect to Replugged.');
+    setConnectedTime(null);
+    setIsFinished(false);
 
     install({
       data,
       onConnect: () => {
-        setTitle('Connected to Replugged');
-        setDescription('Please confirm the addon installation in Discord.');
+        setConnectedTime(Date.now());
       },
       onFinish: (res) => {
+        setIsFinished(true);
+
         switch (res.kind) {
           case 'SUCCESS':
             setTitle('Success!');
