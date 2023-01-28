@@ -46,6 +46,11 @@ export default function InstallPage ({ matches: data }: Props) {
   }, [ connectedTime, isFinished, title, description ]);
 
   const makeRequest = () => {
+    if (data.url) {
+      setTitle('Addon not supported');
+      setDescription('This addon was made for an unsupported version of Replugged and cannot be installed.');
+    }
+
     if (!data.identifier) {
       setTitle('No addon identifier provided');
       return;

@@ -38,9 +38,10 @@ type Response = {
 }
 
 export type InstallData = {
-  identifier: string,
+  identifier?: string,
   source?: string,
   id?: string
+  url?: string,
 }
 
 const min_port = 6463;
