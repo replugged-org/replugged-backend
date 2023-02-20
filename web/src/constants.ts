@@ -46,6 +46,7 @@ export const Routes = {
   BRANDING: '/branding',
   INSTALL: '/install',
   FAQ: '/faq',
+  DOWNLOAD: '/download',
 
   STORE: '/store',
   STORE_PLUGINS: '/store/plugins',
@@ -62,7 +63,6 @@ export const Routes = {
   DOCS_ITEM: (cat: string, doc: string) => `/docs/${cat}/${doc}`,
   DOCS_GITHUB: 'https://github.com/replugged-org/documentation',
   GUIDELINES: '/guidelines',
-  INSTALLATION: '/installation',
   PORKORD_LICENSE: '/porkord-license',
   TERMS: '/legal/tos',
   PRIVACY: '/legal/privacy',

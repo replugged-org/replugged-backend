@@ -94,10 +94,10 @@ export default function InstallPage ({ matches: data }: Props) {
                 Please make sure Discord is open with the latest version of Replugged installed and try again.
                 <br />
                 <div className={styles.buttons}>
-                  <a href={Routes.INSTALLATION} className={sharedStyle.button}>
+                  <a href={Routes.DOWNLOAD} className={sharedStyle.button}>
                     {/* @ts-ignore */}
                     <Zap className={sharedStyle.icon} />
-                    <span>Install Replugged</span>
+                    <span>Download Replugged</span>
                   </a>
                   <a onClick={() => makeRequest()} className={sharedStyle['button-link']}>
                     <span>Try again</span>

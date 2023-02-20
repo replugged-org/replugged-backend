@@ -14,6 +14,7 @@ import Footer from './layout/Footer';
 import Homepage from './Homepage';
 import Account from './account/Account';
 import Contributors from './Contributors';
+import Download from './Download';
 import Stats from './stats/Community';
 import Branding from './Branding';
 import Install from './Install';
@@ -65,6 +66,7 @@ export default function App (props: AppProps) {
       <Suspense fallback={loading}>
         <Router url={props?.url} onChange={change}>
           <Route path={Routes.HOME} component={Homepage} />
+          <Route path={Routes.DOWNLOAD} component={Download} />
           <Route path={Routes.ME} component={AuthBoundary}>
             <Account />
           </Route>
@@ -81,7 +83,6 @@ export default function App (props: AppProps) {
           </Route>
 
           <Route path={Routes.FAQ} component={Markdown} document='faq' />
-          <Route path={Routes.INSTALLATION} component={Markdown} document='installation' />
           <Route path={Routes.GUIDELINES} component={Markdown} document='guidelines' />
 
           <Route path={Routes.TERMS} component={Terms} />

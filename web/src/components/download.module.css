@@ -1,0 +1,25 @@
+.container {
+	margin: 0;
+	padding: 0;
+	max-width: none;
+}
+
+.wrapper {
+	margin: 0 auto;
+	max-width: 1300px;
+	padding: 0 2em;
+	width: 100%;
+}
+
+.heading {
+	padding: 32px 0;
+	text-align: center;
+	background-color: var(--background-secondary);
+	position: relative;
+}
+
+.title {
+	margin-bottom: 8px;
+	position: relative;
+	z-index: 2;
+}
