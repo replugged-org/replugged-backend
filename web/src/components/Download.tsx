@@ -32,6 +32,9 @@ const operatingSystems: OperatingSystemData[] = [ {
   os: 'windows',
   detect: () => platform.includes('win'),
   name: 'Windows',
+  warning: <>
+    If you get a warning that the app can't be opened, click "Run Anyways". You may need to click "more info" to see this option.
+  </>,
   files: [ {
     label: 'Download',
     file: 'replugged-installer-windows.exe'
