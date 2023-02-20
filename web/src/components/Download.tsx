@@ -172,7 +172,7 @@ export default function Homepage () {
           </p>
           <h3>Troubleshooting</h3>
           <p>
-            If you're having issues, please reinstall Discord and try steps 4-6 again.
+            If you're having issues, please reinstall Discord and try steps 5-7 again.
             <br />
             <br />
             Still having issues? Please <a href={Routes.DICKSWORD} target="_blank">join our Discord</a> and create a thread in <a href="https://discord.com/channels/1000926524452647132/1006383180309352538" target="_blank">#support</a> with any errors you're getting and any other information you think might be helpful.
