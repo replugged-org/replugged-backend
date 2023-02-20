@@ -40,6 +40,9 @@ const operatingSystems: OperatingSystemData[] = [ {
   os: 'macos',
   detect: () => platform.includes('mac'),
   name: 'macOS',
+  warning: <>
+    If you get a warning that the app can't be opened, right click on the app and select "Open". See <a href="https://support.apple.com/guide/mac-help/apple-cant-check-app-for-malicious-software-mchleab3a043/mac" target="_blank">this article</a> from Apple for more information.
+  </>,
   files: [ {
     label: 'Download for Intel',
     file: 'replugged-installer-macos.zip'
@@ -52,7 +55,7 @@ const operatingSystems: OperatingSystemData[] = [ {
   detect: () => platform.includes('linux'),
   name: 'Linux',
   warning: <>
-    Not all Linux distributions are supported. If the installer is not able to find your installation or you are using Flatpak, please follow the <a href="#manual">manual installation instructions</a>.
+    If the installer is not able to find your installation or you are using Flatpak, please follow the <a href="#manual">manual installation instructions</a>.
   </>,
   files: [ {
     label: 'Download for x86',
