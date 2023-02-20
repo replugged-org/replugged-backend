@@ -28,6 +28,11 @@
 
 .downloadContainer {
 	background-color: var(--background-light);
+	width: -webkit-fit-content;
+	width: -moz-fit-content;
+	width: fit-content;
+	min-width: min(100%, 500px);
+	max-width: min(100%, 800px);
 	margin: 10px auto;
 	padding: 10px;
 	border-radius: 10px;
@@ -47,7 +52,8 @@
 }
 
 .divider {
-	width: 100%;
+	width: 75%;
+	margin: 0 auto;
 	height: 1px;
 	background-color: var(--text-color);
 }
