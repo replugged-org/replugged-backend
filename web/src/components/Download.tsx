@@ -10,7 +10,7 @@ import Check from 'feather-icons/dist/icons/check.svg';
 import { Routes } from '../constants';
 
 
-const DOWNLOAD_URL_BASE =  'https://github.com/replugged-org/electron-installer/releases/latest/download/';
+const DOWNLOAD_URL_BASE =  'https://github.com/replugged-org/electron-installer/releases/latest/download';
 
 type OperatingSystems = 'windows' | 'macos' | 'linux';
 
