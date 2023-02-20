@@ -2,8 +2,8 @@
 import { h } from 'preact';
 import { lazy, Suspense } from 'preact/compat';
 import { useTitleTemplate, useMeta } from 'hoofd/preact';
-import { useCallback, useMemo } from 'preact/hooks';
-import Router, { Route } from 'preact-router';
+import { useCallback, useEffect, useMemo } from 'preact/hooks';
+import Router, { route, Route } from 'preact-router';
 
 import UserContext, { type User } from './UserContext';
 import Spinner from './util/Spinner';
@@ -41,6 +41,14 @@ type AppProps = {
   ctx?: Record<string, any>
 }
 
+function Redirect ({ to }: {path: string, to: string}) {
+  useEffect(() => {
+    route(to, true);
+  }, [ to ]);
+
+  return null;
+}
+
 export default function App (props: AppProps) {
   const change = useCallback(() => typeof document !== 'undefined' && document.getElementById('app')?.scrollTo(0, 0), []);
   const loading = useMemo(() => (
@@ -67,6 +75,7 @@ export default function App (props: AppProps) {
         <Router url={props?.url} onChange={change}>
           <Route path={Routes.HOME} component={Homepage} />
           <Route path={Routes.DOWNLOAD} component={Download} />
+          <Redirect path='/installation' to={Routes.DOWNLOAD} />
           <Route path={Routes.ME} component={AuthBoundary}>
             <Account />
           </Route>
