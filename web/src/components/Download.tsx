@@ -42,10 +42,10 @@ const operatingSystems: OperatingSystemData[] = [ {
   name: 'macOS',
   files: [ {
     label: 'Download for Intel',
-    file: 'replugged-installer-macos.dmg'
+    file: 'replugged-installer-macos.zip'
   }, {
     label: 'Download for Apple Silicon',
-    file: 'replugged-installer-macos-arm64.dmg'
+    file: 'replugged-installer-macos-arm64.zip'
   } ]
 }, {
   os: 'linux',
@@ -124,6 +124,7 @@ export default function Homepage () {
                 <a
                   className={sharedStyle.button}
                   href={`${DOWNLOAD_URL_BASE}/${file.file}`}
+                  target="_blank"
                   download
                 >
                   {file.label}
