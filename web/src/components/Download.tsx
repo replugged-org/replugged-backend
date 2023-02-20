@@ -4,7 +4,11 @@ import { useTitleTemplate } from 'hoofd/preact';
 
 import style from './download.module.css';
 import sharedStyle from './shared.module.css';
-import { useState } from 'preact/hooks';
+import { useEffect, useState } from 'preact/hooks';
+import Clipboard from 'feather-icons/dist/icons/clipboard.svg';
+import Check from 'feather-icons/dist/icons/check.svg';
+import { Routes } from '../constants';
+
 
 const DOWNLOAD_URL_BASE =  'https://github.com/replugged-org/electron-installer/releases/latest/download/';
 
@@ -61,14 +65,42 @@ const operatingSystems: OperatingSystemData[] = [ {
 
 const defaultOS = (operatingSystems.find(os => os.detect()) || operatingSystems[0]).os;
 
+function Code ({ children }: { children: string }) {
+  const [ copied, setCopied ] = useState(false);
+
+  useEffect(() => {
+    if (copied) {
+      const timeout = setTimeout(() => setCopied(false), 1500);
+
+      return () => clearTimeout(timeout);
+    }
+  }, [ copied ]);
+
+  return (
+    <div className={style.codeContainer}>
+      <code className={style.code}>
+        {children}
+      </code>
+      <button
+        className={style.copyButton}
+        onClick={() => {
+          navigator.clipboard.writeText(children);
+          setCopied(true);
+        }}
+      >
+        {/* @ts-ignore */}
+        {copied ? <Check className={`${sharedStyle.icon} ${style.copyCheck}`} /> : <Clipboard className={sharedStyle.icon} />}
+      </button>
+    </div>
+  );
+}
+
 export default function Homepage () {
   useTitleTemplate('Replugged');
 
   const [ selectedOS, setSelectedOS ] = useState<OperatingSystems>(defaultOS);
 
   const selectedOSData = operatingSystems.find(os => os.os === selectedOS)!;
-
-  // TODO: manual installation instructions
 
   return (
     <main className={style.container}>
@@ -105,6 +137,43 @@ export default function Homepage () {
             )}
           </div>
         </div>
+      </div>
+      <div className={style.wrapper} >
+        <section id="manual" className={style.manual}>
+          <h2>Manual Installation</h2>
+          <h3>Prerequisites</h3>
+          <p>
+            <ul>
+              <li><a href="https://git-scm.com/downloads" target="_blank">Git</a></li>
+              <li><a href="https://nodejs.org/en/" target="_blank">Node.js</a></li>
+              <li><a href="https://pnpm.io/installation" target="_blank">pnpm</a>: <Code>npm install -g pnpm</Code></li>
+              <li><a href="https://discord.com/download" target="_blank">Discord</a></li>
+            </ul>
+          </p>
+          <h3>Installation</h3>
+          <p>
+            <ol>
+              <li>Clone the repository: <Code>git clone https://github.com/replugged-org/replugged</Code></li>
+              <li><code>cd</code> into the repository: <Code>cd replugged</Code></li>
+              <li>Install dependencies: <Code>pnpm i</Code></li>
+              <li>Build Replugged: <Code>pnpm run bundle</Code></li>
+              <li>Fully quit Discord</li>
+              <li>Plug into Discord: <Code>pnpm run plug --production</Code>
+                <br />
+                If you want to specify into a specific Discord version, you can add the platform as an argument: <Code>pnpm run plug --production [stable|ptb|canary|development]</Code>
+              </li>
+              <li>Reopen Discord</li>
+            </ol>
+            You can verify it's installed by going into Discord settings and looking for the "Replugged" tab.
+          </p>
+          <h3>Troubleshooting</h3>
+          <p>
+            If you're having issues, please reinstall Discord and try steps 4-6 again.
+            <br />
+            <br />
+            Still having issues? Please <a href={Routes.DICKSWORD} target="_blank">join our Discord</a> and create a thread in <a href="https://discord.com/channels/1000926524452647132/1006383180309352538" target="_blank">#support</a> with any errors you're getting and any other information you think might be helpful.
+          </p>
+        </section>
       </div>
     </main>
   );
