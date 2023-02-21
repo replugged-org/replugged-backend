@@ -25,52 +25,6 @@ interface OperatingSystemData {
   }[]
 }
 
-// @ts-expect-error DOM types are out of date
-const platform: string = navigator.userAgentData?.platform.toLowerCase() || navigator.platform.toLowerCase();
-
-const operatingSystems: OperatingSystemData[] = [ {
-  os: 'windows',
-  detect: () => platform.includes('win'),
-  name: 'Windows',
-  warning: <>
-    If you get a warning that the app can't be opened, click "Run Anyways". You may need to click "more info" to see this option.
-  </>,
-  files: [ {
-    label: 'Download',
-    file: 'replugged-installer-windows.exe'
-  } ]
-}, {
-  os: 'macos',
-  detect: () => platform.includes('mac'),
-  name: 'macOS',
-  warning: <>
-    If you get a warning that the app can't be opened, right click on the app and select "Open". See <a href="https://support.apple.com/guide/mac-help/apple-cant-check-app-for-malicious-software-mchleab3a043/mac" target="_blank">this article</a> from Apple for more information.
-  </>,
-  files: [ {
-    label: 'Download for Intel',
-    file: 'replugged-installer-macos.zip'
-  }, {
-    label: 'Download for Apple Silicon',
-    file: 'replugged-installer-macos-arm64.zip'
-  } ]
-}, {
-  os: 'linux',
-  detect: () => platform.includes('linux'),
-  name: 'Linux',
-  warning: <>
-    If the installer is not able to find your installation or you are using Flatpak, please follow the <a href="#manual">manual installation instructions</a>.
-  </>,
-  files: [ {
-    label: 'Download for x86',
-    file: 'replugged-installer-linux.AppImage'
-  }, {
-    label: 'Download for arm64',
-    file: 'replugged-installer-linux-arm64.AppImage'
-  } ]
-} ];
-
-const defaultOS = (operatingSystems.find(os => os.detect()) || operatingSystems[0]).os;
-
 function Code ({ children }: { children: string }) {
   const [ copied, setCopied ] = useState(false);
 
@@ -102,6 +56,52 @@ function Code ({ children }: { children: string }) {
 }
 
 export default function Homepage () {
+  // @ts-expect-error DOM types are out of date
+  const platform: string = window.navigator.userAgentData?.platform.toLowerCase() || window.navigator.platform.toLowerCase();
+
+  const operatingSystems: OperatingSystemData[] = [ {
+    os: 'windows',
+    detect: () => platform.includes('win'),
+    name: 'Windows',
+    warning: <>
+    If you get a warning that the app can't be opened, click "Run Anyways". You may need to click "more info" to see this option.
+    </>,
+    files: [ {
+      label: 'Download',
+      file: 'replugged-installer-windows.exe'
+    } ]
+  }, {
+    os: 'macos',
+    detect: () => platform.includes('mac'),
+    name: 'macOS',
+    warning: <>
+    If you get a warning that the app can't be opened, right click on the app and select "Open". See <a href="https://support.apple.com/guide/mac-help/apple-cant-check-app-for-malicious-software-mchleab3a043/mac" target="_blank">this article</a> from Apple for more information.
+    </>,
+    files: [ {
+      label: 'Download for Intel',
+      file: 'replugged-installer-macos.zip'
+    }, {
+      label: 'Download for Apple Silicon',
+      file: 'replugged-installer-macos-arm64.zip'
+    } ]
+  }, {
+    os: 'linux',
+    detect: () => platform.includes('linux'),
+    name: 'Linux',
+    warning: <>
+    If the installer is not able to find your installation or you are using Flatpak, please follow the <a href="#manual">manual installation instructions</a>.
+    </>,
+    files: [ {
+      label: 'Download for x86',
+      file: 'replugged-installer-linux.AppImage'
+    }, {
+      label: 'Download for arm64',
+      file: 'replugged-installer-linux-arm64.AppImage'
+    } ]
+  } ];
+
+  const defaultOS = (operatingSystems.find(os => os.detect()) || operatingSystems[0]).os;
+
   useTitleTemplate('Replugged');
 
   const [ selectedOS, setSelectedOS ] = useState<OperatingSystems>(defaultOS);
