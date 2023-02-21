@@ -1,18 +1,21 @@
 {
     "name": "@replugged/web",
+    "main": "server.js",
     "version": "1.0.0",
     "description": "Frontend for replugged.dev",
     "repository": "git@github.com:replugged-org/replugged-backend.git",
     "private": true,
+    "type": "module",
     "scripts": {
         "dev": "vite",
-        "build": "vite build && vite build --ssr src/server.ts",
+        "build": "vite build",
         "preview": "vite preview",
-        "start": "node server/server.js",
         "lint": "eslint --ext ts --ext tsx src"
     },
     "dependencies": {
         "@preact/preset-vite": "^2.3.0",
+        "cors": "^2.8.5",
+        "express": "^4.18.2",
         "feather-icons": "^4.29.0",
         "highlightjs": "^9.16.2",
         "hljs": "^6.2.3",
