@@ -2,7 +2,7 @@ import {
   defineConfig
 } from 'vite';
 import preact from '@preact/preset-vite';
-import magicalSvg from 'vite-plugin-magical-svg';
+import svgr from 'vite-plugin-svgr';
 
 export default defineConfig({
   css: {
@@ -22,6 +22,8 @@ export default defineConfig({
   },
   plugins: [
     preact(),
-    magicalSvg({ target: 'preact' })
+    svgr({
+      exportAsDefault: true
+    })
   ]
 });

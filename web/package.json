@@ -26,13 +26,13 @@
         "prismjs": "^1.28.0",
         "simple-icons": "^7.5.0",
         "twemoji": "^14.0.2",
-        "vite": "^3.0.3",
-        "vite-plugin-magical-svg": "^1.0.2"
+        "vite": "^3.0.3"
     },
     "devDependencies": {
         "@babel/core": "^7.20.7",
         "@types/node": "^18.6.1",
         "@types/prismjs": "^1.26.0",
-        "react": "^18.2.0"
+        "react": "^18.2.0",
+        "vite-plugin-svgr": "^2.4.0"
     }
 }
