@@ -54,10 +54,10 @@ export default function Homepage () {
           <h1 className={style.title}>Powerful and simple Discord client mod</h1>
           <p className={style.motto}>Enhance your Discord experience with new features and looks. Make your Discord truly yours.</p>
           <div className={style.buttons}>
-            <a href={Routes.INSTALLATION} className={sharedStyle.button}>
+            <a href={Routes.DOWNLOAD} className={sharedStyle.button}>
               {/* @ts-ignore */}
               <Zap className={sharedStyle.icon} />
-              <span>Installation</span>
+              <span>Download</span>
             </a>
             <a href={Routes.DICKSWORD} className={sharedStyle.buttonLink}>
               {/* @ts-ignore */}
@@ -144,10 +144,10 @@ export default function Homepage () {
                         Stop limiting yourself to what Discord gives you. Get Replugged!
           </p>
           <div className={sharedStyle.buttons}>
-            <a href={Routes.INSTALLATION} className={sharedStyle.button}>
+            <a href={Routes.DOWNLOAD} className={sharedStyle.button}>
               {/* @ts-ignore */}
               <Zap className={sharedStyle.icon} />
-              <span>Installation</span>
+              <span>Download</span>
             </a>
             <a href={Routes.DICKSWORD} className={sharedStyle.buttonLink}>
               {/* @ts-ignore */}

@@ -2,8 +2,8 @@
 import { h } from 'preact';
 import { lazy, Suspense } from 'preact/compat';
 import { useTitleTemplate, useMeta } from 'hoofd/preact';
-import { useCallback, useMemo } from 'preact/hooks';
-import Router, { Route } from 'preact-router';
+import { useCallback, useEffect, useMemo } from 'preact/hooks';
+import Router, { route, Route } from 'preact-router';
 
 import UserContext, { type User } from './UserContext';
 import Spinner from './util/Spinner';
@@ -14,6 +14,7 @@ import Footer from './layout/Footer';
 import Homepage from './Homepage';
 import Account from './account/Account';
 import Contributors from './Contributors';
+import Download from './Download';
 import Stats from './stats/Community';
 import Branding from './Branding';
 import Install from './Install';
@@ -38,6 +39,14 @@ type AppProps = {
   user?: null | User,
   url?: string,
   ctx?: Record<string, any>
+}
+
+function Redirect ({ to }: {path: string, to: string}) {
+  useEffect(() => {
+    route(to, true);
+  }, [ to ]);
+
+  return null;
 }
 
 export default function App (props: AppProps) {
@@ -65,6 +74,8 @@ export default function App (props: AppProps) {
       <Suspense fallback={loading}>
         <Router url={props?.url} onChange={change}>
           <Route path={Routes.HOME} component={Homepage} />
+          <Route path={Routes.DOWNLOAD} component={Download} />
+          <Redirect path='/installation' to={Routes.DOWNLOAD} />
           <Route path={Routes.ME} component={AuthBoundary}>
             <Account />
           </Route>
@@ -81,7 +92,6 @@ export default function App (props: AppProps) {
           </Route>
 
           <Route path={Routes.FAQ} component={Markdown} document='faq' />
-          <Route path={Routes.INSTALLATION} component={Markdown} document='installation' />
           <Route path={Routes.GUIDELINES} component={Markdown} document='guidelines' />
 
           <Route path={Routes.TERMS} component={Terms} />

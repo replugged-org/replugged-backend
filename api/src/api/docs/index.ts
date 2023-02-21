@@ -129,11 +129,6 @@ export default async function (fastify: FastifyInstance): Promise<void> {
   }
   categoriesEtag = `W/"${catHash.digest('base64')}"`;
 
-  fastify.get('/installation', (_request: FastifyRequest, reply: FastifyReply) => {
-    reply.header('cache-control', `public, max-age=${CACHE_HEADER}`)
-    return getRemoteDocument('https://raw.githubusercontent.com/wiki/replugged-org/replugged/Installation.md');
-  });
-
   fastify.get('/categories', listCategories);
   fastify.get('/:category/:document', getDocument);
 }
