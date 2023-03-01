@@ -57,7 +57,7 @@ function Code ({ children }: { children: string }) {
 
 export default function Homepage () {
   // @ts-expect-error DOM types are out of date
-  const platform: string = window.navigator.userAgentData?.platform.toLowerCase() || window.navigator.platform.toLowerCase();
+  const platform: string = (window.navigator.userAgentData?.platform || window.navigator.platform || '').toLowerCase();
 
   const operatingSystems: OperatingSystemData[] = [ {
     os: 'windows',
