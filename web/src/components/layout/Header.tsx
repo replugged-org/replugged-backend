@@ -62,7 +62,7 @@ export default function Header () {
 
       <nav className={style.nav}>
         <a className={style.navLink} href={Routes.DOWNLOAD}>Download</a>
-        <a className={style.navLink} href={Routes.STORE}>Store</a>
+        {/* <a className={style.navLink} href={Routes.STORE}>Store</a> */}
         <a className={style.navLink} href={Routes.CONTRIBUTORS}>Contributors</a>
         <a className={style.navLink} href={Routes.DICKSWORD} target='_blank' rel='noreferrer'>Discord Server</a>
         {/* <a className={style.navLink} href={Routes.FAQ}>FAQ</a> */}
