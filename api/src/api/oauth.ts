@@ -318,23 +318,20 @@ export default async function (fastify: FastifyInstance): Promise<void> {
     }
   });
 
-  // api:v2
-  if (fastify.prefix.startsWith('/v3')) {
-    fastify.register(oauthPlugin, {
-      prefix: '/github',
-      data: {
-        isRestricted: true,
-        platform: 'github',
-        scopes: []
-      }
-    });
+  fastify.register(oauthPlugin, {
+    prefix: '/github',
+    data: {
+      isRestricted: true,
+      platform: 'github',
+      scopes: []
+    }
+  });
 
-    fastify.register(oauthPlugin, {
-      prefix: '/patreon',
-      data: {
-        platform: 'patreon',
-        scopes: [ 'identity', 'identity[email]' ]
-      }
-    });
-  }
+  fastify.register(oauthPlugin, {
+    prefix: '/patreon',
+    data: {
+      platform: 'patreon',
+      scopes: [ 'identity', 'identity[email]' ]
+    }
+  });
 }

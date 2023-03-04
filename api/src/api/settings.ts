@@ -5,9 +5,23 @@ import { existsSync, mkdirSync, createReadStream, createWriteStream } from 'fs';
 
 const SETTINGS_UPLOAD_LIMIT = 1e8; // 100MB
 const SETTINGS_UPLOAD_EYES = 1e6; // 1MB
-export const SETTINGS_STORAGE_FOLDER = process.platform !== 'linux' ? 'C:\\RepluggedData\\settings' : new URL('file:///var/lib/replugged/settings/');
+export const SETTINGS_STORAGE_FOLDER = (() => {
+  switch (process.platform) {
+    case 'linux':
+      return new URL('/var/lib/replugged-backend/settings/');
+    case 'win32':
+      return 'C:\\RepluggedData\\settings';
+    case 'darwin':
+      return `${process.env.home}/Library/Application Support/replugged-backend/settings`;
+    default:
+      throw new Error(`Unsupported platform: ${process.platform}`);
+  }
+})();
+
 if (!existsSync(SETTINGS_STORAGE_FOLDER)) {
-  mkdirSync(SETTINGS_STORAGE_FOLDER);
+  mkdirSync(SETTINGS_STORAGE_FOLDER, {
+    recursive: true
+  });
 }
 
 const locks = new Set<string>();
