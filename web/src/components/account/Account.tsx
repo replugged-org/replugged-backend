@@ -153,10 +153,6 @@ function PerksEdit ({ onReturn }: { onReturn: () => void }) {
 
   return (
     <form onSubmit={onSubmit}>
-      {user.cutieStatus.pledgeTier === 3 && <div className={style.perksManagementInfo}>
-        <Info />
-        <span>For the time being, server icon perk is handled manually. Contact aetheryx#0001 on Discord.</span>
-      </div>}
       {error && <div className={style.perksManagementError}>
         <AlertCircle />
         <span>{error}</span>
