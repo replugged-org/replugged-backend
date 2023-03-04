@@ -4,21 +4,22 @@ import { URL } from 'url';
 import { createHash } from 'crypto';
 import { existsSync } from 'fs';
 import { readdir, readFile } from 'fs/promises';
-import { fetch } from 'undici';
 import config from '../../config.js';
 import markdown from './parser.js';
 
-type GetDocParams = { category: string, document: string }
-type Category = { name: string, docs: Map<string, Document> }
+type GetDocParams = {category: string; document: string};
+type Category = {name: string; docs: Map<string, Document>};
 const docsStore = new Map<string, Category>();
-const remoteCache = new Map<string, Document>();
-const remoteCacheFetched = new Map<string, number>();
 const docsCategories: string[] = [];
 let categoriesEtag: string = '';
 
 const CACHE_HEADER = 15 * 60;
 
-function listCategories (this: FastifyInstance, request: FastifyRequest, reply: FastifyReply): void {
+function listCategories (
+  this: FastifyInstance,
+  request: FastifyRequest,
+  reply: FastifyReply
+): void {
   reply.header('cache-control', `public, max-age=${CACHE_HEADER}`);
   if (request.headers['if-none-match'] === categoriesEtag) {
     reply.code(304).send();
@@ -32,13 +33,19 @@ function listCategories (this: FastifyInstance, request: FastifyRequest, reply: 
       .map(([ catId, category ]) => ({
         id: catId,
         name: category.name,
-        docs: Array.from(category.docs.entries()).map(([ docId, doc ]) => ({ id: docId,
-          title: doc.title }))
+        docs: Array.from(category.docs.entries()).map(
+          ([ docId, doc ]) => ({ id: docId,
+            title: doc.title })
+        )
       }))
   );
 }
 
-function getDocument (this: FastifyInstance, request: FastifyRequest<{ Params: GetDocParams }>, reply: FastifyReply): void {
+function getDocument (
+  this: FastifyInstance,
+  request: FastifyRequest<{Params: GetDocParams}>,
+  reply: FastifyReply
+): void {
   const { category, document } = request.params;
   if (!docsStore.has(category)) {
     return void reply.callNotFound();
@@ -58,27 +65,6 @@ function getDocument (this: FastifyInstance, request: FastifyRequest<{ Params: G
 
   reply.header('etag', etag);
   reply.send(doc);
-}
-
-async function fetchRemoteDocument (url: string): Promise<void> {
-  const md = await fetch(url).then((r) => r.text());
-  remoteCache.set(url, markdown(md));
-  remoteCacheFetched.set(url, Date.now());
-}
-
-async function getRemoteDocument (url: string): Promise<Document> {
-  if (!remoteCache.has(url)) {
-    // If not cached, fetch and wait
-    await fetchRemoteDocument(url);
-  } else if (Date.now() - remoteCacheFetched.get(url)! > 1000 * 60 * 15) {
-    // If older than 15m, refetch and wait
-    await fetchRemoteDocument(url);
-  } else if (Date.now() - remoteCacheFetched.get(url)! > 1000 * 60 * 5) {
-    // If older than 5m, refetch but don't wait
-    void fetchRemoteDocument(url);
-  }
-
-  return remoteCache.get(url)!;
 }
 
 function findDocsFolder (): URL | void {
@@ -102,10 +88,14 @@ export default async function (fastify: FastifyInstance): Promise<void> {
   // Load docs data
   const catHash = createHash('sha1').update(config.secret);
   for (const cat of await readdir(docsUrl)) {
-    if (cat === 'LICENSE' || cat === 'README.md' || cat === '.git' || cat === '.DS_Store') {
+    if (
+      cat === 'LICENSE' ||
+      cat === 'README.md' ||
+      cat === '.git' ||
+      cat === '.DS_Store'
+    ) {
       continue;
     }
-
 
     const catId = cat.replace(/^\d+-/, '');
     const docs = new Map<string, Document>();
@@ -123,7 +113,12 @@ export default async function (fastify: FastifyInstance): Promise<void> {
       docsCategories.push(catId);
     }
     docsStore.set(catId, {
-      name: catId.split('-').map((s) => `${s[0].toUpperCase()}${s.substring(1).toLowerCase()}`).join(' '),
+      name: catId
+        .split('-')
+        .map(
+          s => `${s[0].toUpperCase()}${s.substring(1).toLowerCase()}`
+        )
+        .join(' '),
       docs
     });
   }
