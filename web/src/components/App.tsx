@@ -19,8 +19,6 @@ import Stats from './stats/Community';
 import Branding from './Branding';
 import Install from './Install';
 import Storefront from './store/Storefront';
-import Documentation from './docs/Documentation';
-import Markdown from './docs/Markdown';
 import Terms from './legal/Terms';
 import Privacy from './legal/Privacy';
 
@@ -86,13 +84,6 @@ export default function App (props: AppProps) {
           <Route path={Routes.INSTALL} component={Install} />
 
           <Route path={Routes.STORE} component={Storefront} />
-
-          <Route path={Routes.DOCS_ITEM(':categoryId?', ':documentId?')} component={SoonRoute}>
-            <Documentation path={Routes.DOCS_ITEM(':categoryId?', ':documentId?')} />
-          </Route>
-
-          <Route path={Routes.FAQ} component={Markdown} document='faq' />
-          <Route path={Routes.GUIDELINES} component={Markdown} document='guidelines' />
 
           <Route path={Routes.TERMS} component={Terms} />
           <Route path={Routes.PRIVACY} component={Privacy} />

@@ -5,7 +5,6 @@ import { h, cloneElement, Fragment } from 'preact';
 import { useState, useContext, useCallback, useMemo, useLayoutEffect } from 'preact/hooks';
 
 import Spinner from '../../util/Spinner';
-import MarkdownDocument from '../../docs/Markdown';
 import UserContext from '../../UserContext';
 import { Endpoints, Routes } from '../../../constants';
 
@@ -24,22 +23,23 @@ function Intro ({ id, onNext }: { id: string, onNext: () => void }) {
 
 
   return (
-    <MarkdownDocument document={`store/${id}`} notFoundClassName={style.notfound}>
-      <h2>Ready?</h2>
-      {!isLoggedIn && (
-        <p>
-          Before you can submit a form, you must be authenticated. This is to prevent spam, and to know who to reach out
-          about this submission.
-        </p>
-      )}
+    <span>Coming soon</span>
+    // <MarkdownDocument document={`store/${id}`} notFoundClassName={style.notfound}>
+    //   <h2>Ready?</h2>
+    //   {!isLoggedIn && (
+    //     <p>
+    //       Before you can submit a form, you must be authenticated. This is to prevent spam, and to know who to reach out
+    //       about this submission.
+    //     </p>
+    //   )}
 
-      <p>
-        {isLoggedIn
-          ? <button className={button} onClick={onNext}>Get started</button>
-          // @ts-ignore
-          : <a native href={`${Endpoints.LOGIN}?redirect=${path}`} className={button}>Login with Discord</a>}
-      </p>
-    </MarkdownDocument>
+  //   <p>
+  //     {isLoggedIn
+  //       ? <button className={button} onClick={onNext}>Get started</button>
+  //       // @ts-ignore
+  //       : <a native href={`${Endpoints.LOGIN}?redirect=${path}`} className={button}>Login with Discord</a>}
+  //   </p>
+  // </MarkdownDocument>
   );
 }
 

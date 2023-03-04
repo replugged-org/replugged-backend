@@ -9,7 +9,6 @@ import { UserFlags } from '../../../../shared/flags';
 
 import Redirect from '../util/Redirect';
 import LayoutWithSidebar from '../layout/LayoutWithSidebar';
-import MarkdownDocument from '../docs/Markdown';
 import Store from './Store';
 import PublishForm from './form/Publish';
 import VerificationForm from './form/Verification';
@@ -112,8 +111,7 @@ export default function Storefront (props: StoreProps) {
         <VerificationForm path={Routes.STORE_VERIFICATION} eligibility={eligibility?.verification}/>
         <HostingForm path={Routes.STORE_HOSTING} eligibility={eligibility?.hosting}/>
 
-        <MarkdownDocument document='store/copyright' path={Routes.STORE_COPYRIGHT}/>
-        <Redirect default to={Routes.STORE_PLUGINS}/>
+        <Redirect default to={Routes.STORE_PLUGINS} />
       </Router>
     </LayoutWithSidebar>
   );
