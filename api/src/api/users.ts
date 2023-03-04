@@ -13,7 +13,7 @@ import config from '../config.js';
 
 import settingsModule from './settings.js';
 import { isGhostUser, formatUser } from '../data/user.js';
-import { refreshAuthTokens, toMongoFields } from '../utils/oauth.js';
+// import { refreshAuthTokens, toMongoFields } from '../utils/oauth.js';
 import { notifyStateChange, refreshDonatorState } from '../utils/patreon.js';
 
 const DATE_ZERO = new Date(0);
@@ -118,30 +118,30 @@ async function patchSelf (this: FastifyInstance, request: FastifyRequest<PatchSe
   notifyStateChange(newUser, 'perks');
 }
 
-async function getSpotifyToken (this: FastifyInstance, request: FastifyRequest): Promise<unknown> {
-  const { spotify } = request.user!.accounts;
-  if (!spotify) {
-    return { token: null };
-  }
+// async function getSpotifyToken (this: FastifyInstance, request: FastifyRequest): Promise<unknown> {
+//   const { spotify } = request.user!.accounts;
+//   if (!spotify) {
+//     return { token: null };
+//   }
 
-  const users = this.mongo.db!.collection<DatabaseUser>('users');
-  if (Date.now() >= spotify.expiresAt) {
-    try {
-      const tokens = await refreshAuthTokens('spotify', spotify.refreshToken);
-      await users.updateOne({ _id: request.user!._id }, { $currentDate: { updatedAt: true },
-        $set: toMongoFields(tokens, 'spotify') });
-      return { token: tokens.accessToken };
-    } catch {
-      // todo: catch 5xx errors from spotify and report them instead
-      await users.updateOne({ _id: request.user!._id }, { $currentDate: { updatedAt: true },
-        $unset: { 'accounts.spotify': 1 } });
-      return { token: null,
-        revoked: 'ACCESS_DENIED' };
-    }
-  }
+//   const users = this.mongo.db!.collection<DatabaseUser>('users');
+//   if (Date.now() >= spotify.expiresAt) {
+//     try {
+//       const tokens = await refreshAuthTokens('spotify', spotify.refreshToken);
+//       await users.updateOne({ _id: request.user!._id }, { $currentDate: { updatedAt: true },
+//         $set: toMongoFields(tokens, 'spotify') });
+//       return { token: tokens.accessToken };
+//     } catch {
+//       // todo: catch 5xx errors from spotify and report them instead
+//       await users.updateOne({ _id: request.user!._id }, { $currentDate: { updatedAt: true },
+//         $unset: { 'accounts.spotify': 1 } });
+//       return { token: null,
+//         revoked: 'ACCESS_DENIED' };
+//     }
+//   }
 
-  return { token: spotify.accessToken };
-}
+//   return { token: spotify.accessToken };
+// }
 
 async function refreshPledge (this: FastifyInstance, request: FastifyRequest, reply: FastifyReply) {
   const patreonAccount = request.user!.accounts.patreon;
@@ -177,12 +177,12 @@ export default async function (fastify: FastifyInstance): Promise<void> {
     config: { auth: { allowClient: true } }
   });
 
-  fastify.route({
-    method: 'GET',
-    url: '/@me/spotify',
-    handler: getSpotifyToken,
-    config: { auth: { allowClient: true } }
-  });
+  // fastify.route({
+  //   method: 'GET',
+  //   url: '/@me/spotify',
+  //   handler: getSpotifyToken,
+  //   config: { auth: { allowClient: true } }
+  // });
 
   fastify.route({
     method: 'GET',

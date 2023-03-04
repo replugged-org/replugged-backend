@@ -217,12 +217,6 @@ export default function Account () {
         <div className={style.linkedAccounts}>
           <h2 className={style.title}>Linked Accounts</h2>
           <LinkedAccount
-            platform='spotify'
-            icon={Spotify}
-            account={user.accounts.spotify}
-            explainer={'Linking your Spotify account gives you an enhanced experience with the Spotify plugin. It\'ll let you add songs to your Liked Songs, add songs to playlists, see private playlists and more.'}
-          />
-          <LinkedAccount
             platform='patreon'
             icon={Patreon}
             account={user.accounts.patreon}
