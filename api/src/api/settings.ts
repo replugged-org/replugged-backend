@@ -8,7 +8,7 @@ const SETTINGS_UPLOAD_EYES = 1e6; // 1MB
 export const SETTINGS_STORAGE_FOLDER = (() => {
   switch (process.platform) {
     case 'linux':
-      return new URL('/var/lib/replugged-backend/settings/');
+      return new URL('file:///var/lib/replugged-backend/settings/');
     case 'win32':
       return 'C:\\RepluggedData\\settings';
     case 'darwin':
