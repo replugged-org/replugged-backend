@@ -28,7 +28,6 @@ import Link from 'feather-icons/dist/icons/link.svg';
 import Remove from 'feather-icons/dist/icons/x-circle.svg';
 import Refresh from 'feather-icons/dist/icons/rotate-cw.svg';
 import AlertCircle from 'feather-icons/dist/icons/alert-circle.svg';
-import Info from 'feather-icons/dist/icons/info.svg';
 
 import style from './account.module.css';
 import sharedStyle from '../shared.module.css';
@@ -271,8 +270,8 @@ export default function Account () {
             </Modal>
           )}
         </div>
-        {/* <Donator /> */}
-        {user.cutieStatus.pledgeTier ? <ManagePerks /> : <Donator />}
+        {/* TODO: replace null with <Donator /> once we're ready */}
+        {user.cutieStatus.pledgeTier ? <ManagePerks /> : null}
       </div>
     </main>
   );
