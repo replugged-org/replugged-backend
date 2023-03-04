@@ -24,9 +24,6 @@ import Privacy from './legal/Privacy';
 
 const Admin = lazy(() => import('./backoffice/Admin'));
 
-
-import { SoonRoute } from './util/Soon';
-
 import NotFound from './NotFound';
 
 import { Routes } from '../constants';

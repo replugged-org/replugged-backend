@@ -41,13 +41,13 @@ export function formatUser (user: User, includePrivate?: boolean, allFlags?: boo
   };
 
   if (user.flags & UserFlags.HAS_DONATED) {
-    perks.title = 'Former Replugged Cutie';
+    perks.title = 'Former Replugged Supporter';
     perks.badge = 'default';
   }
 
   if (user.flags & UserFlags.IS_CUTIE) {
     perks.color = user.cutiePerks?.color || null;
-    perks.title = 'Replugged Cutie';
+    perks.title = 'Replugged Supporter';
 
     if ((user.cutieStatus?.pledgeTier ?? 1) >= 2 || user.flags & UserFlags.CUTIE_OVERRIDE) {
       perks.title = user.cutiePerks?.title || perks.title;

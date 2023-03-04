@@ -24,7 +24,7 @@ export const UserFlags = {
 
   // User donated at least once. Public.
   HAS_DONATED: 1 << 9,
-  // User is currently a Powercord Cutie. Public.
+  // User is currently a Powercord Supporter. Public.
   IS_CUTIE: 1 << 10,
   // Status has been manually set by a staff. Private.
   CUTIE_OVERRIDE: 1 << 11,

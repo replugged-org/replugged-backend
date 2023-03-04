@@ -109,7 +109,7 @@ function PerksEdit ({ onReturn }: { onReturn: () => void }) {
   const originalCutiePerks = useMemo(() => ({
     color: user.cutiePerks.color || '',
     badge: user.cutiePerks.badge === 'default' ? '' : user.cutiePerks.badge || '',
-    title: user.cutiePerks.title === 'Replugged Cutie' ? '' : user.cutiePerks.title || ''
+    title: user.cutiePerks.title === 'Replugged Supporter' ? '' : user.cutiePerks.title || ''
   }), []);
 
   const cutiePerks = useMemo(() => ({ ...originalCutiePerks }), []);
@@ -119,7 +119,7 @@ function PerksEdit ({ onReturn }: { onReturn: () => void }) {
     // Memoize new values
     cutiePerks.color = data.get('color') as string || '';
     cutiePerks.badge = data.get('badge') as string || '';
-    cutiePerks.title = data.get('title') as string || 'Replugged Cutie';
+    cutiePerks.title = data.get('title') as string || 'Replugged Supporter';
 
     if (originalCutiePerks.color === cutiePerks.color && originalCutiePerks.badge === cutiePerks.badge && originalCutiePerks.title === cutiePerks.title) {
       onReturn();
@@ -179,7 +179,7 @@ function PerksEdit ({ onReturn }: { onReturn: () => void }) {
           />
 
           <div className={style.perksManagementNotice}>
-            <span>You are not allowed to use any official Discord badge, nor Replugged's. Badge updates are monitored and inappropriate ones will be reset. Repeated offenders may see their access to Replugged Cutie perks revoked.</span>
+            <span>You are not allowed to use any official Discord badge, nor Replugged's. Badge updates are monitored and inappropriate ones will be reset. Repeated offenders may see their access to Replugged Supporter perks revoked.</span>
           </div>
         </Fragment>
       )}
@@ -197,7 +197,7 @@ function ManagePerks () {
 
   return (
     <div className={style.perksManagement}>
-      <h2 className={style.title}>Replugged Cutie Perks</h2>
+      <h2 className={style.title}>Replugged Supporter Perks</h2>
       {editing
         ? <PerksEdit onReturn={() => setEditing(false)} />
         : <Profile user={user} onEdit={() => setEditing(true)} />
@@ -227,7 +227,7 @@ export default function Account () {
             platform='patreon'
             icon={Patreon}
             account={user.accounts.patreon}
-            explainer={'Link your Patreon account to benefit from the Replugged Cutie perks, and manage them from here. If you pledged but don\'t see your perks, use the refresh button.'}
+            explainer={'Link your Patreon account to benefit from the Replugged Supporter perks, and manage them from here. If you pledged but don\'t see your perks, use the refresh button.'}
             refreshEndpoint={Endpoints.USER_REFRESH_PLEDGE}
           />
           <hr className={style.separator} />

@@ -35,7 +35,7 @@ function ProfileBadges ({ flags, cutiePerks }: ProfileBadgesProps) {
   return (
     <div className={style.badges} style={{ color: `#${cutiePerks.color || '7289da'}` }}>
 
-      <Tooltip text={cutiePerks.title ?? 'Replugged Cutie'} align='center'>
+      <Tooltip text={cutiePerks.title ?? 'Replugged Supporter'} align='center'>
         {cutiePerks.badge && cutiePerks.badge !== 'default'
           ? <img src={cutiePerks.badge} className={style.badge} />
         // @ts-ignore
@@ -107,11 +107,11 @@ export default function Profile ({ user, onEdit }: ProfileProps) {
           <div className={style.roles}>
             <div className={style.role}>
               <div className={`${style.roleRound} ${style.roleBlurple}`} />
-              <span>Replugged Cutie</span>
+              <span>Replugged Supporter</span>
             </div>
             <div className={style.role}>
               <div className={`${style.roleRound} ${style.rolePink}`} />
-              <span>Tier {user.cutieStatus.pledgeTier} Cutie</span>
+              <span>Tier {user.cutieStatus.pledgeTier} Supporter</span>
             </div>
           </div>
         </div>

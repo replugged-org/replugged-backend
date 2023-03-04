@@ -56,17 +56,17 @@ function FormProperties ({ user, formRef, ...props }: FormChunkProps) {
       </div>
       <SelectField
         name='patronTier'
-        label='Donator tier'
+        label='Supporter tier'
         value={String(user.patronTier ?? 0)}
         options={[
           { id: '0',
             name: 'Not donating' },
           { id: '1',
-            name: '$1 Donator' },
+            name: '$1 Supporter' },
           { id: '2',
-            name: '$5 Donator' },
+            name: '$5 Supporter' },
           { id: '3',
-            name: '$10 Donator' }
+            name: '$10 Supporter' }
         ]}
       />
     </form>
