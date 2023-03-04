@@ -12,7 +12,7 @@ export const SETTINGS_STORAGE_FOLDER = (() => {
     case 'win32':
       return 'C:\\RepluggedData\\settings';
     case 'darwin':
-      return `${process.env.home}/Library/Application Support/replugged-backend/settings`;
+      return `${process.env.HOME}/Library/Application Support/replugged-backend/settings`;
     default:
       throw new Error(`Unsupported platform: ${process.platform}`);
   }
