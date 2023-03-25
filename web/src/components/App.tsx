@@ -1,11 +1,11 @@
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
-import { h } from 'preact';
-import { lazy, Suspense } from 'preact/compat';
-import { useTitleTemplate, useMeta } from 'hoofd/preact';
-import { useCallback, useEffect, useMemo } from 'preact/hooks';
-import Router, { route, Route } from 'preact-router';
+import {h} from 'preact';
+import {lazy, Suspense} from 'preact/compat';
+import {useTitleTemplate} from 'hoofd/preact';
+import {useCallback, useEffect, useMemo} from 'preact/hooks';
+import Router, {route, Route} from 'preact-router';
 
-import UserContext, { type User } from './UserContext';
+import UserContext, {type User} from './UserContext';
 import Spinner from './util/Spinner';
 
 import Header from './layout/Header';
@@ -26,73 +26,78 @@ const Admin = lazy(() => import('./backoffice/Admin'));
 
 import NotFound from './NotFound';
 
-import { Routes } from '../constants';
+import {Routes} from '../constants';
 import AuthBoundary from './util/AuthBoundary';
 
-
 type AppProps = {
-  user?: null | User,
-  url?: string,
-  ctx?: Record<string, any>
+	user?: null | User;
+	url?: string;
+	ctx?: Record<string, any>;
+};
+
+function Redirect({to}: {path: string; to: string}) {
+	useEffect(() => {
+		route(to, true);
+	}, [to]);
+
+	return null;
 }
 
-function Redirect ({ to }: {path: string, to: string}) {
-  useEffect(() => {
-    route(to, true);
-  }, [ to ]);
+export default function App(props: AppProps) {
+	const change = useCallback(
+		() =>
+			typeof document !== 'undefined' &&
+			document.getElementById('app')?.scrollTo(0, 0),
+		[],
+	);
+	const loading = useMemo(
+		() => (
+			<main>
+				<Spinner />
+			</main>
+		),
+		[],
+	);
 
-  return null;
-}
+	useTitleTemplate('%s - Replugged');
 
-export default function App (props: AppProps) {
-  const change = useCallback(() => typeof document !== 'undefined' && document.getElementById('app')?.scrollTo(0, 0), []);
-  const loading = useMemo(() => (
-    <main>
-      <Spinner />
-    </main>
-  ), []);
+	return (
+		<UserContext.Provider value={props?.user}>
+			<Header />
+			<Suspense fallback={loading}>
+				<Router url={props?.url} onChange={change}>
+					<Route path={Routes.HOME} component={Homepage} />
+					<Route path={Routes.DOWNLOAD} component={Download} />
+					<Redirect path="/installation" to={Routes.DOWNLOAD} />
+					<Route path={Routes.ME} component={AuthBoundary}>
+						<Account />
+					</Route>
 
-  useTitleTemplate('%s • Replugged');
-  useMeta({ name: 'og:title',
-    content: 'Replugged' });
-  useMeta({ name: 'og:site_name',
-    content: 'Replugged' });
-  useMeta({ name: 'og:description',
-    content: 'A lightweight Discord client mod focused on simplicity and performance.' });
-  useMeta({ name: 'description',
-    content: 'A lightweight Discord client mod focused on simplicity and performance.' });
+					<Route
+						path={Routes.CONTRIBUTORS}
+						component={Contributors}
+					/>
+					<Route path={Routes.STATS} component={Stats} />
+					<Route path={Routes.BRANDING} component={Branding} />
+					<Route path={Routes.INSTALL} component={Install} />
 
+					<Route path={Routes.STORE} component={Storefront} />
 
-  return (
-    <UserContext.Provider value={props?.user}>
-      <Header />
-      <Suspense fallback={loading}>
-        <Router url={props?.url} onChange={change}>
-          <Route path={Routes.HOME} component={Homepage} />
-          <Route path={Routes.DOWNLOAD} component={Download} />
-          <Redirect path='/installation' to={Routes.DOWNLOAD} />
-          <Route path={Routes.ME} component={AuthBoundary}>
-            <Account />
-          </Route>
+					<Route path={Routes.TERMS} component={Terms} />
+					<Route path={Routes.PRIVACY} component={Privacy} />
 
-          <Route path={Routes.CONTRIBUTORS} component={Contributors} />
-          <Route path={Routes.STATS} component={Stats} />
-          <Route path={Routes.BRANDING} component={Branding} />
-          <Route path={Routes.INSTALL} component={Install} />
+					<Route
+						path={`${Routes.BACKOFFICE}/:path*`}
+						component={AuthBoundary}
+						staff
+					>
+						<Admin />
+					</Route>
 
-          <Route path={Routes.STORE} component={Storefront} />
-
-          <Route path={Routes.TERMS} component={Terms} />
-          <Route path={Routes.PRIVACY} component={Privacy} />
-
-          <Route path={`${Routes.BACKOFFICE}/:path*`} component={AuthBoundary} staff>
-            <Admin />
-          </Route>
-
-          <Route default ctx={props?.ctx} component={NotFound} />
-        </Router>
-      </Suspense>
-      <Footer />
-    </UserContext.Provider>
-  );
+					<Route default ctx={props?.ctx} component={NotFound} />
+				</Router>
+			</Suspense>
+			<Footer />
+		</UserContext.Provider>
+	);
 }
