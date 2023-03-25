@@ -9,15 +9,13 @@ const meta = [
 	{
 		match: [],
 		title: 'Replugged',
-		metaTitle: '{title}',
 		description:
 			'Enhance your Discord experience with new features and looks. Make your Discord truly yours.',
 		robots: '',
 	},
 	{
 		match: ['/'],
-		title: 'Home',
-		metaTitle: 'Replugged - Discord Client Mod',
+		title: 'Replugged - Discord Client Mod',
 	},
 	{
 		match: ['/download'],
@@ -79,9 +77,6 @@ app.get('*', (req, res) => {
 		}) ?? {};
 	// Apply default metadata
 	const mergedMeta = {...defaultMeta, ...currentMeta};
-	// Title suffix if the title is not "Replugged"
-	mergedMeta.titleSuffix =
-		mergedMeta.title === 'Replugged' ? '' : ' - Replugged';
 
 	// Replace variables
 	// Repeat until no more variables are replaced
