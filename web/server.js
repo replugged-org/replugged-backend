@@ -4,6 +4,9 @@ import fs from 'fs';
 const app = express();
 
 const index = fs.readFileSync('dist/index.html', 'utf8');
+const distFiles = fs
+	.readdirSync('dist')
+	.filter(x => !['assets', 'index.html'].includes(x));
 
 const meta = [
 	{
@@ -60,7 +63,14 @@ app.listen(Number(process.env.PORT ?? 8000), () => {
 app.use(cors());
 
 app.use('/assets', express.static('dist/assets'));
-app.get('/robots.txt', (_, res) => res.sendFile('robots.txt', {root: 'dist'}));
+distFiles.forEach(file => {
+	app.get(`/${file}`, (req, res) => {
+		res.sendFile(`${file}`, {
+			root: 'dist',
+		});
+	});
+});
+
 app.get('*', (req, res) => {
 	// Create copy of index for this request
 	let indexCopy = index;
