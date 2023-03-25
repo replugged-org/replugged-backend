@@ -142,7 +142,7 @@ export default function Homepage() {
 		operatingSystems.find(os => os.detect()) || operatingSystems[0]
 	).os;
 
-	useTitle('Replugged');
+	useTitle('Download');
 
 	const [selectedOS, setSelectedOS] = useState<OperatingSystems>(defaultOS);
 

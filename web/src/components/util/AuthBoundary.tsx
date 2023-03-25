@@ -23,7 +23,7 @@ export default function AuthBoundary({children, staff}: AuthBoundaryProps) {
 	const [{url: path}] = useRouter();
 
 	if (user === void 0) {
-		useTitle('Replugged');
+		useTitle('Loading');
 
 		return (
 			<main>
