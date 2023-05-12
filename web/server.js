@@ -13,7 +13,7 @@ const meta = [
 		match: [],
 		title: 'Replugged',
 		description:
-			'Enhance your Discord experience with new features and looks. Make your Discord truly yours.',
+			'Enhance your Discord experience with new features and looks. Replugged makes your Discord truly yours.',
 		robots: '',
 	},
 	{

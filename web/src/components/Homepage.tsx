@@ -56,7 +56,8 @@ export default function Homepage() {
 					</h1>
 					<p className={style.motto}>
 						Enhance your Discord experience with new features and
-						looks. Make your Discord truly yours.
+						looks. Replugged makes your Discord truly{' '}
+						<span class={style.italic}>yours</span>.
 					</p>
 					<div className={style.buttons}>
 						<a
@@ -164,7 +165,7 @@ export default function Homepage() {
                 <hr /> */}
 				<section className={style.section}>
 					<h2 className={style.sectionTitle}>
-						Make your Discord spicer
+						Make your Discord yours
 					</h2>
 					<p className={style.sectionDescription}>
 						Stop limiting yourself to what Discord gives you. Get
