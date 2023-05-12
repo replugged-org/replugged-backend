@@ -1,59 +1,136 @@
-// import { ObjectId } from "@fastify/mongodb";
-import { FastifyInstance /* FastifyReply, FastifyRequest*/ } from 'fastify';
-// import { FormPublish, StoreForm } from '../../../../types/store'
+import {FastifyInstance} from 'fastify';
+import {STORAGE_FOLDER} from '../../utils/misc.js';
+import path from 'path';
+import {stat, readFile, readdir} from 'fs/promises';
 
-// type Params = { id: string }
-// type BulkParams = { page: number, limit?: number }
+async function exists(path: string) {
+	try {
+		await stat(path);
+		return true;
+	} catch {
+		return false;
+	}
+}
 
-// function formatForm(data: FormPublish) {
-//     return {
-//         _id: data._id,
-//         submitter: data.submitter,
-//         type: data.type,
-//         repoUrl: data.repoUrl,
-//         description: data.description
-//     }
-// }
+const ADDONS_FOLDER = STORAGE_FOLDER('addons');
+const RESULTS_PER_PAGE = 20;
 
-// async function fetchPlugins(this: FastifyInstance, request: FastifyRequest<{ Querystring: BulkParams }>) {
-//     const page = (request.query.page ?? 1) - 1
-//     const limit = request.query.limit ?? 50
+const ADDON_TYPES = ['plugin', 'theme'] as const;
+type AddonType = (typeof ADDON_TYPES)[number];
+type Manifest = Record<string, unknown>; // TODO: possibly type this
 
-//     const cursor = this.mongo.db!.collection<StoreForm>('forms').find({
-//         kind: 'publish',
-//         type: 'plugin',
-//         approved: true
-//     }, {
-//         limit: limit, skip: page * limit
-//     })
+async function getManifest(
+	type: AddonType,
+	id: string,
+): Promise<Manifest | null> {
+	const fullPath = path.join(ADDONS_FOLDER, 'manifests', type, `${id}.json`);
+	if (!(await exists(fullPath))) return null;
+	const manifestContent = await readFile(fullPath, 'utf-8');
+	return JSON.parse(manifestContent);
+}
 
-//     const res = await cursor.toArray();
+async function getAsar(type: AddonType, id: string): Promise<Buffer | null> {
+	const fullPath = path.join(ADDONS_FOLDER, 'asars', type, `${id}.asar`);
+	if (!(await exists(fullPath))) return null;
+	return readFile(fullPath);
+}
 
-//     return {
-//         data: res.map((r) => formatForm(r as FormPublish)),
-//         page
-//     }
-// }
+async function listAddonIds(type: AddonType): Promise<string[]> {
+	const fullPath = path.join(ADDONS_FOLDER, 'manifests', type);
+	if (!(await exists(fullPath))) return [];
+	const fileNames = await readdir(fullPath);
+	return fileNames.map(fileName => fileName.replace(/\.json$/, ''));
+}
 
-// async function fetchPlugin(this: FastifyInstance, request: FastifyRequest<{Params: Params}>, reply: FastifyReply) {
-//     const entity = await this.mongo.db!.collection<StoreForm>('form').findOne({
-//         kind: 'publish',
-//         _id: new ObjectId(request.params.id),
-//         type: 'plugin',
-//         approved: true
-//     })
+export default async function (fastify: FastifyInstance): Promise<void> {
+	fastify.get<{
+		Params: {
+			type: AddonType;
+			id: string;
+		};
+	}>('/:type/:id', async (request, reply) => {
+		if (!ADDON_TYPES.includes(request.params.type as AddonType)) {
+			reply.code(400).send({
+				error: `Invalid addon type: ${request.params.type}`,
+			});
+			return;
+		}
 
-//     if(!entity) {
-//         reply.callNotFound();
-//         return;
-//     }
+		const manifest = await getManifest(
+			request.params.type,
+			request.params.id,
+		);
+		if (!manifest) {
+			reply.callNotFound();
+			return;
+		}
+		return manifest;
+	});
 
-//     return entity
-// }
+	fastify.get<{
+		Params: {
+			type: AddonType;
+			id: string;
+		};
+	}>('/:type/:id.asar', async (request, reply) => {
+		if (!ADDON_TYPES.includes(request.params.type as AddonType)) {
+			reply.code(400).send({
+				error: `Invalid addon type: ${request.params.type}`,
+			});
+			return;
+		}
 
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-export default async function (_fastify: FastifyInstance): Promise<void> {
+		const asar = await getAsar(request.params.type, request.params.id);
+		if (!asar) {
+			reply.callNotFound();
+			return;
+		}
+		return asar;
+	});
 
-  // fastify.get('/plugins', fetchPlugins)
-  // fastify.get('/plugins/:id', fetchPlugin)
+	fastify.get<{
+		Params: {
+			type: AddonType;
+			id: string;
+		};
+		Querystring: {
+			page?: string;
+		};
+	}>('/:type', async (request, reply) => {
+		if (!ADDON_TYPES.includes(request.params.type as AddonType)) {
+			reply.code(400).send({
+				error: `Invalid addon type: ${request.params.type}`,
+			});
+			return;
+		}
+		const page = parseInt(request.query.page ?? '1');
+		if (isNaN(page)) {
+			reply.code(400).send({
+				error: `Invalid page number: ${request.query.page}`,
+			});
+			return;
+		}
+
+		const ids = await listAddonIds(request.params.type);
+		const numPages = Math.ceil(ids.length / RESULTS_PER_PAGE);
+		if (page > numPages) {
+			reply.code(404).send({
+				error: `Page ${page} not found`,
+			});
+			return;
+		}
+
+		const start = (page - 1) * RESULTS_PER_PAGE;
+		const end = start + RESULTS_PER_PAGE;
+		const slicedIds = ids.slice(start, end);
+		const manifests = await Promise.all(
+			slicedIds.map(id => getManifest(request.params.type, id)),
+		);
+
+		return {
+			page,
+			numPages,
+			results: manifests,
+		};
+	});
 }
