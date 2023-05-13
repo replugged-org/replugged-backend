@@ -20,6 +20,11 @@ const updateCheckSchema = z.array(
 	}),
 );
 type UpdateCheck = z.infer<typeof updateCheckSchema>;
+type UpdateCheckResult = {
+	id: string;
+	version: string;
+	hasUpdate: boolean;
+};
 
 const ADDONS_FOLDER = STORAGE_FOLDER('addons');
 const RESULTS_PER_PAGE = 20;
@@ -73,20 +78,25 @@ async function getAddonIdsFromDisc(): Promise<string[]> {
 
 async function getAddonsWithUpdates(
 	updateCheck: UpdateCheck,
-): Promise<UpdateCheck> {
+): Promise<UpdateCheckResult[]> {
 	const results = await Promise.all(
 		updateCheck.map(async addon => {
 			const manifest = await getManifest(addon.id);
-			if (!manifest) return null;
-			if (manifest.version === addon.version) return null;
+			if (!manifest)
+				return {
+					id: addon.id,
+					version: addon.version,
+					hasUpdate: false,
+				};
 			return {
 				id: addon.id,
 				version: manifest.version as string,
+				hasUpdate: manifest.version !== addon.version,
 			};
 		}),
 	);
 
-	return results.filter(Boolean) as UpdateCheck;
+	return results;
 }
 
 async function populateCache() {
