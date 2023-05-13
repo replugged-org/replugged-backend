@@ -15,7 +15,6 @@ async function exists(path: string) {
 
 const updateCheckSchema = z.array(
 	z.object({
-		type: z.enum(['plugin', 'theme']),
 		id: z.string(),
 		version: z.string(),
 	}),
@@ -27,50 +26,46 @@ const RESULTS_PER_PAGE = 20;
 
 const ADDON_TYPES = ['plugin', 'theme'] as const;
 type AddonType = (typeof ADDON_TYPES)[number];
-type Manifest = Record<string, unknown>; // TODO: possibly type this
+type Manifest = {
+	id: string;
+	name: string;
+	type: 'replugged-plugin' | 'replugged-theme' | 'replugged';
+} & Record<string, unknown>; // TODO: possibly type this
 
-const manifestCache = new Map<
-	string,
-	{
-		data: Manifest;
-		fetched: Date;
-	}
->();
+const manifestCache = new Map<string, Manifest>();
 const CACHE_DURATION = 1000 * 60 * 1;
 
-async function getManifest(
-	type: AddonType,
-	id: string,
-): Promise<Manifest | null> {
-	const cached = manifestCache.get(`${type}/${id}`);
-	if (cached && cached.fetched.getTime() > Date.now() - CACHE_DURATION) {
-		return cached.data;
+async function getManifest(id: string): Promise<Manifest | null> {
+	if (manifestCache.has(id)) {
+		return manifestCache.get(id)!;
 	}
-	return await loadManifest(type, id);
+	return await loadManifest(id);
 }
-async function loadManifest(
-	type: AddonType,
-	id: string,
-): Promise<Manifest | null> {
-	const fullPath = path.join(ADDONS_FOLDER, 'manifests', type, `${id}.json`);
+async function loadManifest(id: string): Promise<Manifest | null> {
+	const fullPath = path.join(ADDONS_FOLDER, 'manifests', `${id}.json`);
 	if (!(await exists(fullPath))) return null;
 	const manifestContent = await readFile(fullPath, 'utf-8');
 	const json = JSON.parse(manifestContent);
-	manifestCache.set(`${type}/${id}`, {
-		data: json,
-		fetched: new Date(),
-	});
+	manifestCache.set(id, json);
 	return json;
 }
 
-async function getAsar(type: AddonType, id: string): Promise<Buffer | null> {
-	const fullPath = path.join(ADDONS_FOLDER, 'asars', type, `${id}.asar`);
+async function getAsar(id: string): Promise<Buffer | null> {
+	const fullPath = path.join(ADDONS_FOLDER, 'asars', `${id}.asar`);
 	if (!(await exists(fullPath))) return null;
 	return readFile(fullPath);
 }
 
-async function listAddonIds(type: AddonType): Promise<string[]> {
-	const fullPath = path.join(ADDONS_FOLDER, 'manifests', type);
+function listAddons(type: AddonType): Manifest[] {
+	const addons = Array.from(manifestCache.values())
+		.filter(x => x.type === `replugged-${type}`)
+		.sort((a, b) => a.name.localeCompare(b.name));
+
+	return addons;
+}
+
+async function getAddonIdsFromDisc(): Promise<string[]> {
+	const fullPath = path.join(ADDONS_FOLDER, 'manifests');
 	if (!(await exists(fullPath))) return [];
 	const fileNames = await readdir(fullPath);
 	return fileNames.map(fileName => fileName.replace(/\.json$/, ''));
@@ -81,11 +76,10 @@ async function getAddonsWithUpdates(
 ): Promise<UpdateCheck> {
 	const results = await Promise.all(
 		updateCheck.map(async addon => {
-			const manifest = await getManifest(addon.type, addon.id);
+			const manifest = await getManifest(addon.id);
 			if (!manifest) return null;
 			if (manifest.version === addon.version) return null;
 			return {
-				type: addon.type,
 				id: addon.id,
 				version: manifest.version as string,
 			};
@@ -96,8 +90,8 @@ async function getAddonsWithUpdates(
 }
 
 async function populateCache() {
-	const ids = await listAddonIds('plugin');
-	Promise.all(ids.map(id => loadManifest('plugin', id)));
+	const ids = await getAddonIdsFromDisc();
+	Promise.all(ids.map(id => loadManifest(id)));
 }
 populateCache();
 setInterval(populateCache, CACHE_DURATION);
@@ -105,21 +99,10 @@ setInterval(populateCache, CACHE_DURATION);
 export default async function (fastify: FastifyInstance): Promise<void> {
 	fastify.get<{
 		Params: {
-			type: AddonType;
 			id: string;
 		};
-	}>('/:type/:id', async (request, reply) => {
-		if (!ADDON_TYPES.includes(request.params.type as AddonType)) {
-			reply.code(400).send({
-				error: `Invalid addon type: ${request.params.type}`,
-			});
-			return;
-		}
-
-		const manifest = await getManifest(
-			request.params.type,
-			request.params.id,
-		);
+	}>('/:id', async (request, reply) => {
+		const manifest = await getManifest(request.params.id);
 		if (!manifest) {
 			reply.callNotFound();
 			return;
@@ -129,18 +112,10 @@ export default async function (fastify: FastifyInstance): Promise<void> {
 
 	fastify.get<{
 		Params: {
-			type: AddonType;
 			id: string;
 		};
-	}>('/:type/:id.asar', async (request, reply) => {
-		if (!ADDON_TYPES.includes(request.params.type as AddonType)) {
-			reply.code(400).send({
-				error: `Invalid addon type: ${request.params.type}`,
-			});
-			return;
-		}
-
-		const asar = await getAsar(request.params.type, request.params.id);
+	}>('/:id.asar', async (request, reply) => {
+		const asar = await getAsar(request.params.id);
 		if (!asar) {
 			reply.callNotFound();
 			return;
@@ -156,7 +131,7 @@ export default async function (fastify: FastifyInstance): Promise<void> {
 		Querystring: {
 			page?: string;
 		};
-	}>('/:type', async (request, reply) => {
+	}>('/list/:type', async (request, reply) => {
 		if (!ADDON_TYPES.includes(request.params.type as AddonType)) {
 			reply.code(400).send({
 				error: `Invalid addon type: ${request.params.type}`,
@@ -171,8 +146,8 @@ export default async function (fastify: FastifyInstance): Promise<void> {
 			return;
 		}
 
-		const ids = await listAddonIds(request.params.type);
-		const numPages = Math.ceil(ids.length / RESULTS_PER_PAGE);
+		const manifests = listAddons(request.params.type);
+		const numPages = Math.ceil(manifests.length / RESULTS_PER_PAGE);
 		if (page > numPages) {
 			reply.code(404).send({
 				error: `Page ${page} not found`,
@@ -182,15 +157,11 @@ export default async function (fastify: FastifyInstance): Promise<void> {
 
 		const start = (page - 1) * RESULTS_PER_PAGE;
 		const end = start + RESULTS_PER_PAGE;
-		const slicedIds = ids.slice(start, end);
-		const manifests = await Promise.all(
-			slicedIds.map(id => getManifest(request.params.type, id)),
-		);
 
 		return {
 			page,
 			numPages,
-			results: manifests,
+			results: manifests.slice(start, end),
 		};
 	});
 
