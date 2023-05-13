@@ -17,6 +17,12 @@ if (token) {
 }
 
 const [repoId, addonId] = process.argv.slice(2);
+
+if (!repoId) {
+	console.error('Please specify repo id');
+	process.exit(1);
+}
+
 console.log(`Getting latest release for ${repoId}`);
 const res = await fetch(
 	`https://api.github.com/repos/${repoId}/releases/latest`,
@@ -41,7 +47,11 @@ if (manifestAssets.length === 0) {
 	process.exit(1);
 }
 if (manifestAssets.length > 1) {
-	console.error('Multiple manifests found, please specify addon id');
+	console.error(
+		`Multiple manifests found, please specify addon id. Found: ${manifestAssets
+			.map((asset: any) => asset.name.replace(/\.json$/, ''))
+			.join(', ')}`,
+	);
 	process.exit(1);
 }
 const manifestAddonId = manifestAssets[0].name.replace(/\.json$/, '');
