@@ -125,19 +125,22 @@ export default async function (fastify: FastifyInstance): Promise<void> {
 
 	fastify.get<{
 		Params: {
-			type: AddonType;
+			type: string;
 			id: string;
 		};
 		Querystring: {
 			page?: string;
 		};
 	}>('/list/:type', async (request, reply) => {
-		if (!ADDON_TYPES.includes(request.params.type as AddonType)) {
+		// @ts-expect-error
+		if (!ADDON_TYPES.includes(request.params.type.replace(/s$/, ''))) {
 			reply.code(400).send({
 				error: `Invalid addon type: ${request.params.type}`,
 			});
 			return;
 		}
+		const type = request.params.type.replace(/s$/, '') as AddonType;
+
 		const page = parseInt(request.query.page ?? '1');
 		if (isNaN(page)) {
 			reply.code(400).send({
@@ -146,7 +149,7 @@ export default async function (fastify: FastifyInstance): Promise<void> {
 			return;
 		}
 
-		const manifests = listAddons(request.params.type);
+		const manifests = listAddons(type);
 		const numPages = Math.ceil(manifests.length / RESULTS_PER_PAGE);
 		if (page > numPages) {
 			reply.code(404).send({
