@@ -2,6 +2,7 @@ import {FastifyInstance} from 'fastify';
 import {STORAGE_FOLDER} from '../../utils/misc.js';
 import path from 'path';
 import {stat, readFile, readdir} from 'fs/promises';
+import {z} from 'zod';
 
 async function exists(path: string) {
 	try {
@@ -11,6 +12,15 @@ async function exists(path: string) {
 		return false;
 	}
 }
+
+const updateCheckSchema = z.array(
+	z.object({
+		type: z.enum(['plugin', 'theme']),
+		id: z.string(),
+		version: z.string(),
+	}),
+);
+type UpdateCheck = z.infer<typeof updateCheckSchema>;
 
 const ADDONS_FOLDER = STORAGE_FOLDER('addons');
 const RESULTS_PER_PAGE = 20;
@@ -64,6 +74,25 @@ async function listAddonIds(type: AddonType): Promise<string[]> {
 	if (!(await exists(fullPath))) return [];
 	const fileNames = await readdir(fullPath);
 	return fileNames.map(fileName => fileName.replace(/\.json$/, ''));
+}
+
+async function getAddonsWithUpdates(
+	updateCheck: UpdateCheck,
+): Promise<UpdateCheck> {
+	const results = await Promise.all(
+		updateCheck.map(async addon => {
+			const manifest = await getManifest(addon.type, addon.id);
+			if (!manifest) return null;
+			if (manifest.version === addon.version) return null;
+			return {
+				type: addon.type,
+				id: addon.id,
+				version: manifest.version as string,
+			};
+		}),
+	);
+
+	return results.filter(Boolean) as UpdateCheck;
 }
 
 async function populateCache() {
@@ -163,5 +192,19 @@ export default async function (fastify: FastifyInstance): Promise<void> {
 			numPages,
 			results: manifests,
 		};
+	});
+
+	fastify.post('/updates', async (request, reply) => {
+		const zodRes = updateCheckSchema.safeParse(request.body);
+		if (!zodRes.success) {
+			reply.code(400).send({
+				error: 'Invalid request body',
+				issues: zodRes.error.format(),
+			});
+			return;
+		}
+
+		const addons = await getAddonsWithUpdates(zodRes.data);
+		return addons;
 	});
 }
