@@ -42,19 +42,21 @@ console.log(`Version: ${version}`);
 console.log(`Asar: ${asarUrl}`);
 
 const manifestRes = {
-	version: version,
-
 	id: 'dev.replugged.Replugged',
 	name: 'Replugged',
-	description: 'Code for Replugged itself',
+	description: 'Replugged itself',
 	author: {
 		name: 'replugged',
 		discordID: '1000992611840049192',
 		github: 'replugged-org',
 	},
-	updater: {type: 'github', id: 'replugged-org/replugged'},
-	license: 'MIT',
 	type: 'replugged',
+	updater: {
+		type: 'store',
+		id: 'dev.replugged.Replugged',
+	},
+	version: version,
+	license: 'MIT',
 };
 const asarRes = await fetch(asarUrl, {
 	headers,
