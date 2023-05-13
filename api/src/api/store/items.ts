@@ -19,14 +19,38 @@ const ADDON_TYPES = ['plugin', 'theme'] as const;
 type AddonType = (typeof ADDON_TYPES)[number];
 type Manifest = Record<string, unknown>; // TODO: possibly type this
 
+const manifestCache = new Map<
+	string,
+	{
+		data: Manifest;
+		fetched: Date;
+	}
+>();
+const CACHE_DURATION = 1000 * 60 * 1;
+
 async function getManifest(
+	type: AddonType,
+	id: string,
+): Promise<Manifest | null> {
+	const cached = manifestCache.get(`${type}/${id}`);
+	if (cached && cached.fetched.getTime() > Date.now() - CACHE_DURATION) {
+		return cached.data;
+	}
+	return await loadManifest(type, id);
+}
+async function loadManifest(
 	type: AddonType,
 	id: string,
 ): Promise<Manifest | null> {
 	const fullPath = path.join(ADDONS_FOLDER, 'manifests', type, `${id}.json`);
 	if (!(await exists(fullPath))) return null;
 	const manifestContent = await readFile(fullPath, 'utf-8');
-	return JSON.parse(manifestContent);
+	const json = JSON.parse(manifestContent);
+	manifestCache.set(`${type}/${id}`, {
+		data: json,
+		fetched: new Date(),
+	});
+	return json;
 }
 
 async function getAsar(type: AddonType, id: string): Promise<Buffer | null> {
@@ -41,6 +65,13 @@ async function listAddonIds(type: AddonType): Promise<string[]> {
 	const fileNames = await readdir(fullPath);
 	return fileNames.map(fileName => fileName.replace(/\.json$/, ''));
 }
+
+async function populateCache() {
+	const ids = await listAddonIds('plugin');
+	Promise.all(ids.map(id => loadManifest('plugin', id)));
+}
+populateCache();
+setInterval(populateCache, CACHE_DURATION);
 
 export default async function (fastify: FastifyInstance): Promise<void> {
 	fastify.get<{
