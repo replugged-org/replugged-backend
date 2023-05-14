@@ -222,11 +222,9 @@ async function publishForm(
       r.text(),
     );
     if (res.includes("404 Not Found")) {
-      return reply
-        .code(400)
-        .send({
-          errors: { bdAlternative: "The provided URL doesn't point to a BetterDiscord work." },
-        });
+      return reply.code(400).send({
+        errors: { bdAlternative: "The provided URL doesn't point to a BetterDiscord work." },
+      });
     }
   }
 
@@ -235,24 +233,20 @@ async function publishForm(
   }
 
   if (!request.body.complianceGuidelines) {
-    return reply
-      .code(400)
-      .send({
-        errors: {
-          complianceGuidelines: "Your work must comply with the guidelines to be published.",
-        },
-      });
+    return reply.code(400).send({
+      errors: {
+        complianceGuidelines: "Your work must comply with the guidelines to be published.",
+      },
+    });
   }
 
   if (!request.body.complianceLegal) {
-    return reply
-      .code(400)
-      .send({
-        errors: {
-          complianceLegal:
-            "You must grant Replugged sufficient rights in order to publish your work on the store.",
-        },
-      });
+    return reply.code(400).send({
+      errors: {
+        complianceLegal:
+          "You must grant Replugged sufficient rights in order to publish your work on the store.",
+      },
+    });
   }
 
   return finalizeForm(this.mongo.db!, request.user!, "publish", request.body, reply);
@@ -301,11 +295,9 @@ async function hostingForm(
   }
 
   if (!request.body.complianceSecurity) {
-    return reply
-      .code(400)
-      .send({
-        errors: { complianceSecurity: "You must ensure minimum levels of safety in your backend." },
-      });
+    return reply.code(400).send({
+      errors: { complianceSecurity: "You must ensure minimum levels of safety in your backend." },
+    });
   }
 
   if (!request.body.compliancePrivacy) {

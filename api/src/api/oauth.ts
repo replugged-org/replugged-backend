@@ -283,15 +283,13 @@ async function unlink(this: FastifyInstance, request: FastifyRequest, reply: Rep
     return;
   }
 
-  await this.mongo
-    .db!.collection<DatabaseUser>("users")
-    .updateOne(
-      { _id: request.user!._id },
-      {
-        $currentDate: { updatedAt: true },
-        $unset: { [`accounts.${reply.context.config.platform}`]: 1 },
-      },
-    );
+  await this.mongo.db!.collection<DatabaseUser>("users").updateOne(
+    { _id: request.user!._id },
+    {
+      $currentDate: { updatedAt: true },
+      $unset: { [`accounts.${reply.context.config.platform}`]: 1 },
+    },
+  );
 
   reply.redirect("/me");
 }
