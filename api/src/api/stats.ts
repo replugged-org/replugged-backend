@@ -185,18 +185,16 @@ async function contributors(
   };
 
   // type safety: appropriate flag checking is performed
-  const cursor = this.mongo
-    .db!.collection<User>("users")
-    .find(
-      {
-        flags: {
-          $bitsAnySet:
-            UserFlags.DEVELOPER | UserFlags.STAFF | UserFlags.SUPPORT | UserFlags.CONTRIBUTOR,
-          $bitsAllClear: UserFlags.GHOST,
-        },
+  const cursor = this.mongo.db!.collection<User>("users").find(
+    {
+      flags: {
+        $bitsAnySet:
+          UserFlags.DEVELOPER | UserFlags.STAFF | UserFlags.SUPPORT | UserFlags.CONTRIBUTOR,
+        $bitsAllClear: UserFlags.GHOST,
       },
-      { projection: { _id: 1, username: 1, discriminator: 1, avatar: 1, flags: 1 } },
-    );
+    },
+    { projection: { _id: 1, username: 1, discriminator: 1, avatar: 1, flags: 1 } },
+  );
 
   for await (const user of cursor) {
     const cleanUser: MinimalUser & { flags?: number } = { ...user };
