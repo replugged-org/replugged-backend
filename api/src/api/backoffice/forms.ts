@@ -4,6 +4,7 @@ import type { FastifyInstance, FastifyRequest, FastifyReply } from "fastify";
 import config from "../../config.js";
 import { dispatchHonk, editHonkMessage, fetchHonkMessage, sendDm } from "../../utils/discord.js";
 import { UserFlags } from "../../flags.js";
+import { ObjectId } from "@fastify/mongodb";
 
 const DmMessages = {
   publish: {
@@ -41,7 +42,7 @@ async function update(
   const query = request.body as Record<string, unknown>;
 
   const res = await collection.findOneAndUpdate(
-    { _id: id },
+    { _id: new ObjectId(id) },
     { $set: query },
     {
       returnDocument: "after",
@@ -96,9 +97,7 @@ async function finishFormUpdate(request: FastifyRequest, _reply: FastifyReply, f
   return { couldDm };
 }
 
-const pendingFormQuery = {
-  $or: [{ reviewed: { $exists: false } }, { reviewed: { $eq: false } }],
-};
+const pendingFormQuery = { $or: [{ reviewed: { $exists: false } }, { reviewed: { $eq: false } }] };
 
 async function getFormCount(this: FastifyInstance) {
   const res: Record<string, number> = {
@@ -146,7 +145,7 @@ async function readAll(
 }
 
 async function del(this: FastifyInstance, request: FastifyRequest<{ Params: RouteParams }>) {
-  this.mongo.db!.collection<StoreForm>("forms").deleteOne({ _id: request.params.id });
+  this.mongo.db!.collection<StoreForm>("forms").deleteOne({ _id: new ObjectId(request.params.id) });
 
   return {
     deleted: true,
@@ -160,7 +159,7 @@ async function read(
 ) {
   const entity = await this.mongo
     .db!.collection<StoreForm>("forms")
-    .findOne({ _id: request.params.id });
+    .findOne({ _id: new ObjectId(request.params.id) });
 
   if (!entity) {
     reply.callNotFound();

@@ -121,13 +121,7 @@ export async function updateDonatorState(mongo: MongoClient, user: User, manual?
       // Void the IS_CUTIE flag
       await collection.updateOne(
         { _id: user._id },
-        {
-          $bit: {
-            flags: {
-              and: new Long(((1n << 32n) - 1n) & ~BigInt(UserFlags.IS_CUTIE)),
-            },
-          },
-        },
+        { $bit: { flags: { and: new Long(((1n << 32n) - 1n) & ~BigInt(UserFlags.IS_CUTIE)) } } },
       );
 
       user.flags &= ~UserFlags.IS_CUTIE;

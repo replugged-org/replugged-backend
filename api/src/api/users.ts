@@ -95,10 +95,12 @@ async function patchSelf(
       ("color" in request.body.cutiePerks && !pledgeTier) ||
       (("badge" in request.body.cutiePerks || "title" in request.body.cutiePerks) && pledgeTier < 2)
     ) {
-      reply.code(402).send({
-        error: 402,
-        message: "You must be a donator of a higher tier to modify these perks.",
-      });
+      reply
+        .code(402)
+        .send({
+          error: 402,
+          message: "You must be a donator of a higher tier to modify these perks.",
+        });
       return;
     }
 
@@ -107,11 +109,13 @@ async function patchSelf(
       try {
         const icon = new URL(request.body.cutiePerks.badge);
         if (!ALLOWED_HOSTS.includes(icon.hostname)) {
-          reply.code(400).send({
-            error: 400,
-            message:
-              "Icon URL is not from a whitelisted source. Allowed URLs: *.discord.com, *.discordapp.com, media.discordapp.net",
-          });
+          reply
+            .code(400)
+            .send({
+              error: 400,
+              message:
+                "Icon URL is not from a whitelisted source. Allowed URLs: *.discord.com, *.discordapp.com, media.discordapp.net",
+            });
           return;
         }
 
@@ -178,19 +182,23 @@ async function refreshPledge(this: FastifyInstance, request: FastifyRequest, rep
   }
 
   if (request.user!.flags & UserFlags.CUTIE_OVERRIDE) {
-    reply.code(422).send({
-      error: 422,
-      message: "Your pledge status is currently managed by Powercord Staff. Contact us for help.",
-    });
+    reply
+      .code(422)
+      .send({
+        error: 422,
+        message: "Your pledge status is currently managed by Powercord Staff. Contact us for help.",
+      });
     return;
   }
 
   // 1 refresh per hour
   if (Date.now() - lastManualRefresh < 3600e3) {
-    reply.code(429).send({
-      error: 429,
-      message: "A refresh already was requested within the previous hour. Try again later.",
-    });
+    reply
+      .code(429)
+      .send({
+        error: 429,
+        message: "A refresh already was requested within the previous hour. Try again later.",
+      });
     return;
   }
 

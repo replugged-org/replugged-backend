@@ -23,9 +23,7 @@ async function retrieve(this: FastifyInstance, request: FastifyRequest, reply: F
 
 function upload(this: FastifyInstance, request: FastifyRequest, reply: FastifyReply) {
   if (locks.has(request.user!._id)) {
-    reply.code(409).send({
-      error: "Resource locked by another request currently processing.",
-    });
+    reply.code(409).send({ error: "Resource locked by another request currently processing." });
     return;
   }
 
@@ -50,9 +48,7 @@ function upload(this: FastifyInstance, request: FastifyRequest, reply: FastifyRe
 
 async function del(this: FastifyInstance, request: FastifyRequest, reply: FastifyReply) {
   if (locks.has(request.user!._id)) {
-    reply.code(409).send({
-      error: "Resource locked by another request currently processing.",
-    });
+    reply.code(409).send({ error: "Resource locked by another request currently processing." });
     return;
   }
 

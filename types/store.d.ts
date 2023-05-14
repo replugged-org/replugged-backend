@@ -1,3 +1,4 @@
+import { ObjectId } from "mongodb";
 // 0 = Eligible; 1 = Closed; 2 = Banned
 export type Eligibility = 0 | 1 | 2;
 
@@ -47,7 +48,7 @@ type ReviewedForm = {
 };
 
 export type Form = (PendingForm | ReviewedForm) & {
-  _id: string;
+  _id: ObjectId;
   kind: "publish" | "verification" | "hosting";
   messageId: string;
 };

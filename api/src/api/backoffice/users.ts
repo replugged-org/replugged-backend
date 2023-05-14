@@ -25,19 +25,19 @@ type UpdateData = {
 };
 
 // @ts-ignore
-function searchUsers(this: FastifyInstance, _request: FastifyRequest, _reply: FastifyReply) {
+function searchUsers(this: FastifyInstance, request: FastifyRequest, reply: FastifyReply) {
   // eslint-disable-line
   // todo
 }
 
 // @ts-ignore
-function banUser(this: FastifyInstance, _request: FastifyRequest, _reply: FastifyReply) {
+function banUser(this: FastifyInstance, request: FastifyRequest, reply: FastifyReply) {
   // eslint-disable-line
   // todo
 }
 
 // @ts-ignore
-function refreshUserPledge(this: FastifyInstance, _request: FastifyRequest, _reply: FastifyReply) {
+function refreshUserPledge(this: FastifyInstance, request: FastifyRequest, reply: FastifyReply) {
   // eslint-disable-line
   // todo
 }
@@ -105,7 +105,7 @@ async function del(
     return { deleted: false };
   }
 
-  this.mongo.db!.collection<User>("users").deleteOne({ _id: userId });
+  this.mongo.db!.collection("users").deleteOne({ _id: userId });
 
   return { deleted: true };
 }
@@ -263,7 +263,7 @@ async function update(
   }
 
   this.mongo
-    .db!.collection<User>("users")
+    .db!.collection("users")
     .updateOne({ _id: request.params.id }, { $set: { ...mongoData } });
 
   // todo

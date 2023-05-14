@@ -22,9 +22,7 @@ async function read(
   request: FastifyRequest<{ Params: RouteParams }>,
   reply: FastifyReply,
 ) {
-  const entity = await this.mongo
-    .db!.collection<DatabaseTag>("tags")
-    .findOne({ _id: request.params.id });
+  const entity = await this.mongo.db!.collection("tags").findOne({ _id: request.params.id });
 
   if (!entity) {
     reply.callNotFound();
@@ -62,9 +60,7 @@ async function update(
   request: FastifyRequest<{ Params: RouteParams }>,
   reply: FastifyReply,
 ) {
-  const tag = await this.mongo
-    .db!.collection<DatabaseTag>("tags")
-    .findOne({ _id: request.params.id });
+  const tag = await this.mongo.db!.collection("tags").findOne({ _id: request.params.id });
   if (!tag) {
     reply.callNotFound();
   }
@@ -75,16 +71,14 @@ async function del(
   request: FastifyRequest<{ Params: RouteParams }>,
   reply: FastifyReply,
 ) {
-  const tag = await this.mongo
-    .db!.collection<DatabaseTag>("tags")
-    .findOne({ _id: request.params.id });
+  const tag = await this.mongo.db!.collection("tags").findOne({ _id: request.params.id });
 
   if (!tag) {
     reply.callNotFound();
     return;
   }
 
-  this.mongo.db!.collection<DatabaseTag>("tags").deleteOne({ _id: request.params.id });
+  this.mongo.db!.collection("tags").deleteOne({ _id: request.params.id });
 }
 
 export default async function (fastify: FastifyInstance): Promise<void> {
