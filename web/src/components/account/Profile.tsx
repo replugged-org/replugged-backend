@@ -1,84 +1,83 @@
+import { type User } from "../UserContext";
 import {
-  type User
-} from '../UserContext';
-import {
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   h,
-  Fragment
-} from 'preact';
-import { UserFlags } from '../../../../shared/flags';
+  Fragment,
+} from "preact";
+import { UserFlags } from "../../../../shared/flags";
 
-import Tooltip from '../util/Tooltip';
-import Avatar from '../util/Avatar';
+import Tooltip from "../util/Tooltip";
+import Avatar from "../util/Avatar";
 
-import HibiscusMono from '../../assets/badges/hibiscus-mono.svg';
-import Developer from '../../assets/badges/developer.svg';
-import Support from '../../assets/badges/support.svg';
-import Staff from '../../assets/badges/staff.svg';
-import Contributor from '../../assets/badges/contributor.svg';
-import Translator from '../../assets/badges/translator.svg';
-import Hunter from '../../assets/badges/hunter.svg';
-import Early from '../../assets/badges/early.svg';
+import HibiscusMono from "../../assets/badges/hibiscus-mono.svg";
+import Developer from "../../assets/badges/developer.svg";
+import Support from "../../assets/badges/support.svg";
+import Staff from "../../assets/badges/staff.svg";
+import Contributor from "../../assets/badges/contributor.svg";
+import Translator from "../../assets/badges/translator.svg";
+import Hunter from "../../assets/badges/hunter.svg";
+import Early from "../../assets/badges/early.svg";
 
-import style from './profile.module.css';
-import sharedStyle from '../shared.module.css';
+import style from "./profile.module.css";
+import sharedStyle from "../shared.module.css";
 
 type ProfileProps = {
-  user: User
-  onEdit: () => void
-}
+  user: User;
+  onEdit: () => void;
+};
 
-type ProfileBadgesProps = Pick<User, 'flags' | 'cutiePerks'>
+type ProfileBadgesProps = Pick<User, "flags" | "cutiePerks">;
 
-function ProfileBadges ({ flags, cutiePerks }: ProfileBadgesProps) {
+function ProfileBadges({ flags, cutiePerks }: ProfileBadgesProps) {
   console.log(flags);
   return (
-    <div className={style.badges} style={{ color: `#${cutiePerks.color || '7289da'}` }}>
-
-      <Tooltip text={cutiePerks.title ?? 'Replugged Supporter'} align='center'>
-        {cutiePerks.badge && cutiePerks.badge !== 'default'
-          ? <img src={cutiePerks.badge} className={style.badge} />
-        // @ts-ignore
-          : <HibiscusMono className={style.badge} />}
+    <div className={style.badges} style={{ color: `#${cutiePerks.color || "7289da"}` }}>
+      <Tooltip text={cutiePerks.title ?? "Replugged Supporter"} align="center">
+        {cutiePerks.badge && cutiePerks.badge !== "default" ? (
+          <img src={cutiePerks.badge} className={style.badge} />
+        ) : (
+          // @ts-ignore
+          <HibiscusMono className={style.badge} />
+        )}
       </Tooltip>
       {Boolean(flags & UserFlags.DEVELOPER) && (
-        <Tooltip text='Replugged Developer' align='center'>
+        <Tooltip text="Replugged Developer" align="center">
           {/* @ts-ignore */}
           <Developer className={style.badge} />
         </Tooltip>
       )}
       {Boolean(flags & UserFlags.STAFF) && (
-        <Tooltip text='Replugged Staff' align='center'>
+        <Tooltip text="Replugged Staff" align="center">
           {/* @ts-ignore */}
           <Staff className={style.badge} />
         </Tooltip>
       )}
       {Boolean(flags & UserFlags.SUPPORT) && (
-        <Tooltip text='Replugged Support' align='center'>
+        <Tooltip text="Replugged Support" align="center">
           {/* @ts-ignore */}
           <Support className={style.badge} />
         </Tooltip>
       )}
       {Boolean(flags & UserFlags.CONTRIBUTOR) && (
-        <Tooltip text='Replugged Contributor' align='center'>
+        <Tooltip text="Replugged Contributor" align="center">
           {/* @ts-ignore */}
           <Contributor className={style.badge} />
         </Tooltip>
       )}
       {Boolean(flags & UserFlags.TRANSLATOR) && (
-        <Tooltip text='Replugged Translator' align='center'>
+        <Tooltip text="Replugged Translator" align="center">
           {/* @ts-ignore */}
           <Translator className={style.badge} />
         </Tooltip>
       )}
       {Boolean(flags & UserFlags.BUG_HUNTER) && (
-        <Tooltip text='Replugged Bug Hunter' align='center'>
+        <Tooltip text="Replugged Bug Hunter" align="center">
           {/* @ts-ignore */}
           <Hunter className={style.badge} />
         </Tooltip>
       )}
       {Boolean(flags & UserFlags.EARLY_USER) && (
-        <Tooltip text='Replugged Early User' align='center'>
+        <Tooltip text="Replugged Early User" align="center">
           {/* @ts-ignore */}
           <Early className={style.badge} />
         </Tooltip>
@@ -87,7 +86,7 @@ function ProfileBadges ({ flags, cutiePerks }: ProfileBadgesProps) {
   );
 }
 
-export default function Profile ({ user, onEdit }: ProfileProps) {
+export default function Profile({ user, onEdit }: ProfileProps) {
   return (
     <Fragment>
       <div className={style.container}>
@@ -116,7 +115,9 @@ export default function Profile ({ user, onEdit }: ProfileProps) {
           </div>
         </div>
       </div>
-      <button className={sharedStyle.button} onClick={onEdit}>Edit perks</button>
+      <button className={sharedStyle.button} onClick={onEdit}>
+        Edit perks
+      </button>
     </Fragment>
   );
 }

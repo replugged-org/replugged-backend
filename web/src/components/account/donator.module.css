@@ -1,86 +1,86 @@
 .wrapper {
-    width: calc(100% + 4em);
-    margin: 0 -2em;
+  width: calc(100% + 4em);
+  margin: 0 -2em;
 }
 
 .container {
-    width: 440px;
-    margin: 0 auto;
-    border-radius: 5px;
-    flex: 1 0;
+  width: 440px;
+  margin: 0 auto;
+  border-radius: 5px;
+  flex: 1 0;
 }
 
 .body {
-    padding: 25px 15px;
-    background-color: var(--background-secondary);
+  padding: 25px 15px;
+  background-color: var(--background-secondary);
 }
 
 .title {
-    text-align: center;
-    font-size: 1.3em;
-    margin: 0 0 4px;
+  text-align: center;
+  font-size: 1.3em;
+  margin: 0 0 4px;
 }
 
 .subtitle {
-    display: flex;
-    text-align: center;
-    align-items: center;
-    font-weight: 600;
-    font-size: 1.1em;
-    margin: 0 0 24px;
+  display: flex;
+  text-align: center;
+  align-items: center;
+  font-weight: 600;
+  font-size: 1.1em;
+  margin: 0 0 24px;
 }
 
 .subtitle:before,
 .subtitle:after {
-    content: '';
-    background-color: var(--background-light);
-    margin: 0 10px;
-    height: 1px;
-    flex: 1;
+  content: "";
+  background-color: var(--background-light);
+  margin: 0 10px;
+  height: 1px;
+  flex: 1;
 }
 
 .tier {
-    display: flex;
-    margin-bottom: 24px;
-    gap: 16px;
+  display: flex;
+  margin-bottom: 24px;
+  gap: 16px;
 }
 
 .icon {
-    width: 48px;
-    height: 48px;
-    margin-top: 4px;
-    flex-shrink: 0;
-    user-select: none;
-    -webkit-user-drag: none;
+  width: 48px;
+  height: 48px;
+  margin-top: 4px;
+  flex-shrink: 0;
+  user-select: none;
+  -webkit-user-drag: none;
 }
 
 .price {
-    font-size: 1.1em;
-    margin-bottom: 4px;
-    font-weight: 600;
+  font-size: 1.1em;
+  margin-bottom: 4px;
+  font-weight: 600;
 }
 
 .description {
-    margin: 0;
-    font-size: 1em;
+  margin: 0;
+  font-size: 1em;
 }
 
 .description b {
-    font-weight: 600;
+  font-weight: 600;
 }
 
 .footer {
-    display: flex;
-    justify-content: flex-end;
-    border-top: 1px solid var(--background-light);
-    padding: 16px 8px 0px 0px;
-    width: 100%;
+  display: flex;
+  justify-content: flex-end;
+  border-top: 1px solid var(--background-light);
+  padding: 16px 8px 0px 0px;
+  width: 100%;
 }
 
 @media screen and (min-width: 1090px) {
-    .wrapper {
-        width: calc(440px + 16px + 16px);
-        padding: 0 48px;
-        margin: 0;
-    }
+  .wrapper {
+    width: calc(440px + 16px + 16px);
+    padding: 0 48px;
+    margin: 0;
+  }
 }

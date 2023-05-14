@@ -1,67 +1,70 @@
 export enum InstallResponseType {
-  SUCCESS = 'SUCCESS',
-  ALREADY_INSTALLED = 'ALREADY-INSTALLED',
-  NOT_FOUND = 'CANNOT-FIND',
-  UNREACHABLE = 'UNREACHABLE',
+  SUCCESS = "SUCCESS",
+  ALREADY_INSTALLED = "ALREADY-INSTALLED",
+  NOT_FOUND = "CANNOT-FIND",
+  UNREACHABLE = "UNREACHABLE",
 }
 
 type RPCMessage = {
-  cmd: string,
-  data: any,
-  evt: string | null,
-  nonce: string | null,
-}
+  cmd: string;
+  data: any;
+  evt: string | null;
+  nonce: string | null;
+};
 
 type Manifest = Record<string, unknown> & {
-  name: string,
-}
+  name: string;
+};
 
-type Response = {
-  kind: 'SUCCESS';
-  manifest: Manifest;
-}
-| {
-  kind: 'FAILED';
-  manifest?: Manifest;
-}
-| {
-  kind: 'ALREADY_INSTALLED';
-  manifest: Manifest;
-}
-| {
-  kind: 'CANCELLED';
-  manifest: Manifest;
-} | Record<string, unknown> & {
-  kind: 'ERROR';
-} | {
-  kind: 'UNREACHABLE';
-}
+type Response =
+  | {
+      kind: "SUCCESS";
+      manifest: Manifest;
+    }
+  | {
+      kind: "FAILED";
+      manifest?: Manifest;
+    }
+  | {
+      kind: "ALREADY_INSTALLED";
+      manifest: Manifest;
+    }
+  | {
+      kind: "CANCELLED";
+      manifest: Manifest;
+    }
+  | (Record<string, unknown> & {
+      kind: "ERROR";
+    })
+  | {
+      kind: "UNREACHABLE";
+    };
 
 export type InstallData = {
-  identifier?: string,
-  source?: string,
-  id?: string
-  url?: string,
-}
+  identifier?: string;
+  source?: string;
+  id?: string;
+  url?: string;
+};
 
 const min_port = 6463;
 const max_port = 6472;
 
-function random (): string {
+function random(): string {
   return Math.random().toString(16).slice(2);
 }
 
-function tryPort (port: number): Promise<WebSocket> {
+function tryPort(port: number): Promise<WebSocket> {
   const ws = new WebSocket(`ws://127.0.0.1:${port}/?v=1&client_id=REPLUGGED-${random()}`);
   return new Promise((resolve, reject) => {
     let didFinish = false;
-    ws.addEventListener('message', (event) => {
+    ws.addEventListener("message", (event) => {
       if (didFinish) {
         return;
       }
 
       const message = JSON.parse(event.data) as RPCMessage;
-      if (message.evt !== 'READY') {
+      if (message.evt !== "READY") {
         return;
       }
 
@@ -69,7 +72,7 @@ function tryPort (port: number): Promise<WebSocket> {
 
       resolve(ws);
     });
-    ws.addEventListener('error', () => {
+    ws.addEventListener("error", () => {
       if (didFinish) {
         return;
       }
@@ -78,7 +81,7 @@ function tryPort (port: number): Promise<WebSocket> {
 
       reject();
     });
-    ws.addEventListener('close', () => {
+    ws.addEventListener("close", () => {
       if (didFinish) {
         return;
       }
@@ -90,17 +93,19 @@ function tryPort (port: number): Promise<WebSocket> {
   });
 }
 
-function rpcInstall (ws: WebSocket, data: InstallData): Promise<Response> {
+function rpcInstall(ws: WebSocket, data: InstallData): Promise<Response> {
   const nonce = random();
 
-  ws.send(JSON.stringify({
-    cmd: 'REPLUGGED_INSTALL',
-    args: data,
-    nonce
-  }));
+  ws.send(
+    JSON.stringify({
+      cmd: "REPLUGGED_INSTALL",
+      args: data,
+      nonce,
+    }),
+  );
 
   return new Promise((resolve) => {
-    ws.addEventListener('message', (event) => {
+    ws.addEventListener("message", (event) => {
       const message = JSON.parse(event.data) as RPCMessage;
       if (message.nonce !== nonce) {
         return;
@@ -114,12 +119,12 @@ function rpcInstall (ws: WebSocket, data: InstallData): Promise<Response> {
 }
 
 type InstallProps = {
-  data: InstallData
-  onConnect: () => void,
-  onFinish: (response: Response) => void,
-}
+  data: InstallData;
+  onConnect: () => void;
+  onFinish: (response: Response) => void;
+};
 
-export default async function install ({ data, onConnect, onFinish }: InstallProps): Promise<void> {
+export default async function install({ data, onConnect, onFinish }: InstallProps): Promise<void> {
   for (let port = min_port; port <= max_port; port++) {
     try {
       const ws = await tryPort(port);
@@ -131,6 +136,6 @@ export default async function install ({ data, onConnect, onFinish }: InstallPro
   }
 
   onFinish({
-    kind: 'UNREACHABLE'
+    kind: "UNREACHABLE",
   });
 }

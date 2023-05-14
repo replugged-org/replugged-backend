@@ -1,83 +1,84 @@
 .container {
-    position: absolute;
-    width: 32px;
-    height: 32px;
-    top: 50%;
-    left: 50%;
-    margin-top: -16px;
-    margin-left: -16px;
+  position: absolute;
+  width: 32px;
+  height: 32px;
+  top: 50%;
+  left: 50%;
+  margin-top: -16px;
+  margin-left: -16px;
+}
+
+.container::before,
+.container::after {
+  content: "";
+  position: absolute;
+  animation: waiting-spinner 1.8s infinite ease-in-out;
+  background-color: var(--blurple);
+  width: 10px;
+  height: 10px;
+  left: 0;
+  top: 0;
+}
+
+.container::after {
+  animation-delay: -0.9s;
+}
+
+/* Balls */
+.balls {
+  height: 19px;
+  display: flex;
+  align-items: center;
+}
+
+.ball {
+  border-radius: 50%;
+  margin: 0 2px;
+  width: 8px;
+  height: 8px;
+  animation: waiting-balls 1s infinite ease-in-out;
+  background-color: #fff;
+  opacity: 1;
+}
+
+.ball:nth-of-type(2) {
+  animation-delay: 0.2s;
+}
+
+.ball:nth-of-type(3) {
+  animation-delay: 0.4s;
+}
+
+/* Keyframes */
+@keyframes waiting-spinner {
+  25% {
+    transform: translateX(22px) rotate(-90deg) scale(0.5);
   }
-  
-  .container::before, .container::after {
-    content: '';
-    position: absolute;
-    animation: waiting-spinner 1.8s infinite ease-in-out;
-    background-color: var(--blurple);
-    width: 10px;
-    height: 10px;
-    left: 0;
-    top: 0;
+
+  50% {
+    transform: translateX(22px) translateY(22px) rotate(-180deg);
   }
-  
-  .container::after {
-    animation-delay: -.9s;
+
+  75% {
+    transform: translateX(0) translateY(22px) rotate(-270deg) scale(0.5);
   }
-  
-  /* Balls */
-  .balls {
-    height: 19px;
-    display: flex;
-    align-items: center;
+
+  100% {
+    transform: rotate(-1turn);
   }
-  
-  .ball {
-    border-radius: 50%;
-    margin: 0 2px;
-    width: 8px;
-    height: 8px;
-    animation: waiting-balls 1s infinite ease-in-out;
-    background-color: #fff;
+}
+
+@keyframes waiting-balls {
+  from {
     opacity: 1;
+    transform: scale(1);
   }
-  
-  .ball:nth-of-type(2) {
-    animation-delay: .2s;
+  50% {
+    opacity: 0.3;
+    transform: scale(0.7);
   }
-  
-  .ball:nth-of-type(3) {
-    animation-delay: .4s;
+  to {
+    opacity: 1;
+    transform: scale(1);
   }
-  
-  /* Keyframes */
-  @keyframes waiting-spinner {
-    25% {
-      transform: translateX(22px) rotate(-90deg) scale(.5);
-    }
-  
-    50% {
-      transform: translateX(22px) translateY(22px) rotate(-180deg);
-    }
-  
-    75% {
-      transform: translateX(0) translateY(22px) rotate(-270deg) scale(.5);
-    }
-  
-    100% {
-      transform: rotate(-1turn);
-    }
-  }
-  
-  @keyframes waiting-balls {
-    from {
-      opacity: 1;
-      transform: scale(1)
-    }
-    50% {
-      opacity: .3;
-      transform: scale(.7)
-    }
-    to {
-      opacity: 1;
-      transform: scale(1)
-    }
-  }
+}

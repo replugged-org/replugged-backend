@@ -1,25 +1,25 @@
-import type { User, CutieStatus, DatabaseUser } from '../../../types/users';
-import type { MongoClient, UpdateFilter } from 'mongodb';
-import type { OAuthToken } from './oauth.js';
-import { Long } from 'mongodb';
-import config from '../config.js';
-import { addRole, removeRole } from './discord.js';
-import { fetch } from 'undici';
-import { refreshAuthTokens, toMongoFields } from './oauth.js';
-import { UserFlags } from '../flags.js';
+import type { User, CutieStatus, DatabaseUser } from "../../../types/users";
+import type { MongoClient, UpdateFilter } from "mongodb";
+import type { OAuthToken } from "./oauth.js";
+import { Long } from "mongodb";
+import config from "../config.js";
+import { addRole, removeRole } from "./discord.js";
+import { fetch } from "undici";
+import { refreshAuthTokens, toMongoFields } from "./oauth.js";
+import { UserFlags } from "../flags.js";
 
-const DONATION_TIERS = [ 100, 500, 1000, Infinity ];
+const DONATION_TIERS = [100, 500, 1000, Infinity];
 const GRACE_PERIOD = 5 * 24 * 3600e3; // 5 days
 
-export async function notifyStateChange (user: User, change: 'pledge' | 'perks') {
+export async function notifyStateChange(user: User, change: "pledge" | "perks") {
   // Update role - todo: keep track of custom role
-  if (change === 'pledge') {
+  if (change === "pledge") {
     if (user.cutieStatus?.pledgeTier) {
-      addRole(user._id, config.discord.roles.donator, 'Pledge status updated');
+      addRole(user._id, config.discord.roles.donator, "Pledge status updated");
       // members.addGuildMemberRole(config.discord.ids.serverId, user._id, config.discord.roles.donator, 'Pledge status updated', config.discord.botToken)
       //     .catch(() => void 0)
     } else {
-      removeRole(user._id, config.discord.roles.donator, 'Pledge status updated');
+      removeRole(user._id, config.discord.roles.donator, "Pledge status updated");
       // members.removeGuildMemberRole(config.discord.ids.serverId, user._id, config.discord.roles.donator, 'Pledge status updated', config.discord.botToken)
       //     .catch(() => void 0)
     }
@@ -47,20 +47,20 @@ export async function notifyStateChange (user: User, change: 'pledge' | 'perks')
   // }).catch(() => void 0)
 }
 
-export async function fetchPledgeStatus (token: OAuthToken): Promise<[boolean, CutieStatus]> {
+export async function fetchPledgeStatus(token: OAuthToken): Promise<[boolean, CutieStatus]> {
   const query = new URLSearchParams();
-  query.set('include', 'memberships');
-  query.set('fields[member]', 'patron_status,currently_entitled_amount_cents,next_charge_date');
+  query.set("include", "memberships");
+  query.set("fields[member]", "patron_status,currently_entitled_amount_cents,next_charge_date");
   const url = `https://patreon.com/api/oauth2/v2/identity?${query.toString()}`;
-  const response = await fetch(url, { headers: { authorization: `${token.tokenType} ${token.accessToken}` } })
-    .then((r) => <any>r.json());
+  const response = await fetch(url, {
+    headers: { authorization: `${token.tokenType} ${token.accessToken}` },
+  }).then((r) => <any>r.json());
 
   let donated = false;
-  const data = { pledgeTier: 0,
-    perksExpireAt: -1 };
+  const data = { pledgeTier: 0, perksExpireAt: -1 };
   const pledgeData = response.included?.[0]?.attributes;
   if (!pledgeData) {
-    return [ donated, data ];
+    return [donated, data];
   }
 
   // Check if user donated at least once
@@ -69,30 +69,30 @@ export async function fetchPledgeStatus (token: OAuthToken): Promise<[boolean, C
   }
 
   // Check if they're currently donating
-  if (pledgeData.patron_status !== 'active_patron') {
-    return [ donated, data ];
+  if (pledgeData.patron_status !== "active_patron") {
+    return [donated, data];
   }
 
   // Get their current tier and next payment
   data.pledgeTier = DONATION_TIERS.findIndex((v) => v > pledgeData.currently_entitled_amount_cents);
   data.perksExpireAt = new Date(pledgeData.next_charge_date).getTime() + GRACE_PERIOD;
-  return [ donated, data ];
+  return [donated, data];
 }
 
-export async function prepareUpdateData (patreonAccount: OAuthToken): Promise<UpdateFilter<User>> {
+export async function prepareUpdateData(patreonAccount: OAuthToken): Promise<UpdateFilter<User>> {
   let or = new Long(0);
   let and = new Long((1n << 64n) - 1n);
   const update: Record<string, any> = {};
 
   // todo: ditch unix
   if (Date.now() > patreonAccount.expiresAt) {
-    const newToken = await refreshAuthTokens('patreon', patreonAccount.refreshToken!);
-    Object.assign(update, toMongoFields(newToken, 'patreon'));
+    const newToken = await refreshAuthTokens("patreon", patreonAccount.refreshToken!);
+    Object.assign(update, toMongoFields(newToken, "patreon"));
   }
 
-  const [ donated, cutieStatus ] = await fetchPledgeStatus(patreonAccount);
-  update['cutieStatus.pledgeTier'] = cutieStatus.pledgeTier;
-  update['cutieStatus.perksExpireAt'] = cutieStatus.perksExpireAt;
+  const [donated, cutieStatus] = await fetchPledgeStatus(patreonAccount);
+  update["cutieStatus.pledgeTier"] = cutieStatus.pledgeTier;
+  update["cutieStatus.perksExpireAt"] = cutieStatus.perksExpireAt;
 
   if (donated) {
     or = or.or(UserFlags.HAS_DONATED);
@@ -106,50 +106,51 @@ export async function prepareUpdateData (patreonAccount: OAuthToken): Promise<Up
 
   return <UpdateFilter<User>>{
     $set: update,
-    $bit: { flags: { or,
-      and } },
-    $currentDate: { updatedAt: true }
+    $bit: { flags: { or, and } },
+    $currentDate: { updatedAt: true },
   };
 }
 
-export async function updateDonatorState (mongo: MongoClient, user: User, manual?: boolean) {
+export async function updateDonatorState(mongo: MongoClient, user: User, manual?: boolean) {
   const patreonAccount = user.accounts.patreon;
   const perksExpireAt = user.cutieStatus?.perksExpireAt ?? 0;
-  const collection = mongo.db().collection<DatabaseUser>('users');
+  const collection = mongo.db().collection<DatabaseUser>("users");
 
   if (!patreonAccount) {
-    if (perksExpireAt <= Date.now() && (user.flags & UserFlags.IS_CUTIE)) {
+    if (perksExpireAt <= Date.now() && user.flags & UserFlags.IS_CUTIE) {
       // Void the IS_CUTIE flag
       await collection.updateOne(
         { _id: user._id },
-        { $bit: { flags: { and: new Long(((1n << 32n) - 1n) & ~BigInt(UserFlags.IS_CUTIE)) } } }
+        { $bit: { flags: { and: new Long(((1n << 32n) - 1n) & ~BigInt(UserFlags.IS_CUTIE)) } } },
       );
 
       user.flags &= ~UserFlags.IS_CUTIE;
-      notifyStateChange(user, 'pledge');
+      notifyStateChange(user, "pledge");
     }
 
     return;
   }
 
   const mongoUpdate = await prepareUpdateData(patreonAccount);
-  const statusChange = user.cutieStatus?.pledgeTier !== mongoUpdate.$set!['cutieStatus.pledgeTier'];
+  const statusChange = user.cutieStatus?.pledgeTier !== mongoUpdate.$set!["cutieStatus.pledgeTier"];
   if (manual) {
     // @ts-ignore
-    mongoUpdate.$set!['cutieStatus.lastManualRefresh'] = Date.now();
+    mongoUpdate.$set!["cutieStatus.lastManualRefresh"] = Date.now();
   }
 
-  const res = await collection.findOneAndUpdate({ _id: user._id }, mongoUpdate, { returnDocument: 'after' });
+  const res = await collection.findOneAndUpdate({ _id: user._id }, mongoUpdate, {
+    returnDocument: "after",
+  });
   Object.assign(user, res.value!);
 
   if (statusChange) {
-    notifyStateChange(user, 'pledge');
+    notifyStateChange(user, "pledge");
   }
 }
 
 // The queue avoids tripping multiple updates if a query arrives during an ongoing update
 const queue = new Map<string, Promise<void>>();
-export async function refreshDonatorState (mongo: MongoClient, user: User, manual?: boolean) {
+export async function refreshDonatorState(mongo: MongoClient, user: User, manual?: boolean) {
   const perksExpireAt = user.cutieStatus?.perksExpireAt ?? 0;
   if (!manual && (perksExpireAt > Date.now() || user.flags & UserFlags.CUTIE_OVERRIDE)) {
     return;

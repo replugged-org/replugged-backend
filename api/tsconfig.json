@@ -1,10 +1,10 @@
 {
-    "extends": "../tsconfig.json",
-    "compilerOptions": {
-      "outDir": "./dist",
-      "rootDir": "./src",
-      "isolatedModules": false,
-      "typeRoots": [ "./node_modules/@types" ],
-    },
-    "include": [ "./src/**/*" ]
-  }
+  "extends": "../tsconfig.json",
+  "compilerOptions": {
+    "outDir": "./dist",
+    "rootDir": "./src",
+    "isolatedModules": false,
+    "typeRoots": ["./node_modules/@types"]
+  },
+  "include": ["./src/**/*"]
+}

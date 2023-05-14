@@ -1,18 +1,18 @@
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
-import { h } from 'preact';
-import { useRouter } from 'preact-router';
-import { useEffect, useState } from 'preact/hooks';
-import { Endpoints } from '../../../constants';
+import { h } from "preact";
+import { useRouter } from "preact-router";
+import { useEffect, useState } from "preact/hooks";
+import { Endpoints } from "../../../constants";
 
-export default function Manage () {
-  const [ route ] = useRouter<{ id: string }>();
-  const [ user, setUser ] = useState();
+export default function Manage() {
+  const [route] = useRouter<{ id: string }>();
+  const [user, setUser] = useState();
 
   useEffect(() => {
     fetch(Endpoints.BACKOFFICE_USER(route.matches.id))
       .then((r) => r.json())
       .then((u) => setUser(u.id ? u : null));
-  }, [ route.matches.id ]);
+  }, [route.matches.id]);
 
   console.log(user);
 

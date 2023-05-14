@@ -1,29 +1,27 @@
-import {
-  defineConfig
-} from 'vite';
-import preact from '@preact/preset-vite';
-import svgr from 'vite-plugin-svgr';
+import { defineConfig } from "vite";
+import preact from "@preact/preset-vite";
+import svgr from "vite-plugin-svgr";
 
 export default defineConfig({
   css: {
     modules: {
-      localsConvention: 'camelCase'
-    }
+      localsConvention: "camelCase",
+    },
   },
-  publicDir: 'public',
+  publicDir: "public",
   build: {
     assetsInlineLimit: 0,
-    outDir: 'dist'
+    outDir: "dist",
   },
   server: {
     proxy: {
-      '/api': 'http://localhost:8080'
-    }
+      "/api": "http://localhost:8080",
+    },
   },
   plugins: [
     preact(),
     svgr({
-      exportAsDefault: true
-    })
-  ]
+      exportAsDefault: true,
+    }),
+  ],
 });

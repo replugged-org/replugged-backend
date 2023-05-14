@@ -1,31 +1,31 @@
 .container {
-	height: calc(100% - 162px);
-	padding: 10px;
-	display: flex;
-	justify-content: center;
-	align-items: center;
+  height: calc(100% - 162px);
+  padding: 10px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }
 
 .center-text {
-	text-align: center;
+  text-align: center;
 }
 
 @media screen and (min-width: 890px) {
-	.container {
-		height: calc(100% - 143px);
-	}
+  .container {
+    height: calc(100% - 143px);
+  }
 }
 
 @media screen and (min-width: 1440px) {
-	.container {
-		height: calc(100% - 107px);
-	}
+  .container {
+    height: calc(100% - 107px);
+  }
 }
 
 .buttons {
-	display: flex;
-	align-items: center;
-	justify-content: center;
-	gap: 15px;
-	padding-top: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 15px;
+  padding-top: 20px;
 }

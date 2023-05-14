@@ -1,17 +1,17 @@
-import type { FastifyInstance, FastifyRequest, FastifyReply } from 'fastify';
-import { URL } from 'url';
-import { unlink, rename } from 'fs/promises';
-import { existsSync, mkdirSync, createReadStream, createWriteStream } from 'fs';
+import type { FastifyInstance, FastifyRequest, FastifyReply } from "fastify";
+import { URL } from "url";
+import { unlink, rename } from "fs/promises";
+import { existsSync, mkdirSync, createReadStream, createWriteStream } from "fs";
 
 const SETTINGS_UPLOAD_LIMIT = 1e8; // 100MB
 const SETTINGS_UPLOAD_EYES = 1e6; // 1MB
 export const SETTINGS_STORAGE_FOLDER = (() => {
   switch (process.platform) {
-    case 'linux':
-      return new URL('file:///var/lib/replugged-backend/settings/');
-    case 'win32':
-      return 'C:\\RepluggedData\\settings';
-    case 'darwin':
+    case "linux":
+      return new URL("file:///var/lib/replugged-backend/settings/");
+    case "win32":
+      return "C:\\RepluggedData\\settings";
+    case "darwin":
       return `${process.env.HOME}/Library/Application Support/replugged-backend/settings`;
     default:
       throw new Error(`Unsupported platform: ${process.platform}`);
@@ -20,26 +20,26 @@ export const SETTINGS_STORAGE_FOLDER = (() => {
 
 if (!existsSync(SETTINGS_STORAGE_FOLDER)) {
   mkdirSync(SETTINGS_STORAGE_FOLDER, {
-    recursive: true
+    recursive: true,
   });
 }
 
 const locks = new Set<string>();
 
-async function retrieve (this: FastifyInstance, request: FastifyRequest, reply: FastifyReply) {
+async function retrieve(this: FastifyInstance, request: FastifyRequest, reply: FastifyReply) {
   const file = new URL(request.user!._id, SETTINGS_STORAGE_FOLDER);
   if (!existsSync(file)) {
     return reply.callNotFound();
   }
 
   // todo: etag
-  reply.header('content-type', 'application/octet-stream');
+  reply.header("content-type", "application/octet-stream");
   reply.send(createReadStream(file));
 }
 
-function upload (this: FastifyInstance, request: FastifyRequest, reply: FastifyReply) {
+function upload(this: FastifyInstance, request: FastifyRequest, reply: FastifyReply) {
   if (locks.has(request.user!._id)) {
-    reply.code(409).send({ error: 'Resource locked by another request currently processing.' });
+    reply.code(409).send({ error: "Resource locked by another request currently processing." });
     return;
   }
 
@@ -48,24 +48,23 @@ function upload (this: FastifyInstance, request: FastifyRequest, reply: FastifyR
   const tmp = new URL(`${request.user!._id}.tmp`, SETTINGS_STORAGE_FOLDER);
   const stream = createWriteStream(tmp);
   request.raw.pipe(stream);
-  request.raw.on('end', () => {
+  request.raw.on("end", () => {
     if (stream.bytesWritten > SETTINGS_UPLOAD_EYES) {
       // todo: maybe emit notification for abuse monitoring
     }
 
     // todo: compute hash and store it for use as etag
     stream.close();
-    rename(tmp, file)
-      .then(() => {
-        locks.delete(request.user!._id);
-        reply.code(201).send();
-      });
+    rename(tmp, file).then(() => {
+      locks.delete(request.user!._id);
+      reply.code(201).send();
+    });
   });
 }
 
-async function del (this: FastifyInstance, request: FastifyRequest, reply: FastifyReply) {
+async function del(this: FastifyInstance, request: FastifyRequest, reply: FastifyReply) {
   if (locks.has(request.user!._id)) {
-    reply.code(409).send({ error: 'Resource locked by another request currently processing.' });
+    reply.code(409).send({ error: "Resource locked by another request currently processing." });
     return;
   }
 
@@ -79,31 +78,31 @@ async function del (this: FastifyInstance, request: FastifyRequest, reply: Fasti
 }
 
 export default async function (fastify: FastifyInstance): Promise<void> {
-  if (process.env.NODE_ENV !== 'development') {
+  if (process.env.NODE_ENV !== "development") {
     return;
   }
 
-  fastify.addContentTypeParser('application/octet-stream', {}, async () => void 0);
+  fastify.addContentTypeParser("application/octet-stream", {}, async () => void 0);
 
   fastify.route({
-    method: 'POST',
-    url: '/',
+    method: "POST",
+    url: "/",
     handler: upload,
-    config: { auth: { allowClient: true } }
+    config: { auth: { allowClient: true } },
   });
 
   fastify.route({
-    method: 'GET',
-    url: '/',
+    method: "GET",
+    url: "/",
     handler: retrieve,
     bodyLimit: SETTINGS_UPLOAD_LIMIT,
-    config: { auth: { allowClient: true } }
+    config: { auth: { allowClient: true } },
   });
 
   fastify.route({
-    method: 'DELETE',
-    url: '/',
+    method: "DELETE",
+    url: "/",
     handler: del,
-    config: { auth: { allowClient: true } }
+    config: { auth: { allowClient: true } },
   });
 }

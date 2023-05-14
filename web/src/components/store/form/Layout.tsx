@@ -1,26 +1,36 @@
-import type { Attributes, ComponentChild, VNode } from 'preact';
-import type { Eligibility } from '../../../../../types/store';
+import type { Attributes, ComponentChild, VNode } from "preact";
+import type { Eligibility } from "../../../../../types/store";
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
-import { h, cloneElement, Fragment } from 'preact';
-import { useState, useContext, useCallback, useMemo, useLayoutEffect } from 'preact/hooks';
+import { h, cloneElement, Fragment } from "preact";
+import { useState, useContext, useCallback, useMemo, useLayoutEffect } from "preact/hooks";
 
-import Spinner from '../../util/Spinner';
-import UserContext from '../../UserContext';
-import { Endpoints, Routes } from '../../../constants';
+import Spinner from "../../util/Spinner";
+import UserContext from "../../UserContext";
+import { Endpoints, Routes } from "../../../constants";
 
-import style from '../store.module.css';
-import sharedStyle from '../../shared.module.css';
+import style from "../store.module.css";
+import sharedStyle from "../../shared.module.css";
 
-type FormProps = { children: VNode<any>[], onNext: () => void, onError: () => void, onLimit: () => void, id: string }
-type FormLayoutProps = Attributes & { id: string, title: string, children: VNode[], eligibility?: Eligibility }
-type PawaScreenProps = { headline: ComponentChild, text: ComponentChild }
+type FormProps = {
+  children: VNode<any>[];
+  onNext: () => void;
+  onError: () => void;
+  onLimit: () => void;
+  id: string;
+};
+type FormLayoutProps = Attributes & {
+  id: string;
+  title: string;
+  children: VNode[];
+  eligibility?: Eligibility;
+};
+type PawaScreenProps = { headline: ComponentChild; text: ComponentChild };
 
 const button = `${sharedStyle.button} ${style.button}`;
 
-function Intro ({ id, onNext }: { id: string, onNext: () => void }) {
+function Intro({ id, onNext }: { id: string; onNext: () => void }) {
   const isLoggedIn = Boolean(useContext(UserContext));
-  const path = typeof location !== 'undefined' ? location.pathname : '';
-
+  const path = typeof location !== "undefined" ? location.pathname : "";
 
   return (
     <span>Coming soon</span>
@@ -33,97 +43,102 @@ function Intro ({ id, onNext }: { id: string, onNext: () => void }) {
     //     </p>
     //   )}
 
-  //   <p>
-  //     {isLoggedIn
-  //       ? <button className={button} onClick={onNext}>Get started</button>
-  //       // @ts-ignore
-  //       : <a native href={`${Endpoints.LOGIN}?redirect=${path}`} className={button}>Login with Discord</a>}
-  //   </p>
-  // </MarkdownDocument>
+    //   <p>
+    //     {isLoggedIn
+    //       ? <button className={button} onClick={onNext}>Get started</button>
+    //       // @ts-ignore
+    //       : <a native href={`${Endpoints.LOGIN}?redirect=${path}`} className={button}>Login with Discord</a>}
+    //   </p>
+    // </MarkdownDocument>
   );
 }
 
-function Form ({ children, onNext, onError, onLimit, id }: FormProps) {
+function Form({ children, onNext, onError, onLimit, id }: FormProps) {
   // [Cynthia] this is used to force re-render of form fields, to help with errors sometimes not showing up
-  const [ renderKey, setRenderKey ] = useState(0);
-  const [ isSubmitting, setSubmitting ] = useState(false);
-  const [ errors, setErrorsRaw ] = useState<Record<string, string>>({});
-  function setErrors (e: Record<string, string>) {
+  const [renderKey, setRenderKey] = useState(0);
+  const [isSubmitting, setSubmitting] = useState(false);
+  const [errors, setErrorsRaw] = useState<Record<string, string>>({});
+  function setErrors(e: Record<string, string>) {
     setErrorsRaw(e);
     setRenderKey((k) => ++k);
     setSubmitting(false);
   }
 
-  const names = useMemo<string[]>(() => children.map((c) => c.props.name), [ children ]);
+  const names = useMemo<string[]>(() => children.map((c) => c.props.name), [children]);
 
-  const onSubmitHandler = useCallback(async (e: Event) => {
-    e.preventDefault();
-    setSubmitting(true);
-    const form = e.target as HTMLFormElement;
-    const obj: Record<string, any> = {};
-    const err: Record<string, string> = {};
+  const onSubmitHandler = useCallback(
+    async (e: Event) => {
+      e.preventDefault();
+      setSubmitting(true);
+      const form = e.target as HTMLFormElement;
+      const obj: Record<string, any> = {};
+      const err: Record<string, string> = {};
 
-    for (const name of names) {
-      const val = form[name].type === 'checkbox' ? form[name].checked : form[name].value;
-      obj[name] = val;
+      for (const name of names) {
+        const val = form[name].type === "checkbox" ? form[name].checked : form[name].value;
+        obj[name] = val;
 
-      if (name.startsWith('compliance') && !val) {
-        err[name] = 'You must confirm this to continue.';
+        if (name.startsWith("compliance") && !val) {
+          err[name] = "You must confirm this to continue.";
+        }
       }
-    }
 
-    if (Object.keys(err).length) {
-      setErrors(err);
-      return;
-    }
-
-    const res = await fetch(Endpoints.STORE_FORM(id), {
-      method: 'POST',
-      headers: { 'content-type': 'application/json' },
-      body: JSON.stringify(obj)
-    });
-
-    if (res.status >= 500) {
-      onError();
-      return;
-    }
-
-    if (res.status === 429) {
-      onLimit();
-      return;
-    }
-
-    if (res.status !== 201) {
-      const resp = await res.json();
-      if (resp.errors) {
-        setErrors(resp.errors);
+      if (Object.keys(err).length) {
+        setErrors(err);
         return;
       }
-    }
 
-    onNext();
-  }, [ onNext ]);
+      const res = await fetch(Endpoints.STORE_FORM(id), {
+        method: "POST",
+        headers: { "content-type": "application/json" },
+        body: JSON.stringify(obj),
+      });
+
+      if (res.status >= 500) {
+        onError();
+        return;
+      }
+
+      if (res.status === 429) {
+        onLimit();
+        return;
+      }
+
+      if (res.status !== 201) {
+        const resp = await res.json();
+        if (resp.errors) {
+          setErrors(resp.errors);
+          return;
+        }
+      }
+
+      onNext();
+    },
+    [onNext],
+  );
 
   const statefulChildren = useMemo(
-    () => children.map((c) => cloneElement(c, { error: errors[c.props.name],
-      rk: renderKey })),
-    [ children, errors, renderKey ]
+    () => children.map((c) => cloneElement(c, { error: errors[c.props.name], rk: renderKey })),
+    [children, errors, renderKey],
   );
 
   return (
     <form onSubmit={onSubmitHandler}>
       {statefulChildren}
-      <div className={style.note}>Make sure your form is complete and accurate before submitting. Once submitted, you won't be able to edit it!</div>
+      <div className={style.note}>
+        Make sure your form is complete and accurate before submitting. Once submitted, you won't be
+        able to edit it!
+      </div>
       <div>
-        <button type='submit' className={button} disabled={isSubmitting}>
-          {isSubmitting ? <Spinner balls /> : 'Submit'}
+        <button type="submit" className={button} disabled={isSubmitting}>
+          {isSubmitting ? <Spinner balls /> : "Submit"}
         </button>
       </div>
     </form>
   );
 }
 
-function PawaScreen ({ headline, text }: PawaScreenProps) {
+function PawaScreen({ headline, text }: PawaScreenProps) {
   return (
     <div className={style.pawaScreen}>
       <hr />
@@ -133,31 +148,39 @@ function PawaScreen ({ headline, text }: PawaScreenProps) {
   );
 }
 
-export default function FormLayout ({ id, title, children, eligibility }: FormLayoutProps) {
-  const [ stage, setStage ] = useState(0);
+export default function FormLayout({ id, title, children, eligibility }: FormLayoutProps) {
+  const [stage, setStage] = useState(0);
   useLayoutEffect(() => {
-    document.querySelector('header + div')!.scrollTop = 0;
-  }, [ stage ]);
+    document.querySelector("header + div")!.scrollTop = 0;
+  }, [stage]);
 
-  if (typeof eligibility !== 'number') {
-    return (
-      <Spinner />
-    );
+  if (typeof eligibility !== "number") {
+    return <Spinner />;
   }
 
   if (eligibility === 1) {
-    return <PawaScreen headline='This form is closed for now!' text='We currently have paused submissions, try again later.' />;
+    return (
+      <PawaScreen
+        headline="This form is closed for now!"
+        text="We currently have paused submissions, try again later."
+      />
+    );
   }
 
   if (eligibility === 2) {
     return (
       <PawaScreen
-        headline={'Sorry not sorry, you\'ve been banned'}
-        text={<>
-          Replugged Staff banned you from submitting this form due to abuse. To appeal the ban, please join
-          our <a href={Routes.DICKSWORD} target='_blank' rel='noreferrer'>support server</a>, and ask for help
-          in #misc-support.
-        </>}
+        headline={"Sorry not sorry, you've been banned"}
+        text={
+          <>
+            Replugged Staff banned you from submitting this form due to abuse. To appeal the ban,
+            please join our{" "}
+            <a href={Routes.DICKSWORD} target="_blank" rel="noreferrer">
+              support server
+            </a>
+            , and ask for help in #misc-support.
+          </>
+        }
       />
     );
   }
@@ -169,25 +192,62 @@ export default function FormLayout ({ id, title, children, eligibility }: FormLa
   let view: VNode;
   switch (stage) {
     case 1:
-      view = <Form children={children} onNext={() => setStage(2)} onError={() => setStage(3)} onLimit={() => setStage(429)} id={id} />;
+      view = (
+        <Form
+          children={children}
+          onNext={() => setStage(2)}
+          onError={() => setStage(3)}
+          onLimit={() => setStage(429)}
+          id={id}
+        />
+      );
       break;
     case 2:
-      view = <PawaScreen
-        headline='Received!'
-        text={<>
-          The Replugged Staff will give your form the attention it deserves soon.<br /><br />
-          We highly recommend joining the <a href={Routes.DICKSWORD} target='_blank' rel='noreferrer'>Replugged Support server</a> and opening your DMs, so we can contact you directly.
-        </>}
-      />;
+      view = (
+        <PawaScreen
+          headline="Received!"
+          text={
+            <>
+              The Replugged Staff will give your form the attention it deserves soon.
+              <br />
+              <br />
+              We highly recommend joining the{" "}
+              <a href={Routes.DICKSWORD} target="_blank" rel="noreferrer">
+                Replugged Support server
+              </a>{" "}
+              and opening your DMs, so we can contact you directly.
+            </>
+          }
+        />
+      );
       break;
     case 3:
-      view = <PawaScreen headline='Uh, what happened?' text={'It seems like we\'re unable to process your request at this time. Please try again later!'} />;
+      view = (
+        <PawaScreen
+          headline="Uh, what happened?"
+          text={
+            "It seems like we're unable to process your request at this time. Please try again later!"
+          }
+        />
+      );
       break;
     case 429:
-      view = <PawaScreen headline='Woah, calm down!' text={'You have too many submissions currently pending review. Wait for the Replugged Staff to review them, and try again.'} />;
+      view = (
+        <PawaScreen
+          headline="Woah, calm down!"
+          text={
+            "You have too many submissions currently pending review. Wait for the Replugged Staff to review them, and try again."
+          }
+        />
+      );
       break;
     default:
-      view = <PawaScreen headline='Hehe, how did you get there cutie?' text={'I\'d happily give you a cookie but I ate them all :3'} />;
+      view = (
+        <PawaScreen
+          headline="Hehe, how did you get there cutie?"
+          text={"I'd happily give you a cookie but I ate them all :3"}
+        />
+      );
       break;
   }
 

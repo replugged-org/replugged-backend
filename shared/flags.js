@@ -54,35 +54,37 @@ export const UserFlags = {
   APPEALED_EVENTS: 1 << 25,
 
   // User is a ghost entry (entry with no real user data, used for flag keeping purposes). Private.
-  GHOST: 1 << 26
+  GHOST: 1 << 26,
 };
 
-export const PrivateUserFlags = 0 |
-   UserFlags.BANNED |
-   UserFlags.BANNED_PUBLISHER |
-   UserFlags.BANNED_VERIFICATION |
-   UserFlags.BANNED_HOSTING |
-   UserFlags.BANNED_REPORTING |
-   UserFlags.BANNED_SYNC |
-   UserFlags.BANNED_EVENTS |
-   UserFlags.APPEALED_SUPPORT |
-   UserFlags.APPEALED_MUTE |
-   UserFlags.APPEALED_BAN |
-   UserFlags.APPEALED_SYNC |
-   UserFlags.APPEALED_EVENTS |
-   UserFlags.GHOST;
+export const PrivateUserFlags =
+  0 |
+  UserFlags.BANNED |
+  UserFlags.BANNED_PUBLISHER |
+  UserFlags.BANNED_VERIFICATION |
+  UserFlags.BANNED_HOSTING |
+  UserFlags.BANNED_REPORTING |
+  UserFlags.BANNED_SYNC |
+  UserFlags.BANNED_EVENTS |
+  UserFlags.APPEALED_SUPPORT |
+  UserFlags.APPEALED_MUTE |
+  UserFlags.APPEALED_BAN |
+  UserFlags.APPEALED_SYNC |
+  UserFlags.APPEALED_EVENTS |
+  UserFlags.GHOST;
 
 // Flags that make a user go ghost instead of deleted.
-export const PersistentUserFlags = 0 |
-   UserFlags.BANNED |
-   UserFlags.BANNED_PUBLISHER |
-   UserFlags.BANNED_VERIFICATION |
-   UserFlags.BANNED_HOSTING |
-   UserFlags.BANNED_REPORTING |
-   UserFlags.BANNED_SYNC |
-   UserFlags.BANNED_EVENTS |
-   UserFlags.APPEALED_SUPPORT |
-   UserFlags.APPEALED_MUTE |
-   UserFlags.APPEALED_BAN |
-   UserFlags.APPEALED_SYNC |
-   UserFlags.APPEALED_EVENTS;
+export const PersistentUserFlags =
+  0 |
+  UserFlags.BANNED |
+  UserFlags.BANNED_PUBLISHER |
+  UserFlags.BANNED_VERIFICATION |
+  UserFlags.BANNED_HOSTING |
+  UserFlags.BANNED_REPORTING |
+  UserFlags.BANNED_SYNC |
+  UserFlags.BANNED_EVENTS |
+  UserFlags.APPEALED_SUPPORT |
+  UserFlags.APPEALED_MUTE |
+  UserFlags.APPEALED_BAN |
+  UserFlags.APPEALED_SYNC |
+  UserFlags.APPEALED_EVENTS;

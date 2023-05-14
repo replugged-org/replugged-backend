@@ -1,12 +1,19 @@
-import type { MongoClient } from 'mongodb';
-import type { CutiePerks, DatabaseUser, User, GhostUser, RestUser, RestUserPrivate } from '../../../types/users';
-import { URL } from 'url';
-import { existsSync } from 'fs';
-import { unlink } from 'fs/promises';
-import config from '../config.js';
-import { SETTINGS_STORAGE_FOLDER } from '../api/settings.js';
-import { fetchMember, setRoles } from '../utils/discord.js';
-import { UserFlags, PrivateUserFlags, PersistentUserFlags } from '../flags.js';
+import type { MongoClient } from "mongodb";
+import type {
+  CutiePerks,
+  DatabaseUser,
+  User,
+  GhostUser,
+  RestUser,
+  RestUserPrivate,
+} from "../../../types/users";
+import { URL } from "url";
+import { existsSync } from "fs";
+import { unlink } from "fs/promises";
+import config from "../config.js";
+import { SETTINGS_STORAGE_FOLDER } from "../api/settings.js";
+import { fetchMember, setRoles } from "../utils/discord.js";
+import { UserFlags, PrivateUserFlags, PersistentUserFlags } from "../flags.js";
 
 export enum UserDeletionCause {
   // User initiated account deletion manually
@@ -24,30 +31,34 @@ const ROLES_TO_REVOKE = [
   config.discord.roles.hunter,
   config.discord.roles.translator,
   config.discord.roles.contributor,
-  config.discord.roles.donator
+  config.discord.roles.donator,
 ];
 
-export function isGhostUser (user: DatabaseUser): user is GhostUser {
+export function isGhostUser(user: DatabaseUser): user is GhostUser {
   return (user.flags & UserFlags.GHOST) !== 0;
 }
 
-export function formatUser(user: User, includePrivate?: boolean): RestUser
-export function formatUser(user: User, includePrivate?: true, allFlags?: boolean): RestUserPrivate
-export function formatUser (user: User, includePrivate?: boolean, allFlags?: boolean): RestUser | RestUserPrivate {
+export function formatUser(user: User, includePrivate?: boolean): RestUser;
+export function formatUser(user: User, includePrivate?: true, allFlags?: boolean): RestUserPrivate;
+export function formatUser(
+  user: User,
+  includePrivate?: boolean,
+  allFlags?: boolean,
+): RestUser | RestUserPrivate {
   const perks: CutiePerks = {
     color: user?.cutiePerks?.color || null,
     badge: user?.cutiePerks?.badge || null,
-    title: user?.cutiePerks?.title || null
+    title: user?.cutiePerks?.title || null,
   };
 
   if (user.flags & UserFlags.HAS_DONATED) {
-    perks.title = 'Former Replugged Supporter';
-    perks.badge = 'default';
+    perks.title = "Former Replugged Supporter";
+    perks.badge = "default";
   }
 
   if (user.flags & UserFlags.IS_CUTIE) {
     perks.color = user.cutiePerks?.color || null;
-    perks.title = 'Replugged Supporter';
+    perks.title = "Replugged Supporter";
 
     if ((user.cutieStatus?.pledgeTier ?? 1) >= 2 || user.flags & UserFlags.CUTIE_OVERRIDE) {
       perks.title = user.cutiePerks?.title || perks.title;
@@ -63,20 +74,20 @@ export function formatUser (user: User, includePrivate?: boolean, allFlags?: boo
     discriminator: user.discriminator,
     patronTier: user?.cutieStatus?.pledgeTier ?? 0,
     badges: {
-      developer: (user.flags & (UserFlags.DEVELOPER)) !== 0,
-      staff: (user.flags & (UserFlags.STAFF)) !== 0,
-      support: (user.flags & (UserFlags.SUPPORT)) !== 0,
-      contributor: (user.flags & (UserFlags.CONTRIBUTOR)) !== 0,
-      translator: (user.flags & (UserFlags.TRANSLATOR)) !== 0,
-      hunter: (user.flags & (UserFlags.BUG_HUNTER)) !== 0,
-      early: (user.flags & (UserFlags.EARLY_USER)) !== 0,
-      booster: (user.flags & (UserFlags.SERVER_BOOSTER)) !== 0,
+      developer: (user.flags & UserFlags.DEVELOPER) !== 0,
+      staff: (user.flags & UserFlags.STAFF) !== 0,
+      support: (user.flags & UserFlags.SUPPORT) !== 0,
+      contributor: (user.flags & UserFlags.CONTRIBUTOR) !== 0,
+      translator: (user.flags & UserFlags.TRANSLATOR) !== 0,
+      hunter: (user.flags & UserFlags.BUG_HUNTER) !== 0,
+      early: (user.flags & UserFlags.EARLY_USER) !== 0,
+      booster: (user.flags & UserFlags.SERVER_BOOSTER) !== 0,
       custom: {
         name: perks.title,
         icon: perks.badge,
-        color: perks.color
-      } // this will be phased out soon:tm:
-    }
+        color: perks.color,
+      }, // this will be phased out soon:tm:
+    },
   };
 
   if (includePrivate) {
@@ -88,22 +99,22 @@ export function formatUser (user: User, includePrivate?: boolean, allFlags?: boo
       flags: allFlags ? user.flags : restUser.flags,
       cutieStatus: {
         pledgeTier: user.cutieStatus?.pledgeTier ?? 0,
-        perksExpireAt: user.cutieStatus?.perksExpireAt ?? 0
+        perksExpireAt: user.cutieStatus?.perksExpireAt ?? 0,
       },
       // these don't matter in the backoffice anyways right now, might reimplement it eventually
       accounts: {
         spotify: user.accounts?.spotify?.name || void 0,
-        patreon: user.accounts?.patreon?.name || void 0
-      }
+        patreon: user.accounts?.patreon?.name || void 0,
+      },
     };
   }
 
   return restUser;
 }
 
-export async function deleteUser (mongo: MongoClient, userId: string) {
+export async function deleteUser(mongo: MongoClient, userId: string) {
   const database = mongo.db();
-  const userCollection = database.collection<DatabaseUser>('users');
+  const userCollection = database.collection<DatabaseUser>("users");
 
   const user = await userCollection.findOne({ _id: userId });
   if (!user || user.flags & UserFlags.GHOST) {
@@ -119,7 +130,10 @@ export async function deleteUser (mongo: MongoClient, userId: string) {
   // Delete user entry, or keep flags if necessary
   if (user.flags & PersistentUserFlags) {
     // We keep the flags we want to keep track of
-    await userCollection.replaceOne({ _id: userId }, { flags: (user.flags & PersistentUserFlags) | UserFlags.GHOST });
+    await userCollection.replaceOne(
+      { _id: userId },
+      { flags: (user.flags & PersistentUserFlags) | UserFlags.GHOST },
+    );
   } else {
     // We simply delete the entry as we don't need it anymore
     await userCollection.deleteOne({ _id: userId });
@@ -131,6 +145,6 @@ export async function deleteUser (mongo: MongoClient, userId: string) {
   const member = await fetchMember(userId);
   if (member) {
     const newRoles = member.roles.filter((r: any) => !ROLES_TO_REVOKE.includes(r));
-    await setRoles(userId, newRoles, 'User deleted their replugged.dev account');
+    await setRoles(userId, newRoles, "User deleted their replugged.dev account");
   }
 }

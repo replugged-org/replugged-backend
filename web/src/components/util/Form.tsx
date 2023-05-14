@@ -3,61 +3,64 @@ import {
   type ComponentChild,
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   h,
-  ComponentChildren
-} from 'preact';
-import {
-  useState,
-  useCallback,
-  useMemo,
-  useEffect
-} from 'preact/hooks';
+  ComponentChildren,
+} from "preact";
+import { useState, useCallback, useMemo, useEffect } from "preact/hooks";
 
-import ChevronDown from 'feather-icons/dist/icons/chevron-down.svg';
+import ChevronDown from "feather-icons/dist/icons/chevron-down.svg";
 
-import style from './form.module.css';
-import sharedStyle from '../shared.module.css';
+import style from "./form.module.css";
+import sharedStyle from "../shared.module.css";
 
 type BaseProps = Attributes & {
-  id: string
-  label: ComponentChild
-  note?: ComponentChild
-  error?: ComponentChild
-  children: ComponentChild
-  required?: boolean
-}
+  id: string;
+  label: ComponentChild;
+  note?: ComponentChild;
+  error?: ComponentChild;
+  children: ComponentChild;
+  required?: boolean;
+};
 
 type BaseFieldProps = Attributes & {
-  name: string
-  label: ComponentChild
-  note?: ComponentChild
-  error?: ComponentChild
-  required?: boolean
-  disabled?: boolean
-  raw?: boolean
-  rk?: number // [Cynthia] this is used to force re-render of form fields, to help with errors sometimes not showing up
-}
+  name: string;
+  label: ComponentChild;
+  note?: ComponentChild;
+  error?: ComponentChild;
+  required?: boolean;
+  disabled?: boolean;
+  raw?: boolean;
+  rk?: number; // [Cynthia] this is used to force re-render of form fields, to help with errors sometimes not showing up
+};
 
 type TextFieldProps = BaseFieldProps & {
-  value?: string,
-  minLength?: number,
-  maxLength?: number,
-  placeholder?: string,
-  preview?: ComponentChildren
-}
-type CheckboxFieldProps = BaseFieldProps & { value?: boolean }
-type SelectFieldProps = BaseFieldProps & { value?: string, options: Array<{ id: string, name: string }> }
+  value?: string;
+  minLength?: number;
+  maxLength?: number;
+  placeholder?: string;
+  preview?: ComponentChildren;
+};
+type CheckboxFieldProps = BaseFieldProps & { value?: boolean };
+type SelectFieldProps = BaseFieldProps & {
+  value?: string;
+  options: Array<{ id: string; name: string }>;
+};
 
-type FieldState = { id: string, note?: ComponentChild, error?: ComponentChild, onChange: () => void }
+type FieldState = {
+  id: string;
+  note?: ComponentChild;
+  error?: ComponentChild;
+  onChange: () => void;
+};
 
-function useField (note?: ComponentChild, error?: ComponentChild, rk?: number): FieldState {
-  const [ prevError, setPrevError ] = useState(error);
-  const [ showError, setShowError ] = useState(Boolean(error));
+function useField(note?: ComponentChild, error?: ComponentChild, rk?: number): FieldState {
+  const [prevError, setPrevError] = useState(error);
+  const [showError, setShowError] = useState(Boolean(error));
   const onChange = useCallback(() => {
     if (showError) {
       setShowError(false);
       setPrevError(null);
     }
-  }, [ showError ]);
+  }, [showError]);
 
   const id = useMemo(() => Math.random().toString(16).slice(2), []);
   useEffect(() => {
@@ -65,17 +68,17 @@ function useField (note?: ComponentChild, error?: ComponentChild, rk?: number): 
       setShowError(Boolean(error));
     }
     setPrevError(error);
-  }, [ error, rk ]);
+  }, [error, rk]);
 
   return {
     id,
     note: !showError ? note : void 0,
     error: showError ? error : void 0,
-    onChange
+    onChange,
   };
 }
 
-function BaseField (props: BaseProps) {
+function BaseField(props: BaseProps) {
   return (
     <div className={style.field}>
       <label className={style.label} for={props.id}>
@@ -89,11 +92,11 @@ function BaseField (props: BaseProps) {
   );
 }
 
-export function TextField (props: TextFieldProps) {
+export function TextField(props: TextFieldProps) {
   const field = useField(props.note, props.error, props.rk);
   const inputElement = (
     <input
-      type='text'
+      type="text"
       id={field.id}
       name={props.name}
       value={props.value}
@@ -119,7 +122,7 @@ export function TextField (props: TextFieldProps) {
   );
 }
 
-export function TextareaField (props: TextFieldProps) {
+export function TextareaField(props: TextFieldProps) {
   const field = useField(props.note, props.error, props.rk);
 
   return (
@@ -140,13 +143,13 @@ export function TextareaField (props: TextFieldProps) {
   );
 }
 
-export function CheckboxField (props: CheckboxFieldProps) {
+export function CheckboxField(props: CheckboxFieldProps) {
   const field = useField(props.note, props.error, props.rk);
 
   return (
     <BaseField {...field} label={props.label} required={props.required} id={field.id}>
       <input
-        type='checkbox'
+        type="checkbox"
         id={field.id}
         name={props.name}
         checked={props.value}
@@ -159,22 +162,25 @@ export function CheckboxField (props: CheckboxFieldProps) {
   );
 }
 
-export function SelectField (props: SelectFieldProps) {
+export function SelectField(props: SelectFieldProps) {
   const field = useField(props.note, props.error, props.rk);
 
   return (
     <BaseField {...field} label={props.label} required={props.required} id={field.id}>
       <select
-        type='checkbox'
+        type="checkbox"
         id={field.id}
         name={props.name}
         value={props.value}
         required={props.required}
         disabled={props.disabled}
         className={style.selectField}
-        onClick={field.onChange}
-      >
-        {props.options.map(({ id, name }) => <option key={id} value={id}>{name}</option>)}
+        onClick={field.onChange}>
+        {props.options.map(({ id, name }) => (
+          <option key={id} value={id}>
+            {name}
+          </option>
+        ))}
       </select>
       {/* @ts-ignore */}
       <ChevronDown className={style.selectArrow} />
