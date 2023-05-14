@@ -1,43 +1,46 @@
 import {
   // type FastifyInstance,
-  type FastifyReply
-} from 'fastify';
+  type FastifyReply,
+} from "fastify";
 // import {
 //     type User
 // } from '../../../types/users'
-import { createHash } from 'crypto';
-import config from '../config.js';
+import { createHash } from "crypto";
+import config from "../config.js";
 // import { UserFlags } from '../flags.js'
-import { createSigner, createVerifier } from 'fast-jwt';
+import { createSigner, createVerifier } from "fast-jwt";
 
 export type JWTPayload = { id: string };
 
-export enum TokenType { WEB, CLIENT }
+export enum TokenType {
+  WEB,
+  CLIENT,
+}
 
-const KEY = createHash('sha512').update(config.secret).digest();
+const KEY = createHash("sha512").update(config.secret).digest();
 
 export const Verifiers = {
   web: createVerifier({
     key: KEY,
-    algorithms: [ 'HS512' ],
-    allowedAud: 'replugged:web'
+    algorithms: ["HS512"],
+    allowedAud: "replugged:web",
     // allowedIss: 'replugged:api:v1'
   }),
   client: createVerifier({
     key: KEY,
-    algorithms: [ 'HS512' ],
-    allowedAud: [ 'replugged:web', 'replugged:client' ]
+    algorithms: ["HS512"],
+    allowedAud: ["replugged:web", "replugged:client"],
     // allowedIss: 'replugged:api:v1'
-  })
+  }),
 };
 
-export function generateToken (this: FastifyReply, payload: JWTPayload, type: TokenType) {
+export function generateToken(this: FastifyReply, payload: JWTPayload, type: TokenType) {
   const signer = createSigner({
     key: KEY,
-    algorithm: 'HS512',
-    iss: 'replugged:api:v3',
-    aud: type === TokenType.WEB ? 'replugged:web' : 'replugged:client',
-    expiresIn: type === TokenType.WEB ? 24 * 3600e3 : void 0
+    algorithm: "HS512",
+    iss: "replugged:api:v3",
+    aud: type === TokenType.WEB ? "replugged:web" : "replugged:client",
+    expiresIn: type === TokenType.WEB ? 24 * 3600e3 : void 0,
   });
 
   return signer(payload);

@@ -1,45 +1,58 @@
-import type { FormHosting, FormPublish, FormVerification, StoreForm } from '../../../../../../types/store';
+import type {
+  FormHosting,
+  FormPublish,
+  FormVerification,
+  StoreForm,
+} from "../../../../../../types/store";
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
-import { h, Fragment } from 'preact';
+import { h, Fragment } from "preact";
 
-import style from '../../admin.module.css';
+import style from "../../admin.module.css";
 
-type FormProps<T = StoreForm> = { form: T }
+type FormProps<T = StoreForm> = { form: T };
 
-export function PublishForm ({ form }: FormProps<FormPublish>) {
+export function PublishForm({ form }: FormProps<FormPublish>) {
   return (
     <Fragment>
       <div className={style.line2}>
         <div>
           <div className={style.label}>Repository URL</div>
           <div className={style.singleLineText}>
-            <a href={form.repoUrl} target='_blank' rel='noreferrer'>{form.repoUrl}</a>
+            <a href={form.repoUrl} target="_blank" rel="noreferrer">
+              {form.repoUrl}
+            </a>
           </div>
         </div>
         <div>
           <div className={style.label}>BetterDiscord Alternative</div>
           <div className={style.singleLineText}>
-            {form.bdAlterative
-              ? <a href={form.bdAlterative} target='_blank' rel='noreferrer'>{form.bdAlterative}</a>
-              : 'N/A'}
+            {form.bdAlterative ? (
+              <a href={form.bdAlterative} target="_blank" rel="noreferrer">
+                {form.bdAlterative}
+              </a>
+            ) : (
+              "N/A"
+            )}
           </div>
         </div>
       </div>
       <div>
         <div className={style.label}>Note for reviewers</div>
-        <div>{form.reviewNotes || 'N/A'}</div>
+        <div>{form.reviewNotes || "N/A"}</div>
       </div>
     </Fragment>
   );
 }
 
-export function VerificationForm ({ form }: FormProps<FormVerification>) {
+export function VerificationForm({ form }: FormProps<FormVerification>) {
   return (
     <Fragment>
       <div>
         <div className={style.label}>Work URL</div>
         <div className={style.singleLineText}>
-          <a href={form.workUrl} target='_blank' rel='noreferrer'>{form.workUrl}</a>
+          <a href={form.workUrl} target="_blank" rel="noreferrer">
+            {form.workUrl}
+          </a>
         </div>
       </div>
       <div>
@@ -62,14 +75,16 @@ export function VerificationForm ({ form }: FormProps<FormVerification>) {
   );
 }
 
-export function HostingForm ({ form }: FormProps<FormHosting>) {
+export function HostingForm({ form }: FormProps<FormHosting>) {
   return (
     <Fragment>
       <div className={style.line2}>
         <div>
           <div className={style.label}>Repository URL</div>
           <div className={style.singleLineText}>
-            <a href={form.repoUrl} target='_blank' rel='noreferrer'>{form.repoUrl}</a>
+            <a href={form.repoUrl} target="_blank" rel="noreferrer">
+              {form.repoUrl}
+            </a>
           </div>
         </div>
         <div>
@@ -89,7 +104,7 @@ export function HostingForm ({ form }: FormProps<FormHosting>) {
       </div>
       <div>
         <div className={style.label}>Note for reviewers</div>
-        <div>{form.reviewNotes || 'N/A'}</div>
+        <div>{form.reviewNotes || "N/A"}</div>
       </div>
     </Fragment>
   );

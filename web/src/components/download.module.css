@@ -1,105 +1,105 @@
 .container {
-	margin: 0px;
-	margin-bottom: 20px;
-	padding: 0;
-	max-width: none;
+  margin: 0px;
+  margin-bottom: 20px;
+  padding: 0;
+  max-width: none;
 }
 
 .wrapper {
-	margin: 0 auto;
-	max-width: 1300px;
-	padding: 0 2em;
-	width: 100%;
+  margin: 0 auto;
+  max-width: 1300px;
+  padding: 0 2em;
+  width: 100%;
 }
 
 .heading {
-	padding: 32px 0;
-	text-align: center;
-	background-color: var(--background-secondary);
-	position: relative;
-	margin-bottom: 20px;
+  padding: 32px 0;
+  text-align: center;
+  background-color: var(--background-secondary);
+  position: relative;
+  margin-bottom: 20px;
 }
 
 .title {
-	margin-bottom: 8px;
-	position: relative;
-	z-index: 2;
+  margin-bottom: 8px;
+  position: relative;
+  z-index: 2;
 }
 
 .downloadContainer {
-	background-color: var(--background-light);
-	width: -webkit-fit-content;
-	width: -moz-fit-content;
-	width: fit-content;
-	min-width: min(100%, 500px);
-	max-width: min(100%, 800px);
-	margin: 10px auto;
-	padding: 10px;
-	border-radius: 10px;
-	display: flex;
-	flex-direction: column;
-	gap: 20px;
+  background-color: var(--background-light);
+  width: -webkit-fit-content;
+  width: -moz-fit-content;
+  width: fit-content;
+  min-width: min(100%, 500px);
+  max-width: min(100%, 800px);
+  margin: 10px auto;
+  padding: 10px;
+  border-radius: 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
 }
 
 .tabs {
-	display: flex;
-	gap: 10px;
-	justify-content: center;
+  display: flex;
+  gap: 10px;
+  justify-content: center;
 }
 
 .tab:not(.selected) {
-	background-color: var(--background-secondary);
+  background-color: var(--background-secondary);
 }
 
 .divider {
-	width: 75%;
-	margin: 0 auto;
-	height: 1px;
-	background-color: var(--text-color);
+  width: 75%;
+  margin: 0 auto;
+  height: 1px;
+  background-color: var(--text-color);
 }
 
 .buttons {
-	display: flex;
-	gap: 10px;
-	justify-content: center;
+  display: flex;
+  gap: 10px;
+  justify-content: center;
 }
 
 .warning {
-	width: -webkit-fit-content;
-	width: -moz-fit-content;
-	width: fit-content;
-	margin: 0 auto;
-	border: 1px solid rgba(240, 178, 50, 1);
-	border-radius: 5px;
-	padding: 10px;
-	background-color: rgba(240, 178, 50, 0.1);
+  width: -webkit-fit-content;
+  width: -moz-fit-content;
+  width: fit-content;
+  margin: 0 auto;
+  border: 1px solid rgba(240, 178, 50, 1);
+  border-radius: 5px;
+  padding: 10px;
+  background-color: rgba(240, 178, 50, 0.1);
 }
 
 .manual h2 {
-	margin-bottom: 20px;
+  margin-bottom: 20px;
 }
 
 .manual p {
-	margin: 16px 0px;
+  margin: 16px 0px;
 }
 
 .codeContainer {
-	display: inline-flex;
-	align-items: center;
-	margin: 3px 0;
+  display: inline-flex;
+  align-items: center;
+  margin: 3px 0;
 }
 
 .code {
-	background-color: var(--background-secondary);
-	border-radius: 5px;
-	padding: 3px;
+  background-color: var(--background-secondary);
+  border-radius: 5px;
+  padding: 3px;
 }
 
 .copyButton {
-	display: inline-flex;
-	margin-left: 3px;
+  display: inline-flex;
+  margin-left: 3px;
 }
 
 .copyCheck {
-	color: var(--green);
+  color: var(--green);
 }

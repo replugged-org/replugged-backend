@@ -1,22 +1,22 @@
 .container {
-    height: calc(100% - 162px);
-    padding-bottom: 0;
+  height: calc(100% - 162px);
+  padding-bottom: 0;
+}
+
+@media screen and (min-width: 520px) {
+  .pawa {
+    margin: 40px 0 0;
   }
-    
-  @media screen and (min-width: 520px) {
-    .pawa {
-      margin: 40px 0 0;
-    }
+}
+
+@media screen and (min-width: 890px) {
+  .container {
+    height: calc(100% - 143px);
   }
-  
-  @media screen and (min-width: 890px) {
-    .container {
-      height: calc(100% - 143px);
-    }
+}
+
+@media screen and (min-width: 1440px) {
+  .container {
+    height: calc(100% - 107px);
   }
-  
-  @media screen and (min-width: 1440px) {
-    .container {
-      height: calc(100% - 107px);
-    }
-  }
+}

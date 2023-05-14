@@ -72,7 +72,8 @@
   width: 100%;
 }
 
-.linked-account-error, .perks-management-error {
+.linked-account-error,
+.perks-management-error {
   display: flex;
   align-items: center;
   color: var(--red);
@@ -80,7 +81,8 @@
   gap: 8px;
 }
 
-.perks-management-info, .perks-management-notice {
+.perks-management-info,
+.perks-management-notice {
   display: flex;
   align-items: center;
   font-size: 0.9em;

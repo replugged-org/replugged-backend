@@ -1,56 +1,69 @@
-import type { Point, Chart as ChartData, StatsAll, StatsDay } from './useStats';
+import type { Point, Chart as ChartData, StatsAll, StatsDay } from "./useStats";
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
-import { h } from 'preact';
-import { useState, useRef, useEffect, useMemo } from 'preact/hooks';
+import { h } from "preact";
+import { useState, useRef, useEffect, useMemo } from "preact/hooks";
 
-import style from './stats.module.css';
-import Tooltip from '../util/Tooltip';
+import style from "./stats.module.css";
+import Tooltip from "../util/Tooltip";
 
-type Legend = Record<string, string>
+type Legend = Record<string, string>;
 
-type LegendProps = { legend: Legend, dataset: ChartData }
-type ChartSideProps = { width: number, height: number, dataset: ChartData }
+type LegendProps = { legend: Legend; dataset: ChartData };
+type ChartSideProps = { width: number; height: number; dataset: ChartData };
 type ChartBottomProps = {
-  reduced: boolean
-  mode: string
-  width: number
-  height: number
-}
+  reduced: boolean;
+  mode: string;
+  width: number;
+  height: number;
+};
 type ChartDatasetProps = {
-  reduced: boolean
-  width: number
-  height: number
-  dataset: ChartData
-}
+  reduced: boolean;
+  width: number;
+  height: number;
+  dataset: ChartData;
+};
 type ChartLineProps = {
-  reduced: boolean
-  width: number
-  height: number
-  set: string
-  color: string
-  points: Point[]
-}
+  reduced: boolean;
+  width: number;
+  height: number;
+  set: string;
+  color: string;
+  points: Point[];
+};
 type ChartProps = {
-  title: string
-  legend?: Legend
-  dataset: StatsDay | StatsAll | false
-  modes: Array<{ name: string, key: string }>
-  defaultMode?: string
-}
+  title: string;
+  legend?: Legend;
+  dataset: StatsDay | StatsAll | false;
+  modes: Array<{ name: string; key: string }>;
+  defaultMode?: string;
+};
 
 const HEIGHT_RATIO = 270 / 1210;
 const REPLUGGED_EPOCH = 1658901600000;
 const SHOWN_DATES = 7;
-const MONTHS = [ 'Jan', 'Feb', 'Mar', 'Apr', 'May', 'June', 'July', 'Aug', 'Sept', 'Oct', 'Nov', 'Dec' ];
+const MONTHS = [
+  "Jan",
+  "Feb",
+  "Mar",
+  "Apr",
+  "May",
+  "June",
+  "July",
+  "Aug",
+  "Sept",
+  "Oct",
+  "Nov",
+  "Dec",
+];
 
-function ChartLegend ({ legend, dataset: { dataset } }: LegendProps) {
+function ChartLegend({ legend, dataset: { dataset } }: LegendProps) {
   return (
     <div className={style.legend}>
-      {Object.entries(legend).map(([ key, value ]) => (
+      {Object.entries(legend).map(([key, value]) => (
         <div className={style.legendEntry} key={key}>
-          <svg xmlns='http://www.w3.org/2000/svg' width={16} height={8} viewBox='0 0 16 8'>
-            <line x1={0} x2={16} y1={4} y2={4} stroke-width='2' stroke={dataset[key].color}/>
-            <circle cx={8} cy={4} r={4} fill={dataset[key].color}/>
+          <svg xmlns="http://www.w3.org/2000/svg" width={16} height={8} viewBox="0 0 16 8">
+            <line x1={0} x2={16} y1={4} y2={4} stroke-width="2" stroke={dataset[key].color} />
+            <circle cx={8} cy={4} r={4} fill={dataset[key].color} />
           </svg>
           <span>{value}</span>
         </div>
@@ -59,31 +72,39 @@ function ChartLegend ({ legend, dataset: { dataset } }: LegendProps) {
   );
 }
 
-function ChartSide ({ width, height, dataset }: ChartSideProps) {
+function ChartSide({ width, height, dataset }: ChartSideProps) {
   const topMargin = 15;
   const delta = (height - topMargin - 35) / 4;
   const linesDelta = dataset.max - dataset.min;
   const lines = [
     dataset.min + linesDelta,
-    dataset.min + (linesDelta / 4 * 3),
-    dataset.min + (linesDelta / 4 * 2),
-    dataset.min + (linesDelta / 4),
-    dataset.min
+    dataset.min + (linesDelta / 4) * 3,
+    dataset.min + (linesDelta / 4) * 2,
+    dataset.min + linesDelta / 4,
+    dataset.min,
   ].map((a) => Math.round(a));
 
   return (
     <g>
       {lines.map((l, i) => (
         <g key={`${l}-${i}`}>
-          <text className={style.gridText} x={40} y={4 + topMargin + (delta * i)} text-anchor='end'>{l}</text>
-          <line className={style.gridLine} x1={50} x2={width - 10} y1={topMargin + (delta * i)} y2={topMargin + (delta * i)}/>
+          <text className={style.gridText} x={40} y={4 + topMargin + delta * i} text-anchor="end">
+            {l}
+          </text>
+          <line
+            className={style.gridLine}
+            x1={50}
+            x2={width - 10}
+            y1={topMargin + delta * i}
+            y2={topMargin + delta * i}
+          />
         </g>
       ))}
     </g>
   );
 }
 
-function ChartBottom ({ reduced, mode, width, height }: ChartBottomProps) {
+function ChartBottom({ reduced, mode, width, height }: ChartBottomProps) {
   const now = Date.now();
   const baseHeight = height - 35;
   const deltaX = (width - 50) / SHOWN_DATES;
@@ -93,14 +114,14 @@ function ChartBottom ({ reduced, mode, width, height }: ChartBottomProps) {
     let addYear = false;
     let delta;
     switch (mode) {
-      case 'day':
+      case "day":
         addHour = true;
         delta = (24 * 3600e3) / SHOWN_DATES;
         break;
-      case 'week':
+      case "week":
         delta = (24 * 7 * 3600e3) / SHOWN_DATES;
         break;
-      case 'month':
+      case "month":
         addYear = true;
         delta = (24 * 30 * 3600e3) / SHOWN_DATES;
         break;
@@ -111,7 +132,7 @@ function ChartBottom ({ reduced, mode, width, height }: ChartBottomProps) {
     }
 
     for (let i = 0; i < SHOWN_DATES; i++) {
-      const target = new Date(now - (delta * (i + 0.5)));
+      const target = new Date(now - delta * (i + 0.5));
       let str = `${MONTHS[target.getMonth()]} ${target.getDate()}`;
       if (addYear) {
         str += `, ${target.getFullYear()}`;
@@ -123,13 +144,13 @@ function ChartBottom ({ reduced, mode, width, height }: ChartBottomProps) {
           hours++;
           minutes = 0;
         }
-        str += ` ${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}`;
+        str += ` ${hours.toString().padStart(2, "0")}:${minutes.toString().padStart(2, "0")}`;
       }
       res.unshift(str);
     }
 
     return res;
-  }, [ mode ]);
+  }, [mode]);
 
   return (
     <g>
@@ -137,11 +158,13 @@ function ChartBottom ({ reduced, mode, width, height }: ChartBottomProps) {
         if (reduced && i % 2 !== 0) {
           return null;
         }
-        const x = Math.round(50 + (deltaX * (i + 0.5)));
+        const x = Math.round(50 + deltaX * (i + 0.5));
         return (
           <g key={d}>
-            <text className={style.gridText} x={x} y={baseHeight + 25} text-anchor='middle'>{d}</text>
-            <line className={style.gridLine} x1={x} x2={x} y1={baseHeight} y2={baseHeight + 10}/>
+            <text className={style.gridText} x={x} y={baseHeight + 25} text-anchor="middle">
+              {d}
+            </text>
+            <line className={style.gridLine} x1={x} x2={x} y1={baseHeight} y2={baseHeight + 10} />
           </g>
         );
       })}
@@ -149,7 +172,7 @@ function ChartBottom ({ reduced, mode, width, height }: ChartBottomProps) {
   );
 }
 
-function ChartLine ({ reduced, width, height, set, color, points }: ChartLineProps) {
+function ChartLine({ reduced, width, height, set, color, points }: ChartLineProps) {
   const usableWidth = width - 60;
   const usableHeight = height - 50;
   const heightMargin = 15;
@@ -160,50 +183,73 @@ function ChartLine ({ reduced, width, height, set, color, points }: ChartLinePro
       points
         .filter((_, i) => !reduced || i % 2 === 0)
         .map((p) => ({
-          x: (p.x * usableWidth) + widthMargin,
-          y: usableHeight - (p.y * usableHeight) + heightMargin,
-          value: p.value
+          x: p.x * usableWidth + widthMargin,
+          y: usableHeight - p.y * usableHeight + heightMargin,
+          value: p.value,
         })),
-    [ width, height, points, reduced ]
+    [width, height, points, reduced],
   );
 
-  const linePath = useMemo(() => mappedPoints.map((p) => `${p.x},${p.y}`).join(' '), [ mappedPoints ]);
+  const linePath = useMemo(
+    () => mappedPoints.map((p) => `${p.x},${p.y}`).join(" "),
+    [mappedPoints],
+  );
 
   return (
     <g data-dataset={set}>
-      <polyline fill='none' stroke={color} stroke-width='2' points={linePath}/>
+      <polyline fill="none" stroke={color} stroke-width="2" points={linePath} />
       {mappedPoints.map(({ x, y, value }) => (
-        <Tooltip text={String(value)} position='top' align='center'>
-          <circle className={style.chartDot} key={`${x},${y}`} cx={x} cy={y} r={4} fill={color} stroke={`${color}50`}/>
+        <Tooltip text={String(value)} position="top" align="center">
+          <circle
+            className={style.chartDot}
+            key={`${x},${y}`}
+            cx={x}
+            cy={y}
+            r={4}
+            fill={color}
+            stroke={`${color}50`}
+          />
         </Tooltip>
       ))}
     </g>
   );
 }
 
-function ChartDataset ({ reduced, width, height, dataset }: ChartDatasetProps) {
+function ChartDataset({ reduced, width, height, dataset }: ChartDatasetProps) {
   return (
     <g>
-      {Object.entries(dataset.dataset).map(
-        ([ key, { color, points } ]) =>
-          <ChartLine key={key} set={key} width={width} height={height} color={color} points={points} reduced={reduced}/>
-      )}
+      {Object.entries(dataset.dataset).map(([key, { color, points }]) => (
+        <ChartLine
+          key={key}
+          set={key}
+          width={width}
+          height={height}
+          color={color}
+          points={points}
+          reduced={reduced}
+        />
+      ))}
     </g>
   );
 }
 
-export default function Chart (props: ChartProps) {
+export default function Chart(props: ChartProps) {
   const ref = useRef<HTMLElement>(null);
-  const [ reduced, setReduced ] = useState(typeof window === 'undefined' ? false : window.innerWidth < 810);
-  const [ mode, setMode ] = useState(props.defaultMode || props.modes[0].key);
-  const [ [ width, height ], setSize ] = useState([ 0, 0 ]);
-  const dataset = useMemo(() => props.dataset && props.dataset[mode as keyof typeof props.dataset], [ props.dataset, mode ]);
+  const [reduced, setReduced] = useState(
+    typeof window === "undefined" ? false : window.innerWidth < 810,
+  );
+  const [mode, setMode] = useState(props.defaultMode || props.modes[0].key);
+  const [[width, height], setSize] = useState([0, 0]);
+  const dataset = useMemo(
+    () => props.dataset && props.dataset[mode as keyof typeof props.dataset],
+    [props.dataset, mode],
+  );
 
   useEffect(() => {
     const computeSize = () => {
       if (ref.current) {
         const { width: w } = ref.current.getBoundingClientRect();
-        setSize([ w, Math.round((w - 80) * HEIGHT_RATIO) + 50 ]);
+        setSize([w, Math.round((w - 80) * HEIGHT_RATIO) + 50]);
 
         if (!reduced && window.innerWidth < 810) {
           setReduced(true);
@@ -214,9 +260,9 @@ export default function Chart (props: ChartProps) {
     };
 
     computeSize();
-    window.addEventListener('resize', computeSize);
-    return () => window.removeEventListener('resize', computeSize);
-  }, [ ref.current, reduced ]);
+    window.addEventListener("resize", computeSize);
+    return () => window.removeEventListener("resize", computeSize);
+  }, [ref.current, reduced]);
 
   return (
     <section className={style.chart} ref={ref}>
@@ -226,19 +272,24 @@ export default function Chart (props: ChartProps) {
           {props.modes.map((m) => (
             <button
               key={m.key}
-              className={`${style.button}${mode === m.key ? ` ${style.selected}` : ''}`}
-              onClick={() => setMode(m.key)}
-            >
+              className={`${style.button}${mode === m.key ? ` ${style.selected}` : ""}`}
+              onClick={() => setMode(m.key)}>
               {m.name}
             </button>
           ))}
         </div>
       </header>
-      {dataset && props.legend && <ChartLegend legend={props.legend} dataset={dataset}/>}
-      <svg xmlns='http://www.w3.org/2000/svg' width={width} height={height} viewBox={`0 0 ${width} ${height}`}>
-        {dataset && <ChartSide width={width} height={height} dataset={dataset}/>}
-        {dataset && <ChartBottom reduced={reduced} mode={mode} width={width} height={height}/>}
-        {dataset && <ChartDataset reduced={reduced} width={width} height={height} dataset={dataset}/>}
+      {dataset && props.legend && <ChartLegend legend={props.legend} dataset={dataset} />}
+      <svg
+        xmlns="http://www.w3.org/2000/svg"
+        width={width}
+        height={height}
+        viewBox={`0 0 ${width} ${height}`}>
+        {dataset && <ChartSide width={width} height={height} dataset={dataset} />}
+        {dataset && <ChartBottom reduced={reduced} mode={mode} width={width} height={height} />}
+        {dataset && (
+          <ChartDataset reduced={reduced} width={width} height={height} dataset={dataset} />
+        )}
       </svg>
     </section>
   );

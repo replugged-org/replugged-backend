@@ -1,48 +1,47 @@
-import type { StoreForm } from '../../../../../../types/store';
+import type { StoreForm } from "../../../../../../types/store";
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
-import { h, Fragment } from 'preact';
-import { useState, useEffect, useCallback, useRef, useContext } from 'preact/hooks';
+import { h, Fragment } from "preact";
+import { useState, useEffect, useCallback, useRef, useContext } from "preact/hooks";
 
-import Tooltip from '../../../util/Tooltip';
-import Spinner from '../../../util/Spinner';
-import Modal from '../../../util/Modal';
-import { TextareaField } from '../../../util/Form';
-import { PublishForm, VerificationForm, HostingForm } from './Items';
-import { Endpoints } from '../../../../constants';
+import Tooltip from "../../../util/Tooltip";
+import Spinner from "../../../util/Spinner";
+import Modal from "../../../util/Modal";
+import { TextareaField } from "../../../util/Form";
+import { PublishForm, VerificationForm, HostingForm } from "./Items";
+import { Endpoints } from "../../../../constants";
 
-import ExternalLink from 'feather-icons/dist/icons/external-link.svg';
-import Check from 'feather-icons/dist/icons/check.svg';
-import X from 'feather-icons/dist/icons/x.svg';
+import ExternalLink from "feather-icons/dist/icons/external-link.svg";
+import Check from "feather-icons/dist/icons/check.svg";
+import X from "feather-icons/dist/icons/x.svg";
 
-import style from '../../admin.module.css';
-import sharedStyle from '../../../shared.module.css';
-import UserContext from '../../../UserContext';
+import style from "../../admin.module.css";
+import sharedStyle from "../../../shared.module.css";
+import UserContext from "../../../UserContext";
 
 type FormProps = {
-  form: StoreForm
-  canViewDiscussions: boolean
-}
+  form: StoreForm;
+  canViewDiscussions: boolean;
+};
 
-type ModalProps = { onConfirm: (reason: string) => Promise<boolean>, onClose: () => void }
+type ModalProps = { onConfirm: (reason: string) => Promise<boolean>; onClose: () => void };
 
-function ApproveModal ({ onConfirm, onClose }: ModalProps) {
-  const onConfirmWithData = onConfirm.bind(null, '');
+function ApproveModal({ onConfirm, onClose }: ModalProps) {
+  const onConfirmWithData = onConfirm.bind(null, "");
 
   return (
     <Modal
-      title='Approve a form'
+      title="Approve a form"
       onConfirm={onConfirmWithData}
       onClose={onClose}
-      confirmText='Approve'
-      color='green'
-    >
+      confirmText="Approve"
+      color="green">
       <div>Are you sure you want to approve this form?</div>
     </Modal>
   );
 }
 
-function RejectModal ({ onConfirm: onConfirmWithData, onClose }: ModalProps) {
-  const [ submitting, setSubmitting ] = useState(false);
+function RejectModal({ onConfirm: onConfirmWithData, onClose }: ModalProps) {
+  const [submitting, setSubmitting] = useState(false);
   const formRef = useRef<HTMLFormElement>(null);
   const onSubmit = useCallback(() => {
     if (!formRef.current) {
@@ -54,31 +53,34 @@ function RejectModal ({ onConfirm: onConfirmWithData, onClose }: ModalProps) {
         setSubmitting(false);
       }
     });
-  }, [ setSubmitting, onConfirmWithData ]);
+  }, [setSubmitting, onConfirmWithData]);
 
   const onConfirm = useCallback(() => {
     if (!formRef.current) {
       return;
     }
     formRef.current.requestSubmit();
-  }, [ formRef ]);
+  }, [formRef]);
 
   return (
     <Modal
       processing={submitting}
-      title='Reject a form'
+      title="Reject a form"
       onConfirm={onConfirm}
       onClose={onClose}
-      confirmText='Reject'
-      color='red'
-    >
-      <form ref={formRef} onSubmit={(e) => {
-        e.preventDefault(); onSubmit();
-      }} className={style.loneForm}>
+      confirmText="Reject"
+      color="red">
+      <form
+        ref={formRef}
+        onSubmit={(e) => {
+          e.preventDefault();
+          onSubmit();
+        }}
+        className={style.loneForm}>
         <TextareaField
-          name='reason'
-          label='Reason'
-          note='Please specify a reason for the rejection. Maximum 256 chars.'
+          name="reason"
+          label="Reason"
+          note="Please specify a reason for the rejection. Maximum 256 chars."
           minLength={8}
           maxLength={256}
           required
@@ -88,15 +90,15 @@ function RejectModal ({ onConfirm: onConfirmWithData, onClose }: ModalProps) {
   );
 }
 
-function ReviewButtons ({ form, canViewDiscussions }: FormProps) {
+function ReviewButtons({ form, canViewDiscussions }: FormProps) {
   const user = useContext(UserContext)!;
-  const [ action, setAction ] = useState(0);
-  const closeModals = useCallback(() => setAction(0), [ setAction ]);
-  const approveForm = useCallback(() => setAction(1), [ setAction ]);
-  const rejectForm = useCallback(() => setAction(2), [ setAction ]);
+  const [action, setAction] = useState(0);
+  const closeModals = useCallback(() => setAction(0), [setAction]);
+  const approveForm = useCallback(() => setAction(1), [setAction]);
+  const rejectForm = useCallback(() => setAction(2), [setAction]);
 
-  const [ formUser, setUser ] = useState<any | null>(null);
-  const [ formReviewer, setFormReviewer ] = useState<any | null>(null);
+  const [formUser, setUser] = useState<any | null>(null);
+  const [formReviewer, setFormReviewer] = useState<any | null>(null);
   useEffect(() => {
     fetch(Endpoints.BACKOFFICE_USER(form.submitter!))
       .then((r) => r.json())
@@ -111,14 +113,14 @@ function ReviewButtons ({ form, canViewDiscussions }: FormProps) {
 
   const reviewForm = useCallback(async (reason: string) => {
     const resp = await fetch(Endpoints.BACKOFFICE_FORM(form._id.toString()), {
-      method: 'PATCH',
-      headers: { 'content-type': 'application/json' },
+      method: "PATCH",
+      headers: { "content-type": "application/json" },
       body: JSON.stringify({
         reviewed: true,
         approved: !reason,
         reviewer: user._id,
-        reviewReason: reason || void 0
-      })
+        reviewReason: reason || void 0,
+      }),
     });
 
     if (resp.status === 200) {
@@ -133,20 +135,28 @@ function ReviewButtons ({ form, canViewDiscussions }: FormProps) {
   return (
     <Fragment>
       <div className={sharedStyle.buttons}>
-        <Tooltip text={'Can\'t connect to Replugged'} disabled={canViewDiscussions}>
+        <Tooltip text={"Can't connect to Replugged"} disabled={canViewDiscussions}>
           <button className={sharedStyle.button} disabled={!canViewDiscussions}>
             {/* @ts-ignore */}
             <ExternalLink className={sharedStyle.icon} />
             <span>View discussion</span>
           </button>
         </Tooltip>
-        {form.reviewed
-          ? <div className={style.alignCenter}>
+        {form.reviewed ? (
+          <div className={style.alignCenter}>
             {/* @ts-ignore */}
-            {form.approved ? <Check className={sharedStyle.icon} /> : <X className={sharedStyle.icon} />}
-            <span>{form.approved ? 'Approved' : 'Rejected'} by {formReviewer?.username}#{formReviewer?.discriminator}</span>
+            {form.approved ? (
+              <Check className={sharedStyle.icon} />
+            ) : (
+              <X className={sharedStyle.icon} />
+            )}
+            <span>
+              {form.approved ? "Approved" : "Rejected"} by {formReviewer?.username}#
+              {formReviewer?.discriminator}
+            </span>
           </div>
-          : <Fragment>
+        ) : (
+          <Fragment>
             <button className={`${sharedStyle.button} ${sharedStyle.green}`} onClick={approveForm}>
               {/* @ts-ignore */}
               <Check className={sharedStyle.icon} />
@@ -157,20 +167,23 @@ function ReviewButtons ({ form, canViewDiscussions }: FormProps) {
               <X className={sharedStyle.icon} />
               <span>Reject</span>
             </button>
-          </Fragment>}
+          </Fragment>
+        )}
       </div>
 
       {action === 1 && <ApproveModal onConfirm={reviewForm} onClose={closeModals} />}
       {action === 2 && <RejectModal onConfirm={reviewForm} onClose={closeModals} />}
       {action === 3 && (
-        <Modal title='Could not DM the user' onClose={closeModals}>
+        <Modal title="Could not DM the user" onClose={closeModals}>
           <div>
-                        Failed to send a DM to the user, they either are not in the Replugged server or have their DMs closed.
-                        You need to contact them manually.
+            Failed to send a DM to the user, they either are not in the Replugged server or have
+            their DMs closed. You need to contact them manually.
           </div>
           <ul>
             <li>Discord ID: {form.submitter}</li>
-            <li>Discord Tag: {formUser.username}#{formUser.discriminator}</li>
+            <li>
+              Discord Tag: {formUser.username}#{formUser.discriminator}
+            </li>
           </ul>
         </Modal>
       )}
@@ -178,34 +191,43 @@ function ReviewButtons ({ form, canViewDiscussions }: FormProps) {
   );
 }
 
-function Form ({ form, canViewDiscussions }: FormProps) {
+function Form({ form, canViewDiscussions }: FormProps) {
   let body = null;
   switch (form.kind) {
-    case 'publish':
+    case "publish":
       body = <PublishForm form={form} />;
       break;
-    case 'verification':
+    case "verification":
       body = <VerificationForm form={form} />;
       break;
-    case 'hosting':
+    case "hosting":
       body = <HostingForm form={form} />;
       break;
   }
 
-  const [ user, setUser ] = useState<any | null>(null);
+  const [user, setUser] = useState<any | null>(null);
   useEffect(() => {
     fetch(Endpoints.BACKOFFICE_USER(form.submitter!))
       .then((r) => r.json())
       .then((u) => setUser(u));
   }, []);
 
-
   return (
     <section className={style.section}>
       <header className={style.sectionHeader}>
-        <span className={style.sectionTitle}>{form.kind[0].toUpperCase()}{form.kind.slice(1)} form</span>
+        <span className={style.sectionTitle}>
+          {form.kind[0].toUpperCase()}
+          {form.kind.slice(1)} form
+        </span>
         <span className={style.sectionSubtitle}>
-                    Submitted by {user ? <>{user.username}#{user.discriminator}</> : 'Deleted User'}
+          Submitted by{" "}
+          {user ? (
+            <>
+              {user.username}#{user.discriminator}
+            </>
+          ) : (
+            "Deleted User"
+          )}
         </span>
       </header>
       <div className={style.sectionBody}>
@@ -213,15 +235,13 @@ function Form ({ form, canViewDiscussions }: FormProps) {
         <hr className={style.sectionSeparator} />
         <ReviewButtons form={form} canViewDiscussions={canViewDiscussions} />
       </div>
-      <footer className={style.sectionFooter}>
-                Form ID: {form._id}
-      </footer>
+      <footer className={style.sectionFooter}>Form ID: {form._id}</footer>
     </section>
   );
 }
 
-export default function ManageForms () {
-  const [ forms, setForms ] = useState<StoreForm[] | null>(null);
+export default function ManageForms() {
+  const [forms, setForms] = useState<StoreForm[] | null>(null);
   useEffect(() => {
     fetch(Endpoints.BACKOFFICE_FORMS)
       .then((r) => r.json())
@@ -234,19 +254,25 @@ export default function ManageForms () {
     <main>
       <h1 className={style.title}>Submitted forms</h1>
 
-      {forms
-        ? !forms.length
-          ? <div>All clear!</div>
-          : forms.sort((a, b) => {
-            if (a === b) {
-              return 0;
-            }
-            if (a) {
-              return -1;
-            }
-            return 1;
-          }).map((f) => <Form key={f._id} form={f} canViewDiscussions={false} />)
-        : <Spinner />}
+      {forms ? (
+        !forms.length ? (
+          <div>All clear!</div>
+        ) : (
+          forms
+            .sort((a, b) => {
+              if (a === b) {
+                return 0;
+              }
+              if (a) {
+                return -1;
+              }
+              return 1;
+            })
+            .map((f) => <Form key={f._id} form={f} canViewDiscussions={false} />)
+        )
+      ) : (
+        <Spinner />
+      )}
     </main>
   );
 }

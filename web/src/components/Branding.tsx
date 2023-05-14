@@ -1,58 +1,65 @@
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
-import { h } from 'preact';
-import { useTitle } from 'hoofd/preact';
+import { h } from "preact";
+import { useTitle } from "hoofd/preact";
 
-import replugged from '../assets/replugged.svg';
-import repluggedPng from '../assets/replugged.png';
+import replugged from "../assets/replugged.svg";
+import repluggedPng from "../assets/replugged.png";
 
-import style from './branding.module.css';
+import style from "./branding.module.css";
 
 type AssetProps = {
-  name: string
-  copyrightYear: number
-  copyrightHolder: string
-  links: Array<{ name: string, url: string }>
-}
+  name: string;
+  copyrightYear: number;
+  copyrightHolder: string;
+  links: Array<{ name: string; url: string }>;
+};
 
-function Asset ({ name, copyrightYear, copyrightHolder, links }: AssetProps) {
+function Asset({ name, copyrightYear, copyrightHolder, links }: AssetProps) {
   return (
     <section className={style.assetContainer}>
       <h3 className={style.assetName}>{name}</h3>
       <img className={style.asset} src={links[links.length - 1].url} alt={name} />
       <footer className={style.assetFooter}>
         <div className={style.copyright}>
-                    Copyright &copy; {copyrightYear} {copyrightHolder}, All Rights Reserved.
+          Copyright &copy; {copyrightYear} {copyrightHolder}, All Rights Reserved.
         </div>
         <div className={style.links}>
           {/* @ts-ignore */}
-          {links.map((l) => <a key={l.url} download={l.name} href={l.url} native>.{l.name.split('.').pop()}</a>)}
+          {links.map((l) => (
+            <a key={l.url} download={l.name} href={l.url} native>
+              .{l.name.split(".").pop()}
+            </a>
+          ))}
         </div>
       </footer>
     </section>
   );
 }
 
-export default function Branding () {
-  useTitle('Branding');
+export default function Branding() {
+  useTitle("Branding");
 
   return (
     <main>
       <h1>Branding</h1>
-      <p>Please keep all assets in their original shape, proportion, orientation and colors. You are not allowed to
-                re-use any asset and/or the Replugged name as a logo and/or name for your own project, or use it to imply our
-                endorsement.</p>
-      <p>Replugged is spelled with a capital R and all lowercase letters. It may also be spelled all uppercase.</p>
+      <p>
+        Please keep all assets in their original shape, proportion, orientation and colors. You are
+        not allowed to re-use any asset and/or the Replugged name as a logo and/or name for your own
+        project, or use it to imply our endorsement.
+      </p>
+      <p>
+        Replugged is spelled with a capital R and all lowercase letters. It may also be spelled all
+        uppercase.
+      </p>
 
       <div className={style.assets}>
         <Asset
-          name='Replugged Plug'
+          name="Replugged Plug"
           copyrightYear={2022}
-          copyrightHolder='Daniel Klingel'
+          copyrightHolder="Daniel Klingel"
           links={[
-            { name: 'plug.svg',
-              url: replugged },
-            { name: 'plug.png',
-              url: repluggedPng }
+            { name: "plug.svg", url: replugged },
+            { name: "plug.png", url: repluggedPng },
           ]}
         />
         {/* <Asset

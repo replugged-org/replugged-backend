@@ -1,83 +1,96 @@
-import type { FastifyInstance, FastifyRequest, FastifyReply, ConfiguredReply } from 'fastify';
-import type { OAuthProvider, OAuthToken } from '../utils/oauth.js';
-import type { DatabaseUser, User } from '../../../types/users';
-import { Long, type UpdateFilter } from 'mongodb';
-import { randomBytes } from 'crypto';
-import config from '../config.js';
-import { UserFlags } from '../flags.js';
-import { getAuthorizationUrl, getAuthTokens, fetchAccount, toMongoFields } from '../utils/oauth.js';
-import { deleteUser } from '../data/user.js';
-import { addRole, fetchMember, removeRole } from '../utils/discord.js';
-import { TokenType } from '../utils/auth.js';
-import { prepareUpdateData, notifyStateChange } from '../utils/patreon.js';
+import type { FastifyInstance, FastifyRequest, FastifyReply, ConfiguredReply } from "fastify";
+import type { OAuthProvider, OAuthToken } from "../utils/oauth.js";
+import type { DatabaseUser, User } from "../../../types/users";
+import { Long, type UpdateFilter } from "mongodb";
+import { randomBytes } from "crypto";
+import config from "../config.js";
+import { UserFlags } from "../flags.js";
+import { getAuthorizationUrl, getAuthTokens, fetchAccount, toMongoFields } from "../utils/oauth.js";
+import { deleteUser } from "../data/user.js";
+import { addRole, fetchMember, removeRole } from "../utils/discord.js";
+import { TokenType } from "../utils/auth.js";
+import { prepareUpdateData, notifyStateChange } from "../utils/patreon.js";
 
 type OAuthConfig = {
-  platform: OAuthProvider
-  scopes: string[]
-  isRestricted?: boolean
-}
+  platform: OAuthProvider;
+  scopes: string[];
+  isRestricted?: boolean;
+};
 
-type OAuthOptions = { data: OAuthConfig }
+type OAuthOptions = { data: OAuthConfig };
 
 type AuthorizationRequestProps = {
   Querystring: {
-    redirect?: string,
+    redirect?: string;
     // api:v2
-    code?: string
-    error?: string
-  }
-}
+    code?: string;
+    error?: string;
+  };
+};
 
 type CallbackRequestProps = {
   Querystring: {
-    code?: string
-    error?: string
-    state?: string
-  }
-}
+    code?: string;
+    error?: string;
+    state?: string;
+  };
+};
 
-type Reply = ConfiguredReply<FastifyReply, OAuthConfig>
+type Reply = ConfiguredReply<FastifyReply, OAuthConfig>;
 
-async function authorize (this: FastifyInstance, request: FastifyRequest<AuthorizationRequestProps>, reply: Reply) {
-  if (reply.context.config.platform === 'discord' && request.user) {
-    reply.redirect('/me');
+async function authorize(
+  this: FastifyInstance,
+  request: FastifyRequest<AuthorizationRequestProps>,
+  reply: Reply,
+) {
+  if (reply.context.config.platform === "discord" && request.user) {
+    reply.redirect("/me");
     return;
   }
 
   if (reply.context.config.isRestricted && ((request.user?.flags ?? 0) & UserFlags.STAFF) === 0) {
-    reply.redirect('/');
+    reply.redirect("/");
     return;
   }
 
-  const apiVersion = this.prefix.split('/')[1];
+  const apiVersion = this.prefix.split("/")[1];
   const cookieSettings = <const>{
     signed: true,
     httpOnly: true,
-    sameSite: 'lax',
+    sameSite: "lax",
     path: `/api/${apiVersion}`,
-    secure: process.env.NODE_ENV === 'production',
-    maxAge: 300
+    secure: process.env.NODE_ENV === "production",
+    maxAge: 300,
   };
 
-  if (reply.context.config.platform !== 'discord' && !request.user) {
-    reply.setCookie('redirect', `/api${request.url}`, cookieSettings);
+  if (reply.context.config.platform !== "discord" && !request.user) {
+    reply.setCookie("redirect", `/api${request.url}`, cookieSettings);
     reply.redirect(`/api/${apiVersion}/login`);
     return;
   }
 
-
-  const state = randomBytes(16).toString('hex');
-  reply.setCookie('state', state, cookieSettings);
-
+  const state = randomBytes(16).toString("hex");
+  reply.setCookie("state", state, cookieSettings);
 
   const redirect = `${request.routerPath}/callback`;
-  reply.redirect(getAuthorizationUrl(reply.context.config.platform, redirect, reply.context.config.scopes, state));
+  reply.redirect(
+    getAuthorizationUrl(
+      reply.context.config.platform,
+      redirect,
+      reply.context.config.scopes,
+      state,
+    ),
+  );
 }
 
-async function callback (this: FastifyInstance, request: FastifyRequest<CallbackRequestProps>, reply: Reply) {
-  const collection = this.mongo.db!.collection<DatabaseUser>('users');
-  const returnPath = reply.context.config.platform === 'discord' ? '/' : '/me';
-  const authStatus = Boolean(reply.context.config.platform === 'discord') !== Boolean(request.user);
+async function callback(
+  this: FastifyInstance,
+  request: FastifyRequest<CallbackRequestProps>,
+  reply: Reply,
+) {
+  const collection = this.mongo.db!.collection<DatabaseUser>("users");
+  const returnPath = reply.context.config.platform === "discord" ? "/" : "/me";
+  const authStatus = Boolean(reply.context.config.platform === "discord") !== Boolean(request.user);
 
   if (!authStatus || !request.query.state) {
     reply.redirect(returnPath);
@@ -85,17 +98,23 @@ async function callback (this: FastifyInstance, request: FastifyRequest<Callback
   }
 
   // const stateCookie = request.cookies.state ? reply.unsignCookie(request.cookies.state) : null
-  const redirectCookie = request.cookies.redirect ? reply.unsignCookie(request.cookies.redirect) : null;
+  const redirectCookie = request.cookies.redirect
+    ? reply.unsignCookie(request.cookies.redirect)
+    : null;
 
-  const apiVersion = this.prefix.split('/')[1];
-  reply.setCookie('state', '', { sameSite: 'lax',
+  const apiVersion = this.prefix.split("/")[1];
+  reply.setCookie("state", "", {
+    sameSite: "lax",
     path: `/api/${apiVersion}`,
-    secure: process.env.NODE_ENV === 'production',
-    maxAge: 0 });
-  reply.setCookie('redirect', '', { sameSite: 'lax',
+    secure: process.env.NODE_ENV === "production",
+    maxAge: 0,
+  });
+  reply.setCookie("redirect", "", {
+    sameSite: "lax",
     path: `/api/${apiVersion}`,
-    secure: process.env.NODE_ENV === 'production',
-    maxAge: 0 });
+    secure: process.env.NODE_ENV === "production",
+    maxAge: 0,
+  });
 
   // if (!stateCookie?.valid || request.query.state !== stateCookie.value) {
   //   reply.redirect(returnPath)
@@ -110,17 +129,23 @@ async function callback (this: FastifyInstance, request: FastifyRequest<Callback
   let oauthToken: OAuthToken;
   let account: any;
   try {
-    oauthToken = await getAuthTokens(reply.context.config.platform, request.routerPath, request.query.code);
+    oauthToken = await getAuthTokens(
+      reply.context.config.platform,
+      request.routerPath,
+      request.query.code,
+    );
     account = await fetchAccount<any>(reply.context.config.platform, oauthToken);
   } catch (e) {
-    console.error('oauth.ts l109', e);
+    console.error("oauth.ts l109", e);
     reply.redirect(`${redirectCookie?.value ?? returnPath}?error=auth_failure`);
     return;
   }
 
-  if (reply.context.config.platform === 'discord') {
-    const isBanned = await collection.countDocuments({ _id: account.id,
-      flags: { $bitsAllSet: UserFlags.BANNED } });
+  if (reply.context.config.platform === "discord") {
+    const isBanned = await collection.countDocuments({
+      _id: account.id,
+      flags: { $bitsAllSet: UserFlags.BANNED },
+    });
     if (isBanned) {
       reply.redirect(`${redirectCookie?.value ?? returnPath}?error=auth_banned`);
       return;
@@ -137,13 +162,10 @@ async function callback (this: FastifyInstance, request: FastifyRequest<Callback
           username: account.username,
           discriminator: account.discriminator,
           avatar: account.avatar,
-          ...toMongoFields(oauthToken, 'discord')
-        }
+          ...toMongoFields(oauthToken, "discord"),
+        },
       },
-      { upsert: true,
-        returnDocument: 'after',
-        projection: { flags: 1,
-          createdAt: 1 } }
+      { upsert: true, returnDocument: "after", projection: { flags: 1, createdAt: 1 } },
     );
 
     // Cast is safe
@@ -152,32 +174,42 @@ async function callback (this: FastifyInstance, request: FastifyRequest<Callback
     const member = await fetchMember(user._id);
     if (member) {
       if (!member?.roles.includes(config.discord.roles.user)) {
-        addRole(user._id, config.discord.roles.user, 'User created their replugged.dev account').catch(() => 0);
+        addRole(
+          user._id,
+          config.discord.roles.user,
+          "User created their replugged.dev account",
+        ).catch(() => 0);
       }
     }
 
     if (user.createdAt === date) {
       // New account
-      addRole(user._id, config.discord.roles.user, 'User created their replugged.dev account').catch(() => 0);
+      addRole(
+        user._id,
+        config.discord.roles.user,
+        "User created their replugged.dev account",
+      ).catch(() => 0);
     }
 
     const token = reply.generateToken({ id: user._id }, TokenType.WEB);
-    reply.setCookie('token', token, {
+    reply.setCookie("token", token, {
       // Signing the cookie is unnecessary as the JWT itself is signed
       httpOnly: true,
-      sameSite: 'lax',
-      path: '/',
-      secure: process.env.NODE_ENV === 'production',
-      maxAge: 24 * 3600
+      sameSite: "lax",
+      path: "/",
+      secure: process.env.NODE_ENV === "production",
+      maxAge: 24 * 3600,
     });
 
-    reply.redirect(redirectCookie?.value ?? '/me');
+    reply.redirect(redirectCookie?.value ?? "/me");
     return;
   }
 
   const accountId = account.data?.id || account.id;
   const accountName = account.data?.attributes.email || account.login || account.display_name;
-  const accountOwner = await collection.findOne({ [`accounts.${reply.context.config.platform}.id`]: accountId });
+  const accountOwner = await collection.findOne({
+    [`accounts.${reply.context.config.platform}.id`]: accountId,
+  });
   if (accountOwner && accountOwner._id !== request.user!._id) {
     reply.redirect(`${redirectCookie?.value ?? returnPath}?error=already_linked`);
     return;
@@ -188,22 +220,28 @@ async function callback (this: FastifyInstance, request: FastifyRequest<Callback
     $set: {
       [`accounts.${reply.context.config.platform}.id`]: accountId,
       [`accounts.${reply.context.config.platform}.name`]: accountName,
-      ...toMongoFields(oauthToken, reply.context.config.platform)
-    }
+      ...toMongoFields(oauthToken, reply.context.config.platform),
+    },
   };
 
-  if (reply.context.config.platform === 'patreon' && !('patreon' in request.user!.accounts) && (request.user!.flags & UserFlags.CUTIE_OVERRIDE) === 0) {
+  if (
+    reply.context.config.platform === "patreon" &&
+    !("patreon" in request.user!.accounts) &&
+    (request.user!.flags & UserFlags.CUTIE_OVERRIDE) === 0
+  ) {
     const data = await prepareUpdateData(oauthToken);
     update = {
       ...data,
       $set: {
-        ...data.$set ?? {},
-        ...update.$set
-      }
+        ...(data.$set ?? {}),
+        ...update.$set,
+      },
     };
   }
 
-  const res = await collection.findOneAndUpdate({ _id: request.user!._id }, update, { returnDocument: 'after' });
+  const res = await collection.findOneAndUpdate({ _id: request.user!._id }, update, {
+    returnDocument: "after",
+  });
 
   // Patreon update report
   const updatedUser = res.value as User;
@@ -212,16 +250,16 @@ async function callback (this: FastifyInstance, request: FastifyRequest<Callback
   const prevTier = request.user!.cutieStatus?.pledgeTier ?? 0;
   const updatedTier = updatedUser.cutieStatus?.pledgeTier ?? 0;
   if (prevFlag !== updatedFlag || prevTier !== updatedTier) {
-    notifyStateChange(updatedUser, 'pledge');
+    notifyStateChange(updatedUser, "pledge");
   }
 
-  reply.redirect(redirectCookie?.value ?? '/me');
+  reply.redirect(redirectCookie?.value ?? "/me");
 }
 
-async function unlink (this: FastifyInstance, request: FastifyRequest, reply: Reply) {
-  if (reply.context.config.platform === 'discord') {
+async function unlink(this: FastifyInstance, request: FastifyRequest, reply: Reply) {
+  if (reply.context.config.platform === "discord") {
     if (request.user!.flags & UserFlags.STORE_PUBLISHER) {
-      reply.redirect('/me?error=delete_blocked');
+      reply.redirect("/me?error=delete_blocked");
       return;
     }
 
@@ -235,103 +273,104 @@ async function unlink (this: FastifyInstance, request: FastifyRequest, reply: Re
       }
     }
 
-    reply.setCookie('token', '', { maxAge: 0,
-      path: '/' });
-    reply.redirect('/');
+    reply.setCookie("token", "", { maxAge: 0, path: "/" });
+    reply.redirect("/");
     return;
   }
 
   if (reply.context.config.isRestricted && ((request.user?.flags ?? 0) & UserFlags.STAFF) === 0) {
-    reply.redirect('/');
+    reply.redirect("/");
     return;
   }
 
-  await this.mongo.db!.collection<DatabaseUser>('users').updateOne(
+  await this.mongo.db!.collection<DatabaseUser>("users").updateOne(
     { _id: request.user!._id },
-    { $currentDate: { updatedAt: true },
-      $unset: { [`accounts.${reply.context.config.platform}`]: 1 } }
+    {
+      $currentDate: { updatedAt: true },
+      $unset: { [`accounts.${reply.context.config.platform}`]: 1 },
+    },
   );
 
-  reply.redirect('/me');
+  reply.redirect("/me");
 }
 
-async function oauthPlugin (fastify: FastifyInstance, options: OAuthOptions) {
+async function oauthPlugin(fastify: FastifyInstance, options: OAuthOptions) {
   fastify.route({
-    method: 'GET',
-    url: '/',
+    method: "GET",
+    url: "/",
     handler: authorize,
     config: {
       ...options.data,
-      auth: { optional: true }
-    }
+      auth: { optional: true },
+    },
   });
 
   fastify.route({
-    method: 'GET',
-    url: '/callback',
+    method: "GET",
+    url: "/callback",
     handler: callback,
     config: {
       ...options.data,
-      auth: { optional: true }
-    }
+      auth: { optional: true },
+    },
   });
 
   fastify.route({
-    method: 'GET',
-    url: '/unlink',
+    method: "GET",
+    url: "/unlink",
     handler: unlink,
     config: {
       ...options.data,
-      auth: {}
-    }
+      auth: {},
+    },
   });
 }
 
 export default async function (fastify: FastifyInstance): Promise<void> {
   fastify.register(oauthPlugin, {
-    prefix: '/discord',
+    prefix: "/discord",
     data: {
-      platform: 'discord',
-      scopes: [ 'identify' ]
-    }
+      platform: "discord",
+      scopes: ["identify"],
+    },
   });
 
   fastify.register(oauthPlugin, {
-    prefix: '/spotify',
+    prefix: "/spotify",
     data: {
-      platform: 'spotify',
+      platform: "spotify",
       scopes: [
         // Know what you're playing
-        'user-read-currently-playing',
-        'user-read-playback-state',
+        "user-read-currently-playing",
+        "user-read-playback-state",
         // Change tracks on your behalf
-        'user-modify-playback-state',
+        "user-modify-playback-state",
         // Read your public & private songs
-        'playlist-read-private',
-        'user-library-read',
-        'user-top-read',
+        "playlist-read-private",
+        "user-library-read",
+        "user-top-read",
         // Add things to your library
-        'user-library-modify',
-        'playlist-modify-public',
-        'playlist-modify-private'
-      ]
-    }
+        "user-library-modify",
+        "playlist-modify-public",
+        "playlist-modify-private",
+      ],
+    },
   });
 
   fastify.register(oauthPlugin, {
-    prefix: '/github',
+    prefix: "/github",
     data: {
       isRestricted: true,
-      platform: 'github',
-      scopes: []
-    }
+      platform: "github",
+      scopes: [],
+    },
   });
 
   fastify.register(oauthPlugin, {
-    prefix: '/patreon',
+    prefix: "/patreon",
     data: {
-      platform: 'patreon',
-      scopes: [ 'identity', 'identity[email]' ]
-    }
+      platform: "patreon",
+      scopes: ["identity", "identity[email]"],
+    },
   });
 }

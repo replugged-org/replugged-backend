@@ -1,12 +1,12 @@
 {
-    "name": "@replugged/types",
-    "version": "2.0.0",
-    "description": "Shared replugged types",
-    "private": true,
-    "devDependencies": {
-        "typescript": "^4.5.4"
-    },
-    "dependencies": {
-        "mongodb": "^4.8.1"
-    }
+  "name": "@replugged/types",
+  "version": "2.0.0",
+  "description": "Shared replugged types",
+  "private": true,
+  "devDependencies": {
+    "typescript": "^4.5.4"
+  },
+  "dependencies": {
+    "mongodb": "^4.8.1"
+  }
 }
