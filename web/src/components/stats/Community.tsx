@@ -1,6 +1,6 @@
 import type { CommunityStats } from "./useStats";
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
-import { h, Fragment } from "preact";
+import { Fragment, VNode, h } from "preact";
 import { useTitle } from "hoofd/preact";
 
 import Chart from "./Chart";
@@ -8,7 +8,7 @@ import useStats from "./useStats";
 
 import style from "./stats.module.css";
 
-function Replugged({ charts }: { charts?: CommunityStats }) {
+function Replugged({ charts }: { charts?: CommunityStats }): VNode {
   return (
     <>
       <Chart
@@ -57,7 +57,7 @@ function Replugged({ charts }: { charts?: CommunityStats }) {
   );
 }
 
-function Community({ charts }: { charts?: CommunityStats }) {
+function Community({ charts }: { charts?: CommunityStats }): VNode | null {
   if (!charts?.guild) {
     return null;
   }
@@ -68,7 +68,7 @@ function Community({ charts }: { charts?: CommunityStats }) {
       <Chart
         title="Online people"
         legend={{ online: "Online", idle: "Idle", dnd: "Do Not Disturb" }}
-        dataset={charts && charts.guild.presences}
+        dataset={charts?.guild.presences}
         modes={[
           { name: "Last Month", key: "month" },
           { name: "Last Week", key: "week" },
@@ -78,7 +78,7 @@ function Community({ charts }: { charts?: CommunityStats }) {
 
       <Chart
         title="Server members"
-        dataset={charts && charts.guild.users}
+        dataset={charts?.guild.users}
         modes={[
           { name: "Last Month", key: "month" },
           { name: "Last Week", key: "week" },
@@ -89,7 +89,7 @@ function Community({ charts }: { charts?: CommunityStats }) {
       <Chart
         title="Messages seen"
         legend={{ sentMessages: "Messages Sent", deletedMessages: "Messages Deleted" }}
-        dataset={charts && charts.guild.messages}
+        dataset={charts?.guild.messages}
         modes={[
           { name: "Last Month", key: "month" },
           { name: "Last Week", key: "week" },
@@ -100,7 +100,7 @@ function Community({ charts }: { charts?: CommunityStats }) {
   );
 }
 
-export default function Stats() {
+export default function Stats(): VNode {
   useTitle("Statistics");
   const charts = useStats();
 

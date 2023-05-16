@@ -1,5 +1,5 @@
-import { h, render, hydrate } from "preact";
-import { useState, useEffect } from "preact/hooks";
+import { VNode, h, hydrate, render } from "preact";
+import { useEffect, useState } from "preact/hooks";
 import { type User } from "./components/UserContext";
 import { Endpoints } from "./constants";
 import App from "./components/App";
@@ -11,7 +11,7 @@ declare global {
   }
 }
 
-function Wrapper() {
+function Wrapper(): VNode {
   const [user, setUser] = useState<User | null | undefined>(void 0);
   useEffect(() => {
     if (window.HAS_TOKEN !== false) {
@@ -20,7 +20,7 @@ function Wrapper() {
         .then((u) => {
           if (u._id) {
             const patch = (newUser: Partial<User>): void =>
-              setUser((oldUser) => <User>{ ...oldUser, ...newUser, patch });
+              setUser((oldUser) => ({ ...oldUser, ...newUser, patch } as User));
             setUser({ ...u, patch });
             return;
           }

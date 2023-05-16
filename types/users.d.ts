@@ -1,30 +1,30 @@
-export type ExternalAccount = {
+export interface ExternalAccount {
   tokenType: string;
   accessToken: string;
   refreshToken: string;
   // todo: ditch unix
   expiresAt: number;
   name: string;
-};
+}
 
-export type CutieStatus = {
+export interface CutieStatus {
   pledgeTier: number;
   // todo: ditch unix
   perksExpireAt: number;
   // todo: ditch unix
   lastManualRefresh?: number;
-};
+}
 
-export type CutiePerks = {
+export interface CutiePerks {
   color: string | null;
   badge: string | null;
   title: string | null;
   guild?: {
     id: string | null;
   };
-};
+}
 
-export type User = {
+export interface User {
   _id: string;
   username: string;
   discriminator: string;
@@ -39,24 +39,24 @@ export type User = {
   cutiePerks?: CutiePerks;
   createdAt: Date;
   updatedAt?: Date;
-};
+}
 
-export type GhostUser = {
+export interface GhostUser {
   _id: string;
   flags: number;
-};
+}
 
-export type MinimalUser = {
+export interface MinimalUser {
   _id: string;
   username: string;
   discriminator: string;
   avatar: string | null;
-};
+}
 
 export type DatabaseUser = User | GhostUser;
 
 // / REST-specific types
-export type RestUser = {
+export interface RestUser {
   _id: User["_id"];
   flags: User["flags"];
   cutiePerks: Exclude<User["cutiePerks"], undefined>;
@@ -70,7 +70,7 @@ export type RestUser = {
     early: boolean;
     translator: boolean;
   };
-};
+}
 
 export type RestUserPrivate = RestUser & {
   username: User["username"];
@@ -84,7 +84,7 @@ export type RestUserPrivate = RestUser & {
   createdAt: User["createdAt"];
 };
 
-export type UserBanStatus = {
+export interface UserBanStatus {
   account: boolean;
   publish: boolean;
   verification: boolean;
@@ -92,6 +92,6 @@ export type UserBanStatus = {
   reporting: boolean;
   sync: boolean;
   events: boolean;
-};
+}
 
 export type RestAdminUser = RestUser & MinimalUser & { banStatus?: UserBanStatus };

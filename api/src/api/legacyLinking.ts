@@ -1,4 +1,4 @@
-import type { FastifyInstance, FastifyRequest, FastifyReply } from "fastify";
+import type { FastifyInstance, FastifyReply, FastifyRequest } from "fastify";
 import { TokenType } from "../utils/auth.js";
 
 const html = (jwt: string): string => `<!doctype html>
@@ -26,6 +26,6 @@ function legacy(request: FastifyRequest, reply: FastifyReply): void {
 }
 
 /** @deprecated */
-export default async function (fastify: FastifyInstance): Promise<void> {
+export default function (fastify: FastifyInstance): void {
   fastify.get("/users/@me/link/legacy", { config: { auth: { optional: true } } }, legacy);
 }

@@ -1,5 +1,5 @@
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
-import { h } from "preact";
+import { VNode, h } from "preact";
 import { useTitle } from "hoofd/preact";
 
 import replugged from "../assets/replugged.svg";
@@ -7,14 +7,14 @@ import repluggedPng from "../assets/replugged.png";
 
 import style from "./branding.module.css";
 
-type AssetProps = {
+interface AssetProps {
   name: string;
   copyrightYear: number;
   copyrightHolder: string;
   links: Array<{ name: string; url: string }>;
-};
+}
 
-function Asset({ name, copyrightYear, copyrightHolder, links }: AssetProps) {
+function Asset({ name, copyrightYear, copyrightHolder, links }: AssetProps): VNode {
   return (
     <section className={style.assetContainer}>
       <h3 className={style.assetName}>{name}</h3>
@@ -24,8 +24,8 @@ function Asset({ name, copyrightYear, copyrightHolder, links }: AssetProps) {
           Copyright &copy; {copyrightYear} {copyrightHolder}, All Rights Reserved.
         </div>
         <div className={style.links}>
-          {/* @ts-ignore */}
           {links.map((l) => (
+            // @ts-expect-error native
             <a key={l.url} download={l.name} href={l.url} native>
               .{l.name.split(".").pop()}
             </a>
@@ -36,7 +36,7 @@ function Asset({ name, copyrightYear, copyrightHolder, links }: AssetProps) {
   );
 }
 
-export default function Branding() {
+export default function Branding(): VNode {
   useTitle("Branding");
 
   return (

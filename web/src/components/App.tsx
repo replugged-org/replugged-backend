@@ -1,9 +1,9 @@
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
-import { h } from "preact";
-import { lazy, Suspense } from "preact/compat";
+import { VNode, h } from "preact";
+import { Suspense, lazy } from "preact/compat";
 import { useTitleTemplate } from "hoofd/preact";
 import { useCallback, useEffect, useMemo } from "preact/hooks";
-import Router, { route, Route } from "preact-router";
+import Router, { Route, route } from "preact-router";
 
 import UserContext, { type User } from "./UserContext";
 import Spinner from "./util/Spinner";
@@ -29,13 +29,13 @@ import NotFound from "./NotFound";
 import { Routes } from "../constants";
 import AuthBoundary from "./util/AuthBoundary";
 
-type AppProps = {
+interface AppProps {
   user?: null | User;
   url?: string;
-  ctx?: Record<string, any>;
-};
+  ctx?: Record<string, unknown>;
+}
 
-function Redirect({ to }: { path: string; to: string }) {
+function Redirect({ to }: { path: string; to: string }): null {
   useEffect(() => {
     route(to, true);
   }, [to]);
@@ -43,7 +43,7 @@ function Redirect({ to }: { path: string; to: string }) {
   return null;
 }
 
-export default function App(props: AppProps) {
+export default function App(props: AppProps): VNode {
   const change = useCallback(
     () => typeof document !== "undefined" && document.getElementById("app")?.scrollTo(0, 0),
     [],

@@ -1,5 +1,6 @@
 import {
   type Attributes,
+  VNode,
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   h,
 } from "preact";
@@ -10,11 +11,11 @@ import { Routes } from "../constants";
 import style from "./notfound.module.css";
 
 type NotFoundProps = Attributes & {
-  ctx?: Record<string, any>;
+  ctx?: Record<string, unknown>;
   className?: string;
 };
 
-export default function NotFound({ ctx, className }: NotFoundProps) {
+export default function NotFound({ ctx, className }: NotFoundProps): VNode {
   if (import.meta.env.SSR && ctx) {
     ctx.notFound = true;
   }

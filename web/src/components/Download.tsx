@@ -1,5 +1,5 @@
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
-import { h, JSX } from "preact";
+import { JSX, VNode, h } from "preact";
 import { useTitle } from "hoofd/preact";
 
 import style from "./download.module.css";
@@ -19,13 +19,13 @@ interface OperatingSystemData {
   detect: () => boolean;
   name: string;
   warning?: string | JSX.Element;
-  files: {
+  files: Array<{
     label: string;
     file: string;
-  }[];
+  }>;
 }
 
-function Code({ children }: { children: string }) {
+function Code({ children }: { children: string }): VNode {
   const [copied, setCopied] = useState(false);
 
   useEffect(() => {
@@ -45,10 +45,11 @@ function Code({ children }: { children: string }) {
           navigator.clipboard.writeText(children);
           setCopied(true);
         }}>
-        {/* @ts-ignore */}
         {copied ? (
+          // @ts-expect-error class
           <Check className={`${sharedStyle.icon} ${style.copyCheck}`} />
         ) : (
+          // @ts-expect-error class
           <Clipboard className={sharedStyle.icon} />
         )}
       </button>
@@ -56,13 +57,9 @@ function Code({ children }: { children: string }) {
   );
 }
 
-export default function Homepage() {
-  // @ts-expect-error DOM types are out of date
-  const platform: string = (
-    window.navigator.userAgentData?.platform ||
-    window.navigator.platform ||
-    ""
-  ).toLowerCase();
+export default function Homepage(): VNode {
+  const platform: string = // @ts-expect-error DOM types are out of date
+  (window.navigator.userAgentData?.platform || window.navigator.platform || "").toLowerCase();
 
   const operatingSystems: OperatingSystemData[] = [
     {

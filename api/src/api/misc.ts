@@ -1,4 +1,4 @@
-import type { FastifyInstance, FastifyRequest, FastifyReply } from "fastify";
+import type { FastifyInstance, FastifyReply, FastifyRequest } from "fastify";
 
 const plugXml = `
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 447 447">
@@ -16,7 +16,7 @@ const plugXml = `
 </svg>
 `;
 
-function makeHibiscus(color: string) {
+function makeHibiscus(color: string): string {
   return `<!--
   Original work is part of the Twemoji project (https://twemoji.twitter.com/), Copyright (c) Twitter Inc.
   Licensed under the Creative Commons Attribution 4.0 International license.
@@ -45,7 +45,7 @@ function hibiscus(
 }
 
 /** @deprecated */
-export default async function (fastify: FastifyInstance): Promise<void> {
+export default function (fastify: FastifyInstance): void {
   fastify.get("/plug/:color([a-fA-F0-9]{6})", plug);
 
   // "Polyfill" for new donator perks for tier 1 & legacy donators

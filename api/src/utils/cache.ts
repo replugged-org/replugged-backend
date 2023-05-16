@@ -12,7 +12,7 @@ if (!existsSync(CACHE_PATH)) {
   mkdirSync(CACHE_PATH);
 }
 
-function generateKey(hourly?: boolean) {
+function generateKey(hourly?: boolean): string {
   const today = new Date();
   return `${hourly ? "h-" : "d-"}${
     hourly ? today.getUTCHours() : ""
@@ -30,7 +30,7 @@ export async function remoteFile(url: URL): Promise<CacheResult> {
     };
   }
 
-  const res = await fetch(url as any); // todo: report to node-fetch? mismatch between jsdoc and types
+  const res = await fetch(url);
   if (res.status !== 200) {
     return { success: false };
   }

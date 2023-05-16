@@ -1,5 +1,5 @@
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
-import { h, JSX } from "preact";
+import { JSX, VNode, h } from "preact";
 import { useTitle } from "hoofd/preact";
 
 import { Routes } from "../constants";
@@ -12,11 +12,11 @@ import Zap from "feather-icons/dist/icons/zap.svg";
 
 import { useEffect, useState } from "preact/hooks";
 
-type Props = {
+interface Props {
   matches: InstallData;
-};
+}
 
-export default function InstallPage({ matches: data }: Props) {
+export default function InstallPage({ matches: data }: Props): VNode {
   useTitle("Addon Installer");
 
   const [title, setTitle] = useState("Loading...");
@@ -24,7 +24,7 @@ export default function InstallPage({ matches: data }: Props) {
   const [connectedTime, setConnectedTime] = useState<number | null>(null);
   const [isFinished, setIsFinished] = useState(false);
 
-  const setConnectedText = () => {
+  const setConnectedText = (): void => {
     setTitle("Connected to Replugged");
     setDescription("Please confirm the addon installation in Discord.");
     setConnectedTime(null);
@@ -45,7 +45,7 @@ export default function InstallPage({ matches: data }: Props) {
     };
   }, [connectedTime, isFinished, title, description]);
 
-  const makeRequest = () => {
+  const makeRequest = (): void => {
     if (data.url) {
       setTitle("Addon not supported");
       setDescription(
@@ -100,7 +100,7 @@ export default function InstallPage({ matches: data }: Props) {
                 <br />
                 <div className={styles.buttons}>
                   <a href={Routes.DOWNLOAD} className={sharedStyle.button}>
-                    {/* @ts-ignore */}
+                    {/* @ts-expect-error class */}
                     <Zap className={sharedStyle.icon} />
                     <span>Download Replugged</span>
                   </a>

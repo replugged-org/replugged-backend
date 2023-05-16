@@ -1,4 +1,5 @@
 import {
+  VNode,
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   h,
 } from "preact";
@@ -15,13 +16,13 @@ import style from "./contributors.module.css";
 
 type ContributorUser = MinimalUser & { github?: string };
 
-type AllContributors = {
+interface AllContributors {
   developers: ContributorUser[];
   staff: ContributorUser[];
   contributors: ContributorUser[];
-};
+}
 
-function Contributor({ user }: { user: ContributorUser }) {
+function Contributor({ user }: { user: ContributorUser }): VNode {
   return (
     <div className={style.container}>
       <Avatar user={user} />
@@ -35,7 +36,7 @@ function Contributor({ user }: { user: ContributorUser }) {
   );
 }
 
-export default function Contributors() {
+export default function Contributors(): VNode {
   useTitle("Contributors");
 
   const [contributors, setContributors] = useState<AllContributors | null>(null);

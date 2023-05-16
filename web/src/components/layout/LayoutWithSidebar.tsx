@@ -1,4 +1,4 @@
-import type { ComponentChild, Attributes } from "preact";
+import type { Attributes, VNode } from "preact";
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 import { h } from "preact";
 import { useEffect, useState } from "preact/hooks";
@@ -9,13 +9,29 @@ import style from "./layout.module.css";
 type LayoutWithSidebarProps = Attributes & {
   sidebarClassName?: string;
   contentsClassName?: string;
-  children: [ComponentChild, ComponentChild];
+  children: [PreactNode, PreactNode];
 };
 
-export type Document = { id: string; title: string; parts: string[] };
-export type Category = { id: string; name: string; docs: Document[] };
+type PreactNode = VNode & {
+  // eslint-disable-next-line @typescript-eslint/naming-convention
+  __k?: PreactNode[];
+  props: {
+    children: string | null;
+  };
+};
 
-function digTitle(preactNode: any): string | null {
+export interface Document {
+  id: string;
+  title: string;
+  parts: string[];
+}
+export interface Category {
+  id: string;
+  name: string;
+  docs: Document[];
+}
+
+function digTitle(preactNode: PreactNode): string | null {
   if (preactNode.type === "h1") {
     return preactNode.props.children;
   }
@@ -39,20 +55,20 @@ export default function LayoutWithSidebar({
   sidebarClassName,
   contentsClassName,
   children: [sidebar, content],
-}: LayoutWithSidebarProps) {
+}: LayoutWithSidebarProps): VNode {
   const [opened, setOpened] = useState(false);
   const [title, setTitle] = useState("");
 
   useEffect(() => {
     let to: number | undefined = void 0;
     let i = 0;
-    function fn() {
+    function fn(): void {
       if (i > 10) {
         return setTitle("");
       }
       i++;
 
-      if (!(content as any)?.__k) {
+      if (!(content as PreactNode)?.__k) {
         return void (to = window.setTimeout(fn, 10));
       }
       const res = digTitle(content);

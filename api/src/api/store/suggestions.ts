@@ -2,23 +2,23 @@ import { fetch } from "undici";
 import config from "../../config.js";
 import { getOrCompute } from "../../utils/cache.js";
 
-type GithubIssue = {
+interface GithubIssue {
   number: number;
   title: string;
   author: { login: string; avatarUrl: string } | null;
   body: string;
   reactions: { totalCount: number };
   labels: { nodes: Array<{ name: string }> };
-};
+}
 
-type Suggestion = {
+interface Suggestion {
   id: GithubIssue["number"];
   title: GithubIssue["title"];
   author: GithubIssue["author"];
   description: string;
   upvotes: number;
   wip: boolean;
-};
+}
 
 function gqlQuery(after: string): string {
   return `query {
@@ -37,20 +37,21 @@ async function fetchAll(): Promise<GithubIssue[]> {
   let payload;
   const items = [];
   do {
-    const query = gqlQuery(payload && payload.data.repository.issues.pageInfo.endCursor);
+    const query = gqlQuery(payload?.data.repository.issues.pageInfo.endCursor);
     const res = await fetch("https://api.github.com/graphql", {
       method: "POST",
       headers: { authorization: `Bearer ${config.github.token}` },
       body: JSON.stringify({ query }),
     });
 
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     payload = (await res.json()) as any;
     items.push(...payload.data.repository.issues.nodes);
   } while (payload.data.repository.issues.pageInfo.hasNextPage);
   return items;
 }
 
-export async function fetchSuggestions(): Promise<Suggestion[]> {
+export function fetchSuggestions(): Promise<Suggestion[]> {
   return getOrCompute(
     "gh_suggestions",
     async () => {

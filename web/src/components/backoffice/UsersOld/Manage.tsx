@@ -1,7 +1,7 @@
 import type { RestAdminUser } from "../../../../../types/users";
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
-import { h } from "preact";
-import { useState, useEffect, useReducer, useCallback, useRef } from "preact/hooks";
+import { VNode, h } from "preact";
+import { useCallback, useEffect, useReducer, useRef, useState } from "preact/hooks";
 
 import Spinner from "../../util/Spinner";
 import Tooltip from "../../util/Tooltip";
@@ -9,7 +9,7 @@ import Paginator from "../../util/Paginator";
 import Modal from "../../util/Modal";
 import { DiscordAvatar } from "../../util/Avatar";
 import { TextField } from "../../util/Form";
-import { ManageEdit, ManageModeration, ManageDelete } from "./Modals";
+import { ManageDelete, ManageEdit, ManageModeration } from "./Modals";
 import { Endpoints } from "../../../constants";
 
 import Edit from "feather-icons/dist/icons/edit.svg";
@@ -19,9 +19,17 @@ import Trash from "feather-icons/dist/icons/trash-2.svg";
 import style from "../admin.module.css";
 import sharedStyle from "../../shared.module.css";
 
-type UserStore = { [page: number]: RestAdminUser[] };
-type UserStoreAction = { users: RestAdminUser[]; page: number };
-type ApiResponse = { data: RestAdminUser[]; pages: number };
+interface UserStore {
+  [page: number]: RestAdminUser[];
+}
+interface UserStoreAction {
+  users: RestAdminUser[];
+  page: number;
+}
+interface ApiResponse {
+  data: RestAdminUser[];
+  pages: number;
+}
 type ModalState = { kind: "edit" | "mod" | "delete"; user: RestAdminUser } | { kind: "id" };
 
 const Status = { IDLE: 0, PROCESSING: 1, NOT_FOUND: 2, FOUND: 3 };
@@ -30,7 +38,7 @@ function userReducer(state: UserStore, action: UserStoreAction): UserStore {
   return { ...state, [action.page]: action.users };
 }
 
-function EditById({ onClose }: { onClose: () => void }) {
+function EditById({ onClose }: { onClose: () => void }): VNode {
   const [status, setStatus] = useState(Status.IDLE);
   const [user, setUser] = useState<RestAdminUser | null>(null);
   const formRef = useRef<HTMLFormElement>(null);
@@ -81,7 +89,13 @@ function EditById({ onClose }: { onClose: () => void }) {
   );
 }
 
-function UserRow({ user, setModal }: { user: RestAdminUser; setModal: (s: ModalState) => void }) {
+function UserRow({
+  user,
+  setModal,
+}: {
+  user: RestAdminUser;
+  setModal: (s: ModalState) => void;
+}): VNode {
   const bans = user.banStatus
     ? Object.entries(user.banStatus)
         .filter(([, isBanned]) => isBanned)
@@ -116,7 +130,7 @@ function UserRow({ user, setModal }: { user: RestAdminUser; setModal: (s: ModalS
         </Tooltip>
         <Tooltip text="Delete user account">
           <button className={style.action} onClick={deleteUser}>
-            {/* @ts-ignore */}
+            {/* @ts-expect-error class */}
             <Trash className={sharedStyle.red} />
           </button>
         </Tooltip>
@@ -125,7 +139,7 @@ function UserRow({ user, setModal }: { user: RestAdminUser; setModal: (s: ModalS
   );
 }
 
-export default function ManageUsers() {
+export default function ManageUsers(): VNode {
   const [page, setPage] = useState(1);
   const [pages, setPages] = useState(0);
   const [usersStore, pushUsers] = useReducer(userReducer, {});

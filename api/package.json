@@ -4,6 +4,9 @@
   "description": "Replugged backend API",
   "type": "module",
   "main": "./dist/index.js",
+  "engines": {
+    "node": ">=16.0.0"
+  },
   "scripts": {
     "dev": "tsc && node .",
     "build": "tsc",

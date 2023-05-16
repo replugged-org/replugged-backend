@@ -1,5 +1,5 @@
 import type { User } from "../../types/users";
-import type { TokenType, JWTPayload } from "./utils/auth.js";
+import type { JWTPayload, TokenType } from "./utils/auth.js";
 
 declare module "fastify" {
   interface FastifyRequest {

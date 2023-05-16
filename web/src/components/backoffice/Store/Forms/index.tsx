@@ -1,13 +1,14 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */ // too lazy to fix this
 import type { StoreForm } from "../../../../../../types/store";
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
-import { h, Fragment } from "preact";
-import { useState, useEffect, useCallback, useRef, useContext } from "preact/hooks";
+import { Fragment, VNode, h } from "preact";
+import { useCallback, useContext, useEffect, useRef, useState } from "preact/hooks";
 
 import Tooltip from "../../../util/Tooltip";
 import Spinner from "../../../util/Spinner";
 import Modal from "../../../util/Modal";
 import { TextareaField } from "../../../util/Form";
-import { PublishForm, VerificationForm, HostingForm } from "./Items";
+import { HostingForm, PublishForm, VerificationForm } from "./Items";
 import { Endpoints } from "../../../../constants";
 
 import ExternalLink from "feather-icons/dist/icons/external-link.svg";
@@ -18,14 +19,17 @@ import style from "../../admin.module.css";
 import sharedStyle from "../../../shared.module.css";
 import UserContext from "../../../UserContext";
 
-type FormProps = {
+interface FormProps {
   form: StoreForm;
   canViewDiscussions: boolean;
-};
+}
 
-type ModalProps = { onConfirm: (reason: string) => Promise<boolean>; onClose: () => void };
+interface ModalProps {
+  onConfirm: (reason: string) => Promise<boolean>;
+  onClose: () => void;
+}
 
-function ApproveModal({ onConfirm, onClose }: ModalProps) {
+function ApproveModal({ onConfirm, onClose }: ModalProps): VNode {
   const onConfirmWithData = onConfirm.bind(null, "");
 
   return (
@@ -40,7 +44,7 @@ function ApproveModal({ onConfirm, onClose }: ModalProps) {
   );
 }
 
-function RejectModal({ onConfirm: onConfirmWithData, onClose }: ModalProps) {
+function RejectModal({ onConfirm: onConfirmWithData, onClose }: ModalProps): VNode {
   const [submitting, setSubmitting] = useState(false);
   const formRef = useRef<HTMLFormElement>(null);
   const onSubmit = useCallback(() => {
@@ -90,7 +94,7 @@ function RejectModal({ onConfirm: onConfirmWithData, onClose }: ModalProps) {
   );
 }
 
-function ReviewButtons({ form, canViewDiscussions }: FormProps) {
+function ReviewButtons({ form, canViewDiscussions }: FormProps): VNode {
   const user = useContext(UserContext)!;
   const [action, setAction] = useState(0);
   const closeModals = useCallback(() => setAction(0), [setAction]);
@@ -137,17 +141,18 @@ function ReviewButtons({ form, canViewDiscussions }: FormProps) {
       <div className={sharedStyle.buttons}>
         <Tooltip text={"Can't connect to Replugged"} disabled={canViewDiscussions}>
           <button className={sharedStyle.button} disabled={!canViewDiscussions}>
-            {/* @ts-ignore */}
+            {/* @ts-expect-error class */}
             <ExternalLink className={sharedStyle.icon} />
             <span>View discussion</span>
           </button>
         </Tooltip>
         {form.reviewed ? (
           <div className={style.alignCenter}>
-            {/* @ts-ignore */}
             {form.approved ? (
+              // @ts-expect-error class
               <Check className={sharedStyle.icon} />
             ) : (
+              // @ts-expect-error class
               <X className={sharedStyle.icon} />
             )}
             <span>
@@ -158,12 +163,12 @@ function ReviewButtons({ form, canViewDiscussions }: FormProps) {
         ) : (
           <Fragment>
             <button className={`${sharedStyle.button} ${sharedStyle.green}`} onClick={approveForm}>
-              {/* @ts-ignore */}
+              {/* @ts-expect-error class */}
               <Check className={sharedStyle.icon} />
               <span>Approve</span>
             </button>
             <button className={`${sharedStyle.button} ${sharedStyle.red}`} onClick={rejectForm}>
-              {/* @ts-ignore */}
+              {/* @ts-expect-error class */}
               <X className={sharedStyle.icon} />
               <span>Reject</span>
             </button>
@@ -191,7 +196,7 @@ function ReviewButtons({ form, canViewDiscussions }: FormProps) {
   );
 }
 
-function Form({ form, canViewDiscussions }: FormProps) {
+function Form({ form, canViewDiscussions }: FormProps): VNode {
   let body = null;
   switch (form.kind) {
     case "publish":
@@ -240,7 +245,7 @@ function Form({ form, canViewDiscussions }: FormProps) {
   );
 }
 
-export default function ManageForms() {
+export default function ManageForms(): VNode {
   const [forms, setForms] = useState<StoreForm[] | null>(null);
   useEffect(() => {
     fetch(Endpoints.BACKOFFICE_FORMS)

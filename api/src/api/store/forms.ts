@@ -1,5 +1,6 @@
+/* eslint-disable @typescript-eslint/explicit-function-return-type */
 import { type Db } from "mongodb";
-import type { FastifyInstance, FastifyRequest, FastifyReply } from "fastify";
+import type { FastifyInstance, FastifyReply, FastifyRequest } from "fastify";
 import type { EligibilityStatus } from "../../../../types/store";
 import type { User } from "../../../../types/users";
 import { lookup } from "dns";
@@ -9,7 +10,7 @@ import config from "../../config.js";
 import { dispatchHonk } from "../../utils/discord.js";
 
 // todo: see if this can deduped easily, schemas also contain the structure
-type PublishBody = {
+interface PublishBody {
   repoUrl: string;
   bdAlternative: string;
   reviewNotes: string;
@@ -17,18 +18,18 @@ type PublishBody = {
   complianceLegal: boolean;
   type: string;
   descripion: string;
-};
+}
 
-type VerificationBody = {
+interface VerificationBody {
   workUrl: string;
   workAbout: string;
   developerAbout: string;
   workFuture: string;
   why: string;
   complianceCute: boolean;
-};
+}
 
-type HostingBody = {
+interface HostingBody {
   repoUrl: string;
   purpose: string;
   technical: string;
@@ -36,7 +37,7 @@ type HostingBody = {
   reviewNotes: string;
   complianceSecurity: boolean;
   compliancePrivacy: boolean;
-};
+}
 
 const BD_URL_RE = /^(?:https?:\/\/)?betterdiscord\.app\/(plugin|theme)\/([^/]+)/i;
 const PLAIN_RE = /^[a-z0-9-]+$/i;
@@ -101,7 +102,7 @@ const fieldToDescription: Record<string, string> = {
 // -- Helpers
 async function fetchEligibility(db: Db, user?: User | null): Promise<EligibilityStatus> {
   if (user) {
-    const banStatus = await db.collection<any>("userbans").findOne({ _id: user!._id });
+    const banStatus = await db.collection("userbans").findOne({ _id: user!._id });
     return {
       publish: banStatus?.publish ? 2 : 0,
       verification: banStatus?.verification ? 2 : 0,
@@ -118,34 +119,33 @@ async function fetchEligibility(db: Db, user?: User | null): Promise<Eligibility
   };
 }
 
-async function isAvailable(subdomain: string): Promise<boolean> {
+function isAvailable(subdomain: string): Promise<boolean> {
   return new Promise((resolve) =>
     lookup(`${subdomain}.replugged.dev`, (e) => resolve(e?.code === "ENOTFOUND")),
   );
 }
 
 /** @deprecated */
-// @ts-ignore
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-function stringifyForm(data: Record<string, unknown>): string {
-  const acc: string[] = [];
-  for (const key in data) {
-    if (key in data && key in fieldToDescription) {
-      const value = (data[key] || "N/A") as string;
-      acc.push(
-        `**${fieldToDescription[key]}**: ${value.length > 128 ? `${value.slice(128)}...` : value}`,
-      );
-    }
-  }
+// // eslint-disable-next-line @typescript-eslint/no-unused-vars
+// function stringifyForm(data: Record<string, unknown>): string {
+//   const acc: string[] = [];
+//   for (const key in data) {
+//     if (key in data && key in fieldToDescription) {
+//       const value = (data[key] || "N/A") as string;
+//       acc.push(
+//         `**${fieldToDescription[key]}**: ${value.length > 128 ? `${value.slice(128)}...` : value}`,
+//       );
+//     }
+//   }
 
-  return acc.join("\n");
-}
+//   return acc.join("\n");
+// }
 
-type EmbedField = {
+interface EmbedField {
   inline?: boolean;
   name: string;
   value: string;
-};
+}
 
 function fieldifyForm(data: Record<string, unknown>): EmbedField[] {
   const fields: EmbedField[] = [];
@@ -249,6 +249,7 @@ async function publishForm(
     });
   }
 
+  // @ts-expect-error idc
   return finalizeForm(this.mongo.db!, request.user!, "publish", request.body, reply);
 }
 
@@ -270,6 +271,7 @@ async function verificationForm(
       .send({ errors: { complianceCute: "Hey cutie, you forgot to confirm you're cute!!" } });
   }
 
+  // @ts-expect-error idc
   return finalizeForm(this.mongo.db!, request.user!, "verification", request.body, reply);
 }
 
@@ -306,10 +308,11 @@ async function hostingForm(
       .send({ errors: { compliancePrivacy: "You must comply with the applicable privacy laws." } });
   }
 
+  // @ts-expect-error idc
   return finalizeForm(this.mongo.db!, request.user!, "hosting", request.body, reply);
 }
 
-export default async function (fastify: FastifyInstance): Promise<void> {
+export default function (fastify: FastifyInstance): void {
   // if (process.env.NODE_ENV !== 'development') return
 
   fastify.get("/eligibility", { config: { auth: { optional: true } } }, (request) =>

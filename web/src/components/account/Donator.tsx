@@ -1,10 +1,10 @@
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
-import { h } from "preact";
+import { VNode, h } from "preact";
 
 import style from "./donator.module.css";
 import { Routes } from "../../constants";
 
-export default function RepluggedCutie() {
+export default function RepluggedCutie(): VNode {
   return (
     <div className={style.wrapper}>
       <div className={style.container}>

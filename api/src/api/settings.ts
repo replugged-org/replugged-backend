@@ -1,7 +1,7 @@
-import type { FastifyInstance, FastifyRequest, FastifyReply } from "fastify";
+import type { FastifyInstance, FastifyReply, FastifyRequest } from "fastify";
 import { URL } from "url";
-import { unlink, rename } from "fs/promises";
-import { existsSync, mkdirSync, createReadStream, createWriteStream } from "fs";
+import { rename, unlink } from "fs/promises";
+import { createReadStream, createWriteStream, existsSync, mkdirSync } from "fs";
 
 const SETTINGS_UPLOAD_LIMIT = 1e8; // 100MB
 const SETTINGS_UPLOAD_EYES = 1e6; // 1MB
@@ -26,7 +26,7 @@ if (!existsSync(SETTINGS_STORAGE_FOLDER)) {
 
 const locks = new Set<string>();
 
-async function retrieve(this: FastifyInstance, request: FastifyRequest, reply: FastifyReply) {
+function retrieve(this: FastifyInstance, request: FastifyRequest, reply: FastifyReply): void {
   const file = new URL(request.user!._id, SETTINGS_STORAGE_FOLDER);
   if (!existsSync(file)) {
     return reply.callNotFound();
@@ -37,7 +37,7 @@ async function retrieve(this: FastifyInstance, request: FastifyRequest, reply: F
   reply.send(createReadStream(file));
 }
 
-function upload(this: FastifyInstance, request: FastifyRequest, reply: FastifyReply) {
+function upload(this: FastifyInstance, request: FastifyRequest, reply: FastifyReply): void {
   if (locks.has(request.user!._id)) {
     reply.code(409).send({ error: "Resource locked by another request currently processing." });
     return;
@@ -62,7 +62,11 @@ function upload(this: FastifyInstance, request: FastifyRequest, reply: FastifyRe
   });
 }
 
-async function del(this: FastifyInstance, request: FastifyRequest, reply: FastifyReply) {
+async function del(
+  this: FastifyInstance,
+  request: FastifyRequest,
+  reply: FastifyReply,
+): Promise<void> {
   if (locks.has(request.user!._id)) {
     reply.code(409).send({ error: "Resource locked by another request currently processing." });
     return;
@@ -77,12 +81,12 @@ async function del(this: FastifyInstance, request: FastifyRequest, reply: Fastif
   reply.code(204).send();
 }
 
-export default async function (fastify: FastifyInstance): Promise<void> {
+export default function (fastify: FastifyInstance): void {
   if (process.env.NODE_ENV !== "development") {
     return;
   }
 
-  fastify.addContentTypeParser("application/octet-stream", {}, async () => void 0);
+  fastify.addContentTypeParser("application/octet-stream", {}, () => void 0);
 
   fastify.route({
     method: "POST",

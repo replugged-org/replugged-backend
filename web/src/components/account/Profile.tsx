@@ -1,8 +1,10 @@
+/* eslint-disable @typescript-eslint/ban-ts-comment */
 import { type User } from "../UserContext";
 import {
+  Fragment,
+  VNode,
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   h,
-  Fragment,
 } from "preact";
 import { UserFlags } from "../../../../shared/flags";
 
@@ -21,14 +23,14 @@ import Early from "../../assets/badges/early.svg";
 import style from "./profile.module.css";
 import sharedStyle from "../shared.module.css";
 
-type ProfileProps = {
+interface ProfileProps {
   user: User;
   onEdit: () => void;
-};
+}
 
 type ProfileBadgesProps = Pick<User, "flags" | "cutiePerks">;
 
-function ProfileBadges({ flags, cutiePerks }: ProfileBadgesProps) {
+function ProfileBadges({ flags, cutiePerks }: ProfileBadgesProps): VNode {
   console.log(flags);
   return (
     <div className={style.badges} style={{ color: `#${cutiePerks.color || "7289da"}` }}>
@@ -36,49 +38,49 @@ function ProfileBadges({ flags, cutiePerks }: ProfileBadgesProps) {
         {cutiePerks.badge && cutiePerks.badge !== "default" ? (
           <img src={cutiePerks.badge} className={style.badge} />
         ) : (
-          // @ts-ignore
+          // @ts-expect-error
           <HibiscusMono className={style.badge} />
         )}
       </Tooltip>
       {Boolean(flags & UserFlags.DEVELOPER) && (
         <Tooltip text="Replugged Developer" align="center">
-          {/* @ts-ignore */}
+          {/* @ts-expect-error */}
           <Developer className={style.badge} />
         </Tooltip>
       )}
       {Boolean(flags & UserFlags.STAFF) && (
         <Tooltip text="Replugged Staff" align="center">
-          {/* @ts-ignore */}
+          {/* @ts-expect-error */}
           <Staff className={style.badge} />
         </Tooltip>
       )}
       {Boolean(flags & UserFlags.SUPPORT) && (
         <Tooltip text="Replugged Support" align="center">
-          {/* @ts-ignore */}
+          {/* @ts-expect-error */}
           <Support className={style.badge} />
         </Tooltip>
       )}
       {Boolean(flags & UserFlags.CONTRIBUTOR) && (
         <Tooltip text="Replugged Contributor" align="center">
-          {/* @ts-ignore */}
+          {/* @ts-expect-error */}
           <Contributor className={style.badge} />
         </Tooltip>
       )}
       {Boolean(flags & UserFlags.TRANSLATOR) && (
         <Tooltip text="Replugged Translator" align="center">
-          {/* @ts-ignore */}
+          {/* @ts-expect-error */}
           <Translator className={style.badge} />
         </Tooltip>
       )}
       {Boolean(flags & UserFlags.BUG_HUNTER) && (
         <Tooltip text="Replugged Bug Hunter" align="center">
-          {/* @ts-ignore */}
+          {/* @ts-expect-error */}
           <Hunter className={style.badge} />
         </Tooltip>
       )}
       {Boolean(flags & UserFlags.EARLY_USER) && (
         <Tooltip text="Replugged Early User" align="center">
-          {/* @ts-ignore */}
+          {/* @ts-expect-error */}
           <Early className={style.badge} />
         </Tooltip>
       )}
@@ -86,7 +88,7 @@ function ProfileBadges({ flags, cutiePerks }: ProfileBadgesProps) {
   );
 }
 
-export default function Profile({ user, onEdit }: ProfileProps) {
+export default function Profile({ user, onEdit }: ProfileProps): VNode {
   return (
     <Fragment>
       <div className={style.container}>

@@ -1,9 +1,9 @@
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
-import { h } from "preact";
+import { VNode, h } from "preact";
 import { Routes } from "../../constants";
 import style from "./footer.module.css";
 
-export default function Footer() {
+export default function Footer(): VNode {
   return (
     <footer className={style.container}>
       <div className={style.section}>

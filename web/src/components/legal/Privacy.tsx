@@ -1,11 +1,11 @@
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
-import { h } from "preact";
+import { VNode, h } from "preact";
 import { useTitle } from "hoofd/preact";
 import { Routes } from "../../constants";
 
 import style from "../docs/markdown.module.css";
 
-export default function Privacy() {
+export default function Privacy(): VNode {
   useTitle("Privacy Policy");
 
   return (

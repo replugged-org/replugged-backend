@@ -1,10 +1,10 @@
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
-import { h } from "preact";
+import { VNode, h } from "preact";
 import { useTitle } from "hoofd/preact";
 
 import style from "../docs/markdown.module.css";
 
-export default function Terms() {
+export default function Terms(): VNode {
   useTitle("Terms of Service");
 
   return (

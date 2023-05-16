@@ -5,12 +5,12 @@ export enum InstallResponseType {
   UNREACHABLE = "UNREACHABLE",
 }
 
-type RPCMessage = {
+interface RPCMessage {
   cmd: string;
-  data: any;
+  data: Response;
   evt: string | null;
   nonce: string | null;
-};
+}
 
 type Manifest = Record<string, unknown> & {
   name: string;
@@ -40,15 +40,15 @@ type Response =
       kind: "UNREACHABLE";
     };
 
-export type InstallData = {
+export interface InstallData {
   identifier?: string;
   source?: string;
   id?: string;
   url?: string;
-};
+}
 
-const min_port = 6463;
-const max_port = 6472;
+const MIN_PORT = 6463;
+const MAX_PORT = 6472;
 
 function random(): string {
   return Math.random().toString(16).slice(2);
@@ -79,7 +79,7 @@ function tryPort(port: number): Promise<WebSocket> {
 
       didFinish = true;
 
-      reject();
+      reject(new Error("WS error"));
     });
     ws.addEventListener("close", () => {
       if (didFinish) {
@@ -88,7 +88,7 @@ function tryPort(port: number): Promise<WebSocket> {
 
       didFinish = true;
 
-      reject();
+      reject(new Error("WS close"));
     });
   });
 }
@@ -118,14 +118,14 @@ function rpcInstall(ws: WebSocket, data: InstallData): Promise<Response> {
   });
 }
 
-type InstallProps = {
+interface InstallProps {
   data: InstallData;
   onConnect: () => void;
   onFinish: (response: Response) => void;
-};
+}
 
 export default async function install({ data, onConnect, onFinish }: InstallProps): Promise<void> {
-  for (let port = min_port; port <= max_port; port++) {
+  for (let port = MIN_PORT; port <= MAX_PORT; port++) {
     try {
       const ws = await tryPort(port);
       onConnect();

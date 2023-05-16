@@ -1,48 +1,52 @@
-import type { FastifyInstance, FastifyRequest, FastifyReply, ConfiguredReply } from "fastify";
+/* eslint-disable @typescript-eslint/no-explicit-any */
+import type { ConfiguredReply, FastifyInstance, FastifyReply, FastifyRequest } from "fastify";
 import type { OAuthProvider, OAuthToken } from "../utils/oauth.js";
 import type { DatabaseUser, User } from "../../../types/users";
 import { Long, type UpdateFilter } from "mongodb";
 import { randomBytes } from "crypto";
 import config from "../config.js";
 import { UserFlags } from "../flags.js";
-import { getAuthorizationUrl, getAuthTokens, fetchAccount, toMongoFields } from "../utils/oauth.js";
+import { fetchAccount, getAuthTokens, getAuthorizationUrl, toMongoFields } from "../utils/oauth.js";
 import { deleteUser } from "../data/user.js";
 import { addRole, fetchMember, removeRole } from "../utils/discord.js";
 import { TokenType } from "../utils/auth.js";
-import { prepareUpdateData, notifyStateChange } from "../utils/patreon.js";
+import { notifyStateChange, prepareUpdateData } from "../utils/patreon.js";
 
-type OAuthConfig = {
+interface OAuthConfig {
   platform: OAuthProvider;
   scopes: string[];
   isRestricted?: boolean;
-};
+}
 
-type OAuthOptions = { data: OAuthConfig };
+interface OAuthOptions {
+  data: OAuthConfig;
+}
 
-type AuthorizationRequestProps = {
+interface AuthorizationRequestProps {
   Querystring: {
     redirect?: string;
     // api:v2
     code?: string;
     error?: string;
   };
-};
+}
 
-type CallbackRequestProps = {
+interface CallbackRequestProps {
   Querystring: {
     code?: string;
     error?: string;
     state?: string;
   };
-};
+}
 
 type Reply = ConfiguredReply<FastifyReply, OAuthConfig>;
 
+// eslint-disable-next-line require-await
 async function authorize(
   this: FastifyInstance,
   request: FastifyRequest<AuthorizationRequestProps>,
   reply: Reply,
-) {
+): Promise<void> {
   if (reply.context.config.platform === "discord" && request.user) {
     reply.redirect("/me");
     return;
@@ -54,14 +58,14 @@ async function authorize(
   }
 
   const apiVersion = this.prefix.split("/")[1];
-  const cookieSettings = <const>{
+  const cookieSettings = {
     signed: true,
     httpOnly: true,
     sameSite: "lax",
     path: `/api/${apiVersion}`,
     secure: process.env.NODE_ENV === "production",
     maxAge: 300,
-  };
+  } as const;
 
   if (reply.context.config.platform !== "discord" && !request.user) {
     reply.setCookie("redirect", `/api${request.url}`, cookieSettings);
@@ -87,7 +91,7 @@ async function callback(
   this: FastifyInstance,
   request: FastifyRequest<CallbackRequestProps>,
   reply: Reply,
-) {
+): Promise<void> {
   const collection = this.mongo.db!.collection<DatabaseUser>("users");
   const returnPath = reply.context.config.platform === "discord" ? "/" : "/me";
   const authStatus = Boolean(reply.context.config.platform === "discord") !== Boolean(request.user);
@@ -256,7 +260,7 @@ async function callback(
   reply.redirect(redirectCookie?.value ?? "/me");
 }
 
-async function unlink(this: FastifyInstance, request: FastifyRequest, reply: Reply) {
+async function unlink(this: FastifyInstance, request: FastifyRequest, reply: Reply): Promise<void> {
   if (reply.context.config.platform === "discord") {
     if (request.user!.flags & UserFlags.STORE_PUBLISHER) {
       reply.redirect("/me?error=delete_blocked");
@@ -294,7 +298,7 @@ async function unlink(this: FastifyInstance, request: FastifyRequest, reply: Rep
   reply.redirect("/me");
 }
 
-async function oauthPlugin(fastify: FastifyInstance, options: OAuthOptions) {
+function oauthPlugin(fastify: FastifyInstance, options: OAuthOptions): void {
   fastify.route({
     method: "GET",
     url: "/",
@@ -326,7 +330,7 @@ async function oauthPlugin(fastify: FastifyInstance, options: OAuthOptions) {
   });
 }
 
-export default async function (fastify: FastifyInstance): Promise<void> {
+export default function (fastify: FastifyInstance): void {
   fastify.register(oauthPlugin, {
     prefix: "/discord",
     data: {

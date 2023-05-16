@@ -1,4 +1,4 @@
-import type { Ref } from "preact";
+import type { Ref, VNode } from "preact";
 import type { RestAdminUser } from "../../../../../types/users";
 import { useCallback, useEffect, useRef, useState } from "preact/hooks";
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -11,10 +11,16 @@ import { Endpoints } from "../../../constants";
 import style from "../admin.module.css";
 import Tabs from "../../util/Tabs";
 
-type ManageModalProps = { user: RestAdminUser; onClose: () => void };
-type FormChunkProps = { user: RestAdminUser; formRef: Ref<HTMLFormElement> };
+interface ManageModalProps {
+  user: RestAdminUser;
+  onClose: () => void;
+}
+interface FormChunkProps {
+  user: RestAdminUser;
+  formRef: Ref<HTMLFormElement>;
+}
 
-function FormProperties({ user, formRef, ...props }: FormChunkProps) {
+function FormProperties({ user, formRef, ...props }: FormChunkProps): VNode {
   return (
     <form ref={formRef} onSubmit={(e) => e.preventDefault()} {...props}>
       <div className={style.form2}>
@@ -45,7 +51,7 @@ function FormProperties({ user, formRef, ...props }: FormChunkProps) {
   );
 }
 
-function FormPerks({ user, formRef, ...props }: FormChunkProps) {
+function FormPerks({ user, formRef, ...props }: FormChunkProps): VNode {
   return (
     <form ref={formRef} onSubmit={(e) => e.preventDefault()} {...props}>
       <TextField
@@ -69,16 +75,16 @@ function FormPerks({ user, formRef, ...props }: FormChunkProps) {
   );
 }
 
-type DatabaseBadge = {
+interface DatabaseBadge {
   /** Guild id */
   _id: string;
   /** user id */
   userId: string;
   name: string;
   badge: string;
-};
+}
 
-function FormGuildBadge({ user, formRef, ...props }: FormChunkProps) {
+function FormGuildBadge({ user, formRef, ...props }: FormChunkProps): VNode {
   const [perks, setPerks] = useState<DatabaseBadge | null>(null);
   useEffect(() => {
     fetch(Endpoints.BACKOFFICE_GET_USERS_GUILD_PERKS(user._id))
@@ -100,7 +106,7 @@ function FormGuildBadge({ user, formRef, ...props }: FormChunkProps) {
   );
 }
 
-export function ManageEdit({ user, onClose }: ManageModalProps) {
+export function ManageEdit({ user, onClose }: ManageModalProps): VNode {
   const [processing, setProcessing] = useState(false);
   const formPropertiesRef = useRef<HTMLFormElement>(null);
   const formPerksRef = useRef<HTMLFormElement>(null);
@@ -165,7 +171,7 @@ export function ManageEdit({ user, onClose }: ManageModalProps) {
   );
 }
 
-export function ManageModeration({ user, onClose }: ManageModalProps) {
+export function ManageModeration({ user, onClose }: ManageModalProps): VNode {
   const [processing, setProcessing] = useState(false);
   const formRef = useRef<HTMLFormElement>(null);
   const onApply = useCallback((e?: Event) => {
@@ -250,7 +256,7 @@ export function ManageModeration({ user, onClose }: ManageModalProps) {
   );
 }
 
-export function ManageDelete({ user, onClose }: ManageModalProps) {
+export function ManageDelete({ user, onClose }: ManageModalProps): VNode {
   const [processing, setProcessing] = useState(false);
   const formRef = useRef<HTMLFormElement>(null);
   const onYeet = useCallback(() => {

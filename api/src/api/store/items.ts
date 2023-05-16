@@ -51,7 +51,7 @@ import { FastifyInstance /* FastifyReply, FastifyRequest*/ } from "fastify";
 //     return entity
 // }
 
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
+ 
 export default async function (_fastify: FastifyInstance): Promise<void> {
   // fastify.get('/plugins', fetchPlugins)
   // fastify.get('/plugins/:id', fetchPlugin)

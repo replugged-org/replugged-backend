@@ -1,10 +1,10 @@
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
-import { h } from "preact";
+import { VNode, h } from "preact";
 import { useRouter } from "preact-router";
 import { useEffect, useState } from "preact/hooks";
 import { Endpoints } from "../../../constants";
 
-export default function Manage() {
+export default function Manage(): VNode {
   const [route] = useRouter<{ id: string }>();
   const [user, setUser] = useState();
 

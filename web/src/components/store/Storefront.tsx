@@ -1,6 +1,6 @@
-import type { Attributes } from "preact";
+import type { Attributes, VNode } from "preact";
 import type { EligibilityStatus } from "../../../../types/store";
-import { h, Fragment } from "preact";
+import { Fragment, h } from "preact";
 import { useContext, useEffect, useState } from "preact/hooks";
 import { useTitle } from "hoofd/preact";
 import { Router } from "preact-router";
@@ -26,10 +26,10 @@ import Staff from "../../assets/badges/staff.svg";
 import style from "./storefront.module.css";
 
 type StoreProps = Attributes & { url?: string };
-type ItemProps = Attributes & { icon: any; href: string; label: string };
+type ItemProps = Attributes & { icon: string; href: string; label: string };
 
 const eligibilityCache: EligibilityStatus | null = null;
-function useEligibility() {
+function useEligibility(): EligibilityStatus | null {
   const [eligibility, setEligibility] = useState(eligibilityCache);
   useEffect(() => {
     if (!eligibility) {
@@ -52,7 +52,7 @@ function useEligibility() {
   return eligibility;
 }
 
-function Item({ icon, href, label }: ItemProps) {
+function Item({ icon, href, label }: ItemProps): VNode {
   if (href.startsWith("https")) {
     return (
       <a className={style.item} href={href} target="_blank">
@@ -70,7 +70,7 @@ function Item({ icon, href, label }: ItemProps) {
   );
 }
 
-function Sidebar() {
+function Sidebar(): VNode {
   const user = useContext(UserContext);
 
   return (
@@ -98,7 +98,7 @@ function Sidebar() {
   );
 }
 
-export default function Storefront(props: StoreProps) {
+export default function Storefront(props: StoreProps): VNode {
   const eligibility = useEligibility();
   useTitle("%s • Replugged Store");
 

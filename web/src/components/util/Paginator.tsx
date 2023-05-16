@@ -1,5 +1,5 @@
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
-import { h } from "preact";
+import { VNode, h } from "preact";
 
 import ArrowHeadBackDouble from "feather-icons/dist/icons/chevrons-left.svg";
 import ArrowHeadBack from "feather-icons/dist/icons/chevron-left.svg";
@@ -8,13 +8,13 @@ import ArrowHeadNextDouble from "feather-icons/dist/icons/chevrons-right.svg";
 
 import style from "./paginator.module.css";
 
-type PaginatorProps = {
+interface PaginatorProps {
   current: number;
   total: number;
   setPage: (page: number) => void;
-};
+}
 
-export default function Paginator({ current, total, setPage }: PaginatorProps) {
+export default function Paginator({ current, total, setPage }: PaginatorProps): VNode {
   const prevLocked = current === 1;
   const nextLocked = current === total;
 
