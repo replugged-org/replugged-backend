@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 // For CLI usage
 // npm run download-replugged
 
@@ -9,7 +10,7 @@ import { writeFile } from "fs/promises";
 
 const ADDONS_FOLDER = STORAGE_FOLDER("addons");
 
-const token = config.github.token;
+const { token } = config.github;
 
 const headers: Record<string, string> = {};
 if (token) {
@@ -50,7 +51,7 @@ const manifestRes = {
     type: "store",
     id: "dev.replugged.Replugged",
   },
-  version: version,
+  version,
   license: "MIT",
 };
 const asarRes = await fetch(asarUrl, {

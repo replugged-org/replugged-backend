@@ -1,7 +1,7 @@
 import { existsSync, mkdirSync } from "fs";
 import path from "path";
 
-export const STORAGE_FOLDER = (folder: string) => {
+export const STORAGE_FOLDER = (folder: string): string => {
   let path: string;
 
   switch (process.platform) {
@@ -27,7 +27,7 @@ export const STORAGE_FOLDER = (folder: string) => {
   return path;
 };
 
-export const createDirForFile = (file: string) => {
+export const createDirForFile = (file: string): void => {
   const dir = path.dirname(file);
   if (existsSync(dir)) return;
   mkdirSync(dir, {

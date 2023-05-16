@@ -1,9 +1,9 @@
 import { FastifyInstance } from "fastify";
 import { STORAGE_FOLDER } from "../../utils/misc.js";
 import path from "path";
-import { stat, readFile, readdir } from "fs/promises";
+import { readFile, readdir, stat } from "fs/promises";
 
-async function exists(path: string) {
+async function exists(path: string): Promise<boolean> {
   try {
     await stat(path);
     return true;
@@ -62,14 +62,14 @@ async function getAddonIdsFromDisc(): Promise<string[]> {
   return fileNames.map((fileName) => fileName.replace(/\.json$/, ""));
 }
 
-async function populateCache() {
+async function populateCache(): Promise<void> {
   const ids = await getAddonIdsFromDisc();
   Promise.all(ids.map((id) => loadManifest(id)));
 }
 populateCache();
 setInterval(populateCache, CACHE_DURATION);
 
-export default async function (fastify: FastifyInstance): Promise<void> {
+export default function (fastify: FastifyInstance): void {
   fastify.get<{
     Params: {
       id: string;
@@ -104,8 +104,8 @@ export default async function (fastify: FastifyInstance): Promise<void> {
     Querystring: {
       page?: string;
     };
-  }>("/list/:type", async (request, reply) => {
-    // @ts-expect-error
+  }>("/list/:type", (request, reply) => {
+    // @ts-expect-error includes bs
     if (!ADDON_TYPES.includes(request.params.type.replace(/s$/, ""))) {
       reply.code(400).send({
         error: `Invalid addon type: ${request.params.type}`,
@@ -114,7 +114,7 @@ export default async function (fastify: FastifyInstance): Promise<void> {
     }
     const type = request.params.type.replace(/s$/, "") as AddonType;
 
-    const page = parseInt(request.query.page ?? "1");
+    const page = parseInt(request.query.page ?? "1", 10);
     if (isNaN(page)) {
       reply.code(400).send({
         error: `Invalid page number: ${request.query.page}`,

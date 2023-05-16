@@ -3,6 +3,6 @@ import type { FastifyInstance } from "fastify";
 
 import itemsModule from "./items.js";
 
-export default async function (fastify: FastifyInstance): Promise<void> {
+export default function (fastify: FastifyInstance): void {
   fastify.register(itemsModule, { prefix: "/" });
 }

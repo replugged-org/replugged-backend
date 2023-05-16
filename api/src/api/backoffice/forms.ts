@@ -1,6 +1,7 @@
+/* eslint-disable @typescript-eslint/explicit-function-return-type */
 import type { User } from "../../../../types/users";
 import type { StoreForm } from "../../../../types/store";
-import type { FastifyInstance, FastifyRequest, FastifyReply } from "fastify";
+import type { FastifyInstance, FastifyReply, FastifyRequest } from "fastify";
 import config from "../../config.js";
 import { dispatchHonk, editHonkMessage, fetchHonkMessage, sendDm } from "../../utils/discord.js";
 import { UserFlags } from "../../flags.js";
@@ -27,9 +28,9 @@ const DmMessages = {
   },
 };
 
-type RouteParams = {
+interface RouteParams {
   id: string;
-};
+}
 
 async function update(
   this: FastifyInstance,
@@ -54,7 +55,7 @@ async function update(
   if (!res.value) {
     return reply.callNotFound();
   }
-  // eslint-disable-next-line no-use-before-define
+
   const resp = await Promise.resolve(finishFormUpdate(request, reply, res.value));
   if (resp) {
     reply.code(200).send(resp);
@@ -119,7 +120,10 @@ async function getFormCount(this: FastifyInstance) {
   return res;
 }
 
-type ReadAllQuery = { limit?: number; page?: number };
+interface ReadAllQuery {
+  limit?: number;
+  page?: number;
+}
 
 async function readAll(
   this: FastifyInstance,
@@ -144,7 +148,7 @@ async function readAll(
   };
 }
 
-async function del(this: FastifyInstance, request: FastifyRequest<{ Params: RouteParams }>) {
+function del(this: FastifyInstance, request: FastifyRequest<{ Params: RouteParams }>) {
   this.mongo.db!.collection<StoreForm>("forms").deleteOne({ _id: new ObjectId(request.params.id) });
 
   return {
@@ -169,7 +173,7 @@ async function read(
   return entity;
 }
 
-export default async function (fastify: FastifyInstance): Promise<void> {
+export default function (fastify: FastifyInstance) {
   fastify.route({
     method: "GET",
     url: "/",

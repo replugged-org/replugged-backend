@@ -1,13 +1,21 @@
-import type { FastifyInstance, FastifyRequest, FastifyReply } from "fastify";
+/* eslint-disable @typescript-eslint/no-unused-vars */
+/* eslint-disable @typescript-eslint/ban-ts-comment */
+/* eslint-disable @typescript-eslint/explicit-function-return-type */
+import type { FastifyInstance, FastifyReply, FastifyRequest } from "fastify";
 import { UserFlagKeys, UserFlags } from "../../flags.js";
 import { formatUser } from "../../data/user.js";
 import { User } from "../../../../types/users.js";
 import { GuildBadge } from "../../../../types/guild";
 
-type RouteParams = { id: string };
-type ReadAllQuery = { limit?: number; page?: number };
+interface RouteParams {
+  id: string;
+}
+interface ReadAllQuery {
+  limit?: number;
+  page?: number;
+}
 
-type UpdateData = {
+interface UpdateData {
   patronTier: 0;
   "badges.developer": boolean;
   "badges.staff": boolean;
@@ -22,23 +30,20 @@ type UpdateData = {
   "badges.guild.id": string | null;
   "badges.guild.icon": string | null;
   "badges.guild.name": string | null;
-};
+}
 
-// @ts-ignore
+// @ts-expect-error
 function searchUsers(this: FastifyInstance, request: FastifyRequest, reply: FastifyReply) {
-  // eslint-disable-line
   // todo
 }
 
-// @ts-ignore
+// @ts-expect-error
 function banUser(this: FastifyInstance, request: FastifyRequest, reply: FastifyReply) {
-  // eslint-disable-line
   // todo
 }
 
-// @ts-ignore
+// @ts-expect-error
 function refreshUserPledge(this: FastifyInstance, request: FastifyRequest, reply: FastifyReply) {
-  // eslint-disable-line
   // todo
 }
 
@@ -110,7 +115,7 @@ async function del(
   return { deleted: true };
 }
 
-function toggleFlags(existingFlags: number, flag: UserFlagKeys, setTo: Boolean) {
+function toggleFlags(existingFlags: number, flag: UserFlagKeys, setTo: boolean) {
   let newFlags = existingFlags;
   if ((existingFlags & UserFlags[flag]) !== 0 && setTo === false) {
     newFlags ^= UserFlags[flag];
@@ -189,7 +194,7 @@ async function update(
   }
 
   if (data["badges.custom.color"] !== null) {
-    // @ts-ignore
+    // @ts-expect-error
     mongoData.cutiePerks = {
       ...mongoData.cutiePerks,
       color: data["badges.custom.color"],
@@ -197,14 +202,14 @@ async function update(
   }
 
   if (data["badges.custom.icon"] !== null) {
-    // @ts-ignore
+    // @ts-expect-error
     mongoData.cutiePerks = {
       ...mongoData.cutiePerks,
       badge: data["badges.custom.icon"].replace(/#/g, ""),
     };
 
     if (!data["badges.custom.color"] || !mongoData.cutiePerks?.color) {
-      // @ts-ignore
+      // @ts-expect-error
       mongoData.cutiePerks = {
         ...mongoData.cutiePerks,
         color: "7289da",
@@ -213,7 +218,7 @@ async function update(
   }
 
   if (data["badges.guild.id"] && data["badges.guild.icon"] && data["badges.guild.name"]) {
-    // @ts-ignore
+    // @ts-expect-error
     mongoData.cutiePerks = {
       ...mongoData.cutiePerks,
       guild: {
@@ -247,14 +252,14 @@ async function update(
   }
 
   if (data["badges.custom.name"] !== null) {
-    // @ts-ignore
+    // @ts-expect-error
     mongoData.cutiePerks = {
       ...mongoData.cutiePerks,
       title: data["badges.custom.name"],
     };
 
     if (!data["badges.custom.color"] || !mongoData.cutiePerks?.color) {
-      // @ts-ignore
+      // @ts-expect-error
       mongoData.cutiePerks = {
         ...mongoData.cutiePerks,
         color: "7289da",
@@ -290,7 +295,7 @@ async function getUserCount(this: FastifyInstance) {
   return users;
 }
 
-export default async function (fastify: FastifyInstance): Promise<void> {
+export default function (fastify: FastifyInstance): void {
   // Main routes
 
   fastify.route({

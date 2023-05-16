@@ -1,19 +1,27 @@
 import type { VNode } from "preact";
-import { h, Fragment, cloneElement } from "preact";
+import { Fragment, cloneElement, h } from "preact";
 import { useCallback, useRef, useState } from "preact/hooks";
-import { createPortal } from "preact/compat";
+import { HTMLAttributes, createPortal } from "preact/compat";
 
 import style from "./tooltip.module.css";
 
-type TooltipProps = {
-  children: VNode<any>;
+type TooltipChild = VNode<HTMLAttributes<HTMLDivElement>>;
+
+interface TooltipProps {
+  children: TooltipChild;
   text: string;
   position?: "top" | "bottom";
   align?: "left" | "left-center" | "right" | "right-center" | "center";
   disabled?: boolean;
-};
+}
 
-export default function Tooltip({ children, text, position, align, disabled }: TooltipProps) {
+export default function Tooltip({
+  children,
+  text,
+  position,
+  align,
+  disabled,
+}: TooltipProps): TooltipChild {
   position = position ?? "top";
   align = align ?? "left";
 
@@ -25,6 +33,7 @@ export default function Tooltip({ children, text, position, align, disabled }: T
     (e: MouseEvent) => {
       setDisplay(true);
       if (ogOnMouseEnter) {
+        // @ts-expect-error idk
         ogOnMouseEnter(e);
       }
     },
@@ -36,6 +45,7 @@ export default function Tooltip({ children, text, position, align, disabled }: T
     (e: MouseEvent) => {
       setDisplay(false);
       if (ogOnMouseLeave) {
+        // @ts-expect-error idk
         ogOnMouseLeave(e);
       }
     },
@@ -44,7 +54,7 @@ export default function Tooltip({ children, text, position, align, disabled }: T
 
   let tooltip = null;
   if (display && elementRef.current) {
-    const css: Record<string, any> = {};
+    const css: Record<string, string | number> = {};
     const className = [style.tooltip];
     const rect = elementRef.current.getBoundingClientRect();
 

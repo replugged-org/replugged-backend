@@ -1,4 +1,4 @@
-import { h } from "preact";
+import { VNode, h } from "preact";
 import { useTitle } from "hoofd/preact";
 
 import { Routes } from "../constants";
@@ -16,8 +16,8 @@ import Theme from "../assets/icons/brush.svg";
 import style from "./homepage.module.css";
 import sharedStyle from "./shared.module.css";
 
-type FeatureProps = {
-  icon: any;
+interface FeatureProps {
+  icon: string;
   title: string;
   description: string;
   note?: string;
@@ -25,9 +25,9 @@ type FeatureProps = {
     href: string;
     label: string;
   };
-};
+}
 
-function Feature({ icon, title, description, note, link }: FeatureProps) {
+function Feature({ icon, title, description, note, link }: FeatureProps): VNode {
   return (
     <section className={style.feature}>
       <div className={style.featureIcon}>{h(icon, null)}</div>
@@ -44,7 +44,7 @@ function Feature({ icon, title, description, note, link }: FeatureProps) {
   );
 }
 
-export default function Homepage() {
+export default function Homepage(): VNode {
   useTitle("Home");
 
   return (
@@ -58,12 +58,12 @@ export default function Homepage() {
           </p>
           <div className={style.buttons}>
             <a href={Routes.DOWNLOAD} className={sharedStyle.button}>
-              {/* @ts-ignore */}
+              {/* @ts-expect-error class */}
               <Zap className={sharedStyle.icon} />
               <span>Download</span>
             </a>
             <a href={Routes.DICKSWORD} className={sharedStyle.buttonLink}>
-              {/* @ts-ignore */}
+              {/* @ts-expect-error class */}
               <MessageCircle className={sharedStyle.icon} />
               <span>Discord Server</span>
             </a>
@@ -158,12 +158,12 @@ export default function Homepage() {
           </p>
           <div className={sharedStyle.buttons}>
             <a href={Routes.DOWNLOAD} className={sharedStyle.button}>
-              {/* @ts-ignore */}
+              {/* @ts-expect-error class */}
               <Zap className={sharedStyle.icon} />
               <span>Download</span>
             </a>
             <a href={Routes.DICKSWORD} className={sharedStyle.buttonLink}>
-              {/* @ts-ignore */}
+              {/* @ts-expect-error class */}
               <MessageCircle className={sharedStyle.icon} />
               <span>Discord Server</span>
             </a>

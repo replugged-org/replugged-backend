@@ -1,16 +1,16 @@
-import type { Attributes } from "preact";
+import type { Attributes, VNode } from "preact";
 import type { Eligibility } from "../../../../../types/store";
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 import { h } from "preact";
 import { useTitle } from "hoofd/preact";
 
 import FormLayout from "./Layout";
-import { TextField, TextareaField, CheckboxField, SelectField } from "../../util/Form";
+import { CheckboxField, SelectField, TextField, TextareaField } from "../../util/Form";
 import { Routes } from "../../../constants";
 
 type FormProps = Attributes & { eligibility?: Eligibility };
 
-export default function PublishForm({ eligibility }: FormProps) {
+export default function PublishForm({ eligibility }: FormProps): VNode {
   useTitle("Publish your work");
 
   return (

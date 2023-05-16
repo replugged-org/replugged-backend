@@ -2,10 +2,10 @@ import type { MongoClient } from "mongodb";
 import type {
   CutiePerks,
   DatabaseUser,
-  User,
   GhostUser,
   RestUser,
   RestUserPrivate,
+  User,
 } from "../../../types/users";
 import { URL } from "url";
 import { existsSync } from "fs";
@@ -13,7 +13,7 @@ import { unlink } from "fs/promises";
 import config from "../config.js";
 import { SETTINGS_STORAGE_FOLDER } from "../api/settings.js";
 import { fetchMember, setRoles } from "../utils/discord.js";
-import { UserFlags, PrivateUserFlags, PersistentUserFlags } from "../flags.js";
+import { PersistentUserFlags, PrivateUserFlags, UserFlags } from "../flags.js";
 
 export enum UserDeletionCause {
   // User initiated account deletion manually
@@ -112,7 +112,7 @@ export function formatUser(
   return restUser;
 }
 
-export async function deleteUser(mongo: MongoClient, userId: string) {
+export async function deleteUser(mongo: MongoClient, userId: string): Promise<void> {
   const database = mongo.db();
   const userCollection = database.collection<DatabaseUser>("users");
 
@@ -144,7 +144,7 @@ export async function deleteUser(mongo: MongoClient, userId: string) {
   // Update member on the guild
   const member = await fetchMember(userId);
   if (member) {
-    const newRoles = member.roles.filter((r: any) => !ROLES_TO_REVOKE.includes(r));
+    const newRoles = member.roles.filter((r) => !ROLES_TO_REVOKE.includes(r));
     await setRoles(userId, newRoles, "User deleted their replugged.dev account");
   }
 }

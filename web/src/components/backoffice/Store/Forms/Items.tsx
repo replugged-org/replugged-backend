@@ -5,13 +5,15 @@ import type {
   StoreForm,
 } from "../../../../../../types/store";
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
-import { h, Fragment } from "preact";
+import { Fragment, VNode, h } from "preact";
 
 import style from "../../admin.module.css";
 
-type FormProps<T = StoreForm> = { form: T };
+interface FormProps<T = StoreForm> {
+  form: T;
+}
 
-export function PublishForm({ form }: FormProps<FormPublish>) {
+export function PublishForm({ form }: FormProps<FormPublish>): VNode {
   return (
     <Fragment>
       <div className={style.line2}>
@@ -44,7 +46,7 @@ export function PublishForm({ form }: FormProps<FormPublish>) {
   );
 }
 
-export function VerificationForm({ form }: FormProps<FormVerification>) {
+export function VerificationForm({ form }: FormProps<FormVerification>): VNode {
   return (
     <Fragment>
       <div>
@@ -75,7 +77,7 @@ export function VerificationForm({ form }: FormProps<FormVerification>) {
   );
 }
 
-export function HostingForm({ form }: FormProps<FormHosting>) {
+export function HostingForm({ form }: FormProps<FormHosting>): VNode {
   return (
     <Fragment>
       <div className={style.line2}>

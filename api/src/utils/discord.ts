@@ -1,14 +1,16 @@
-import type { User, Member, ApiMessage } from "../../../types/discord";
+/* eslint-disable @typescript-eslint/naming-convention */
+/* eslint-disable @typescript-eslint/no-explicit-any */
+import type { ApiMessage, Member, User } from "../../../types/discord";
 import { fetch } from "undici";
 import config from "../config.js";
 
-export async function fetchUser(userId: string): Promise<User> {
+export function fetchUser(userId: string): Promise<User> {
   return fetch(`https://discord.com/api/v9/users/${userId}`, {
     headers: { authorization: `Bot ${config.discord.botToken}` },
   }).then<any>((r: any) => r.json());
 }
 
-export async function fetchCurrentUser(token: string): Promise<User> {
+export function fetchCurrentUser(token: string): Promise<User> {
   return fetch("https://discord.com/api/v9/users/@me", {
     headers: { authorization: `Bearer ${token}` },
   }).then<any>((r: any) => r.json());
@@ -43,11 +45,7 @@ export async function sendDm(userId: string, message: string): Promise<boolean> 
 
 // / Honks
 
-export async function dispatchHonk(
-  honk: string,
-  payload: unknown,
-  query?: string,
-): Promise<ApiMessage> {
+export function dispatchHonk(honk: string, payload: unknown, query?: string): Promise<ApiMessage> {
   return fetch(`https://discord.com/api/v9/webhooks/${honk}?wait=true&${query ?? ""}`, {
     method: "POST",
     headers: { "content-type": "application/json" },
@@ -55,14 +53,14 @@ export async function dispatchHonk(
   }).then<any>((r: any) => r.json());
 }
 
-export async function fetchHonkMessage(honk: string, message: string): Promise<ApiMessage> {
+export function fetchHonkMessage(honk: string, message: string): Promise<ApiMessage> {
   return fetch(`https://discord.com/api/v9/webhooks/${honk}/messages/${message}`).then<any>(
     (r: any) => r.json(),
   );
 }
 
 /** @deprecated */
-export async function editHonkMessage(
+export function editHonkMessage(
   honk: string,
   message: string,
   payload: unknown,
@@ -93,14 +91,14 @@ export async function fetchAllMembers(): Promise<Member[]> {
   return users;
 }
 
-export async function fetchMember(memberId: string): Promise<Member | undefined> {
+export function fetchMember(memberId: string): Promise<Member | undefined> {
   return fetch(
     `https://discord.com/api/v9/guilds/${config.discord.ids.serverId}/members/${memberId}`,
     { headers: { authorization: `Bot ${config.discord.botToken}` } },
   ).then<any>((r: any) => (r.status === 200 ? r.json() : void 0));
 }
 
-export async function setRoles(
+export function setRoles(
   memberId: string,
   roleIds: string[],
   auditLogReason?: string,
@@ -123,7 +121,7 @@ export async function setRoles(
   );
 }
 
-export async function addRole(
+export function addRole(
   memberId: string,
   roleId: string,
   auditLogReason?: string,
@@ -145,7 +143,7 @@ export async function addRole(
   );
 }
 
-export async function removeRole(
+export function removeRole(
   memberId: string,
   roleId: string,
   auditLogReason?: string,

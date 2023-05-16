@@ -1,10 +1,18 @@
 import type { FastifyInstance, FastifyReply, FastifyRequest } from "fastify";
 import { createHash } from "crypto";
 
-type Badge = { _id: string; name: string; icon: string };
+interface Badge {
+  _id: string;
+  name: string;
+  icon: string;
+}
 type RestBadge = Omit<Badge, "_id">;
 
-async function getGuildBadges(this: FastifyInstance, request: FastifyRequest, reply: FastifyReply) {
+async function getGuildBadges(
+  this: FastifyInstance,
+  request: FastifyRequest,
+  reply: FastifyReply,
+): Promise<void> {
   // todo: revise storage method and check donator status of badge manager
   const hash = createHash("sha256");
   const cursor = this.mongo.db!.collection<Badge>("badges").find();
@@ -25,6 +33,6 @@ async function getGuildBadges(this: FastifyInstance, request: FastifyRequest, re
   reply.send(badges);
 }
 
-export default async function (fastify: FastifyInstance): Promise<void> {
+export default function (fastify: FastifyInstance): void {
   fastify.get("/guilds", getGuildBadges);
 }

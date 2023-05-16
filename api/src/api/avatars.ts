@@ -1,4 +1,4 @@
-import type { FastifyInstance, FastifyRequest, FastifyReply } from "fastify";
+import type { FastifyInstance, FastifyReply, FastifyRequest } from "fastify";
 import type { User as DiscordUser } from "../../../types/discord";
 import type { DatabaseUser, User } from "../../../types/users";
 import { URL } from "url";
@@ -9,7 +9,10 @@ import { remoteFile } from "../utils/cache.js";
 import { fetchUser } from "../utils/discord.js";
 import { UserFlags } from "../flags.js";
 
-type AvatarRequest = { TokenizeUser: User; Params: { id: string } };
+interface AvatarRequest {
+  TokenizeUser: User;
+  Params: { id: string };
+}
 
 async function getDiscordAvatar(user: User, update: (user: DiscordUser) => void): Promise<Buffer> {
   if (!user.avatar) {
@@ -23,7 +26,7 @@ async function getDiscordAvatar(user: User, update: (user: DiscordUser) => void)
   );
   if (!file.success) {
     const discordUser = await fetchUser(user._id);
-    // eslint-disable-next-line require-atomic-updates
+
     user.avatar = discordUser.avatar;
     update(discordUser);
 
@@ -39,7 +42,7 @@ async function avatar(
   this: FastifyInstance,
   request: FastifyRequest<AvatarRequest>,
   reply: FastifyReply,
-) {
+): Promise<Buffer | undefined> {
   let { user } = request;
   if (request.params.id !== request.user?._id) {
     // type safety: because we ensure GHOST bit is clear, we'll only get User objects.
@@ -93,7 +96,7 @@ async function avatar(
   );
 }
 
-export default async function (fastify: FastifyInstance): Promise<void> {
+export default function (fastify: FastifyInstance): void {
   fastify.route({
     method: "GET",
     url: "/:id(\\d+).png",

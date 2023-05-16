@@ -1,24 +1,42 @@
-import { useState, useEffect } from "preact/hooks";
+import { useEffect, useState } from "preact/hooks";
 import { Endpoints } from "../../constants";
 
-export type Point = { x: number; y: number; value: number };
+export interface Point {
+  x: number;
+  y: number;
+  value: number;
+}
 type RawDataset = Array<Record<string, number>>;
-type Dataset = { [key: string]: { color: string; points: Point[] } };
+interface Dataset {
+  [key: string]: { color: string; points: Point[] };
+}
 
-export type Chart = { min: number; max: number; dataset: Dataset };
-export type StatsAll = { allTime: Chart; month: Chart; week: Chart };
-export type StatsDay = { month: Chart; week: Chart; day: Chart };
-export type CommunityStats = {
+export interface Chart {
+  min: number;
+  max: number;
+  dataset: Dataset;
+}
+export interface StatsAll {
+  allTime: Chart;
+  month: Chart;
+  week: Chart;
+}
+export interface StatsDay {
+  month: Chart;
+  week: Chart;
+  day: Chart;
+}
+export interface CommunityStats {
   numbers: Record<string, number>;
   users: StatsAll;
   guild: {
     users: StatsDay;
     messages: StatsDay;
     presences: StatsDay;
-  };
-};
+  } | null;
+}
 
-function roundMinMax(all: number[]) {
+function roundMinMax(all: number[]): number[] {
   const min = Math.min(...all);
   const max = Math.max(...all);
   const roundTo = max - min < 100 ? 50 : max - min < 250 ? 100 : 500;
@@ -100,9 +118,11 @@ function stackedChart(dataset: RawDataset, keys: string[], colors: string[]): Ch
   return { min, max, dataset: finalDataset };
 }
 
-const chartsCache: void | any = void 0;
-export default function useStats(): CommunityStats {
-  const [charts, setCharts] = useState(chartsCache);
+interface DataPoint {
+  total: number;
+}
+export default function useStats(): CommunityStats | undefined {
+  const [charts, setCharts] = useState<CommunityStats>();
   useEffect(() => {
     if (!charts) {
       fetch(Endpoints.STATS)
@@ -126,17 +146,17 @@ export default function useStats(): CommunityStats {
               ? {
                   users: {
                     month: simpleChart(
-                      data.guild.month.map((d: any) => d.total),
+                      data.guild.month.map((d: DataPoint) => d.total),
                       "total",
                       "#7289da",
                     ),
                     week: simpleChart(
-                      data.guild.week.map((d: any) => d.total),
+                      data.guild.week.map((d: DataPoint) => d.total),
                       "total",
                       "#7289da",
                     ),
                     day: simpleChart(
-                      data.guild.day.map((d: any) => d.total),
+                      data.guild.day.map((d: DataPoint) => d.total),
                       "total",
                       "#7289da",
                     ),

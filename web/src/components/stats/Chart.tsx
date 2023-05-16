@@ -1,42 +1,49 @@
-import type { Point, Chart as ChartData, StatsAll, StatsDay } from "./useStats";
+import type { Chart as ChartData, Point, StatsAll, StatsDay } from "./useStats";
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
-import { h } from "preact";
-import { useState, useRef, useEffect, useMemo } from "preact/hooks";
+import { VNode, h } from "preact";
+import { useEffect, useMemo, useRef, useState } from "preact/hooks";
 
 import style from "./stats.module.css";
 import Tooltip from "../util/Tooltip";
 
 type Legend = Record<string, string>;
 
-type LegendProps = { legend: Legend; dataset: ChartData };
-type ChartSideProps = { width: number; height: number; dataset: ChartData };
-type ChartBottomProps = {
+interface LegendProps {
+  legend: Legend;
+  dataset: ChartData;
+}
+interface ChartSideProps {
+  width: number;
+  height: number;
+  dataset: ChartData;
+}
+interface ChartBottomProps {
   reduced: boolean;
   mode: string;
   width: number;
   height: number;
-};
-type ChartDatasetProps = {
+}
+interface ChartDatasetProps {
   reduced: boolean;
   width: number;
   height: number;
   dataset: ChartData;
-};
-type ChartLineProps = {
+}
+interface ChartLineProps {
   reduced: boolean;
   width: number;
   height: number;
   set: string;
   color: string;
   points: Point[];
-};
-type ChartProps = {
+}
+interface ChartProps {
   title: string;
   legend?: Legend;
   dataset: StatsDay | StatsAll | false;
   modes: Array<{ name: string; key: string }>;
   defaultMode?: string;
-};
+}
 
 const HEIGHT_RATIO = 270 / 1210;
 const REPLUGGED_EPOCH = 1658901600000;
@@ -56,7 +63,7 @@ const MONTHS = [
   "Dec",
 ];
 
-function ChartLegend({ legend, dataset: { dataset } }: LegendProps) {
+function ChartLegend({ legend, dataset: { dataset } }: LegendProps): VNode {
   return (
     <div className={style.legend}>
       {Object.entries(legend).map(([key, value]) => (
@@ -72,7 +79,7 @@ function ChartLegend({ legend, dataset: { dataset } }: LegendProps) {
   );
 }
 
-function ChartSide({ width, height, dataset }: ChartSideProps) {
+function ChartSide({ width, height, dataset }: ChartSideProps): VNode {
   const topMargin = 15;
   const delta = (height - topMargin - 35) / 4;
   const linesDelta = dataset.max - dataset.min;
@@ -104,7 +111,7 @@ function ChartSide({ width, height, dataset }: ChartSideProps) {
   );
 }
 
-function ChartBottom({ reduced, mode, width, height }: ChartBottomProps) {
+function ChartBottom({ reduced, mode, width, height }: ChartBottomProps): VNode {
   const now = Date.now();
   const baseHeight = height - 35;
   const deltaX = (width - 50) / SHOWN_DATES;
@@ -172,7 +179,7 @@ function ChartBottom({ reduced, mode, width, height }: ChartBottomProps) {
   );
 }
 
-function ChartLine({ reduced, width, height, set, color, points }: ChartLineProps) {
+function ChartLine({ reduced, width, height, set, color, points }: ChartLineProps): VNode {
   const usableWidth = width - 60;
   const usableHeight = height - 50;
   const heightMargin = 15;
@@ -215,7 +222,7 @@ function ChartLine({ reduced, width, height, set, color, points }: ChartLineProp
   );
 }
 
-function ChartDataset({ reduced, width, height, dataset }: ChartDatasetProps) {
+function ChartDataset({ reduced, width, height, dataset }: ChartDatasetProps): VNode {
   return (
     <g>
       {Object.entries(dataset.dataset).map(([key, { color, points }]) => (
@@ -233,7 +240,7 @@ function ChartDataset({ reduced, width, height, dataset }: ChartDatasetProps) {
   );
 }
 
-export default function Chart(props: ChartProps) {
+export default function Chart(props: ChartProps): VNode {
   const ref = useRef<HTMLElement>(null);
   const [reduced, setReduced] = useState(
     typeof window === "undefined" ? false : window.innerWidth < 810,
@@ -246,7 +253,7 @@ export default function Chart(props: ChartProps) {
   );
 
   useEffect(() => {
-    const computeSize = () => {
+    const computeSize = (): void => {
       if (ref.current) {
         const { width: w } = ref.current.getBoundingClientRect();
         setSize([w, Math.round((w - 80) * HEIGHT_RATIO) + 50]);

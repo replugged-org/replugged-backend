@@ -1,4 +1,5 @@
-import type { User, CutieStatus, DatabaseUser } from "../../../types/users";
+/* eslint-disable @typescript-eslint/naming-convention */
+import type { CutieStatus, DatabaseUser, User } from "../../../types/users";
 import type { MongoClient, UpdateFilter } from "mongodb";
 import type { OAuthToken } from "./oauth.js";
 import { Long } from "mongodb";
@@ -11,7 +12,7 @@ import { UserFlags } from "../flags.js";
 const DONATION_TIERS = [100, 500, 1000, Infinity];
 const GRACE_PERIOD = 5 * 24 * 3600e3; // 5 days
 
-export async function notifyStateChange(user: User, change: "pledge" | "perks") {
+export function notifyStateChange(user: User, change: "pledge" | "perks"): void {
   // Update role - todo: keep track of custom role
   if (change === "pledge") {
     if (user.cutieStatus?.pledgeTier) {
@@ -54,7 +55,18 @@ export async function fetchPledgeStatus(token: OAuthToken): Promise<[boolean, Cu
   const url = `https://patreon.com/api/oauth2/v2/identity?${query.toString()}`;
   const response = await fetch(url, {
     headers: { authorization: `${token.tokenType} ${token.accessToken}` },
-  }).then((r) => <any>r.json());
+  }).then(
+    (r) =>
+      r.json() as {
+        included?: Array<{
+          attributes?: {
+            patron_status: string;
+            currently_entitled_amount_cents: number;
+            next_charge_date: string;
+          };
+        }>;
+      },
+  );
 
   let donated = false;
   const data = { pledgeTier: 0, perksExpireAt: -1 };
@@ -82,7 +94,7 @@ export async function fetchPledgeStatus(token: OAuthToken): Promise<[boolean, Cu
 export async function prepareUpdateData(patreonAccount: OAuthToken): Promise<UpdateFilter<User>> {
   let or = new Long(0);
   let and = new Long((1n << 64n) - 1n);
-  const update: Record<string, any> = {};
+  const update: Record<string, unknown> = {};
 
   // todo: ditch unix
   if (Date.now() > patreonAccount.expiresAt) {
@@ -104,14 +116,18 @@ export async function prepareUpdateData(patreonAccount: OAuthToken): Promise<Upd
     and = and.and(~UserFlags.IS_CUTIE);
   }
 
-  return <UpdateFilter<User>>{
+  return {
     $set: update,
     $bit: { flags: { or, and } },
     $currentDate: { updatedAt: true },
-  };
+  } as UpdateFilter<User>;
 }
 
-export async function updateDonatorState(mongo: MongoClient, user: User, manual?: boolean) {
+export async function updateDonatorState(
+  mongo: MongoClient,
+  user: User,
+  manual?: boolean,
+): Promise<void> {
   const patreonAccount = user.accounts.patreon;
   const perksExpireAt = user.cutieStatus?.perksExpireAt ?? 0;
   const collection = mongo.db().collection<DatabaseUser>("users");
@@ -134,7 +150,7 @@ export async function updateDonatorState(mongo: MongoClient, user: User, manual?
   const mongoUpdate = await prepareUpdateData(patreonAccount);
   const statusChange = user.cutieStatus?.pledgeTier !== mongoUpdate.$set!["cutieStatus.pledgeTier"];
   if (manual) {
-    // @ts-ignore
+    // @ts-expect-error idk
     mongoUpdate.$set!["cutieStatus.lastManualRefresh"] = Date.now();
   }
 
@@ -150,10 +166,14 @@ export async function updateDonatorState(mongo: MongoClient, user: User, manual?
 
 // The queue avoids tripping multiple updates if a query arrives during an ongoing update
 const queue = new Map<string, Promise<void>>();
-export async function refreshDonatorState(mongo: MongoClient, user: User, manual?: boolean) {
+export function refreshDonatorState(
+  mongo: MongoClient,
+  user: User,
+  manual?: boolean,
+): Promise<void> {
   const perksExpireAt = user.cutieStatus?.perksExpireAt ?? 0;
   if (!manual && (perksExpireAt > Date.now() || user.flags & UserFlags.CUTIE_OVERRIDE)) {
-    return;
+    return Promise.resolve();
   }
 
   let promise = queue.get(user._id);

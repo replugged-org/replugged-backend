@@ -1,6 +1,7 @@
 import {
   type Attributes,
   type ComponentChildren,
+  VNode,
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   h,
 } from "preact";
@@ -24,7 +25,7 @@ type ModalProps = Attributes & {
   color?: "red" | "green" | "classic";
 };
 
-export default function Modal(props: ModalProps) {
+export default function Modal(props: ModalProps): VNode {
   const btnStyle = `${sharedStyle.button}${
     props.color && props.color !== "classic" ? ` ${sharedStyle[props.color]}` : ""
   }`;
@@ -33,7 +34,7 @@ export default function Modal(props: ModalProps) {
       <div className={style.container} onClick={(e) => e.stopPropagation()}>
         <header className={style.header}>
           <span className={style.title}>{props.title}</span>
-          {/* @ts-ignore */}
+          {/* @ts-expect-error idk */}
           <X className={style.close} onClick={props.onClose} />
         </header>
         <div className={style.inner}>{props.children}</div>

@@ -1,6 +1,6 @@
-import type { Attributes, ComponentChildren } from "preact";
+import type { Attributes, ComponentChildren, VNode } from "preact";
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
-import { h, cloneElement, toChildArray } from "preact";
+import { cloneElement, h, toChildArray } from "preact";
 import { useMemo, useState } from "preact/hooks";
 
 import style from "./tabs.module.css";
@@ -9,7 +9,7 @@ type TabProps = Attributes & {
   children: ComponentChildren;
 };
 
-export default function Tabs({ children: rawChildren }: TabProps) {
+export default function Tabs({ children: rawChildren }: TabProps): VNode {
   const [selected, setSelected] = useState<string | null>(null);
   const children = toChildArray(rawChildren);
 
@@ -19,15 +19,12 @@ export default function Tabs({ children: rawChildren }: TabProps) {
       if (typeof child !== "object") {
         continue;
       }
-      // @ts-ignore -- todo
       if (!("data-tab-id" in child.props) || typeof child.props["data-tab-id"] !== "string") {
         continue;
       }
-      // @ts-ignore -- todo
       if (!("data-tab-name" in child.props) || typeof child.props["data-tab-name"] !== "string") {
         continue;
       }
-      // @ts-ignore -- todo
       res.push({
         id: child.props["data-tab-id"],
         name: child.props["data-tab-name"],

@@ -1,9 +1,12 @@
 import type { FastifyInstance, FastifyReply, FastifyRequest } from "fastify";
 import type { GuildBadge } from "../../../types/guild";
 
-type Badge = { name: string; icon: string };
+interface Badge {
+  name: string;
+  icon: string;
+}
 
-async function badges(
+function badges(
   this: FastifyInstance,
   _request: FastifyRequest,
   reply: FastifyReply,
@@ -25,6 +28,6 @@ async function badges(
 }
 
 /** @deprecated */
-export default async function (fastify: FastifyInstance): Promise<void> {
+export default function (fastify: FastifyInstance): void {
   fastify.get("/badges", badges);
 }

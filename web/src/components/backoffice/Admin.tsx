@@ -1,6 +1,6 @@
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
-import { h, Fragment } from "preact";
-import { useState, useEffect } from "preact/hooks";
+import { Fragment, VNode, h } from "preact";
+import { useEffect, useState } from "preact/hooks";
 import { useTitle } from "hoofd/preact";
 import Router from "preact-router";
 import { Link } from "preact-router/match";
@@ -30,7 +30,7 @@ import CodeSandbox from "feather-icons/dist/icons/codesandbox.svg";
 
 import style from "./admin.module.css";
 
-function Sidebar() {
+function Sidebar(): VNode {
   // Unread badges
   const [unread, setUnread] = useState({ forms: 0, reports: 0 });
   const [totalUsers, setTotalUsers] = useState<number>(0);
@@ -112,14 +112,16 @@ function Sidebar() {
   );
 }
 
-export default function Admin() {
+export default function Admin(): VNode {
   useTitle("Replugged Admin");
 
   return (
     <LayoutWithSidebar>
       <Sidebar />
       <Router>
+        {/* @ts-expect-error idk */}
         <Users path={Routes.BACKOFFICE_USERS} />
+        {/* @ts-expect-error idk */}
         <UsersManage path={Routes.BACKOFFICE_USERS_MANAGE(":id")} />
 
         <SoonRoute path={Routes.BACKOFFICE_BANS}>
@@ -143,6 +145,7 @@ export default function Admin() {
           <div>threats</div>
         </SoonRoute>
 
+        {/* @ts-expect-error idk */}
         <Forms path={Routes.BACKOFFICE_STORE_FORMS} />
 
         <SoonRoute path={Routes.BACKOFFICE_STORE_REPORTS}>

@@ -1,11 +1,13 @@
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
-import { h } from "preact";
+import { VNode, h } from "preact";
 
 import style from "./spinner.module.css";
 
-type SpinnerProps = { balls?: boolean };
+interface SpinnerProps {
+  balls?: boolean;
+}
 
-export default function Spinner({ balls }: SpinnerProps) {
+export default function Spinner({ balls }: SpinnerProps): VNode {
   if (balls) {
     return (
       <div className={style.balls}>

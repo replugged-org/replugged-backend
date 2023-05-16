@@ -1,4 +1,5 @@
-export type User = {
+/* eslint-disable @typescript-eslint/naming-convention */
+export interface User {
   id: string;
   username: string;
   discriminator: string;
@@ -10,9 +11,9 @@ export type User = {
   flags?: number;
   premium_type?: number;
   public_flags?: number;
-};
+}
 
-export type Member = {
+export interface Member {
   user: User;
   nick?: string | null;
   roles: string[];
@@ -22,10 +23,10 @@ export type Member = {
   mute: boolean;
   pending?: boolean;
   permissions?: string;
-};
+}
 
 // Note: type is incomplete
-export type ApiMessage = {
+export interface ApiMessage {
   id: string;
   channel_id: string;
   guild_id?: string;
@@ -34,15 +35,15 @@ export type ApiMessage = {
   content: string;
   timestamp: string;
   thread?: { id: string };
-};
+}
 
-export type DiscordEmbedField = {
+export interface DiscordEmbedField {
   name: string;
   value: string;
   inline?: boolean;
-};
+}
 
-export type DiscordEmbed = {
+export interface DiscordEmbed {
   color: number;
   title: string;
   url: string;
@@ -64,4 +65,4 @@ export type DiscordEmbed = {
     text: string;
     icon_url: string;
   };
-};
+}

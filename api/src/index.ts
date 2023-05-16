@@ -1,13 +1,13 @@
-import fastifyFactory, { type FastifyRequest, type FastifyReply, FastifyInstance } from "fastify";
+import fastifyFactory, { FastifyInstance, type FastifyReply, type FastifyRequest } from "fastify";
 import type { User } from "../../types/users.js";
 import fastifyCookie from "@fastify/cookie";
 import fastifyMongodb from "@fastify/mongodb";
 import fastifyRawBody from "fastify-raw-body";
 
-// @ts-ignore pls shut up ts
+// @ts-expect-error pls shut up ts
 import config from "./config.js";
 
-import { generateToken, Verifiers } from "./utils/auth.js";
+import { Verifiers, generateToken } from "./utils/auth.js";
 
 import apiModule from "./api/index.js";
 import { UserFlags } from "./flags.js";

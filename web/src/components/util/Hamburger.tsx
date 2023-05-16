@@ -1,16 +1,16 @@
-import { useEffect, useCallback } from "preact/hooks";
+import { useCallback, useEffect } from "preact/hooks";
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
-import { h } from "preact";
+import { VNode, h } from "preact";
 
 import style from "./hamburger.module.css";
 
-type HamburgerProps = {
+interface HamburgerProps {
   opened: boolean;
   setOpened: (o: boolean) => void;
   className?: string;
-};
+}
 
-export default function Hamburger({ opened, setOpened, className }: HamburgerProps) {
+export default function Hamburger({ opened, setOpened, className }: HamburgerProps): VNode {
   const open = useCallback(() => setOpened(true), [opened]);
   const close = useCallback(() => setTimeout(() => setOpened(false), 0), []);
 

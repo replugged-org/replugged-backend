@@ -1,11 +1,11 @@
-import type { FastifyInstance, FastifyRequest, FastifyReply } from "fastify";
-import type { DatabaseUser, User } from "../../../types/users";
+import type { FastifyInstance, FastifyReply, FastifyRequest } from "fastify";
+import type { DatabaseUser, RestUser, User } from "../../../types/users";
 import { createHash } from "crypto";
 import { UserFlags } from "../flags.js";
 import config from "../config.js";
 
 import settingsModule from "./settings.js";
-import { isGhostUser, formatUser } from "../data/user.js";
+import { formatUser, isGhostUser } from "../data/user.js";
 // import { refreshAuthTokens, toMongoFields } from '../utils/oauth.js';
 import { notifyStateChange, refreshDonatorState } from "../utils/patreon.js";
 
@@ -22,7 +22,12 @@ const ALLOWED_HOSTS = [
   "media.discordapp.net",
 ];
 
-async function sendUser(request: FastifyRequest, reply: FastifyReply, user: User, self?: boolean) {
+function sendUser(
+  request: FastifyRequest,
+  reply: FastifyReply,
+  user: User,
+  self?: boolean,
+): RestUser | undefined {
   const etag = `W/"${createHash("sha256")
     .update(config.secret)
     .update(user._id)
@@ -43,7 +48,7 @@ async function getUser(
   this: FastifyInstance,
   request: FastifyRequest<{ Params: { id: string } }>,
   reply: FastifyReply,
-) {
+): Promise<RestUser | undefined> {
   // Should be able to be accessed from Discord
   reply.header("Access-Control-Allow-Origin", "*");
 
@@ -57,7 +62,8 @@ async function getUser(
       discriminator: "0001",
       avatar: null,
       flags: 0,
-      accounts: <any>{},
+      // @ts-expect-error not gonna fix
+      accounts: {},
       createdAt: DATE_ZERO,
     });
   }
@@ -66,18 +72,25 @@ async function getUser(
   return sendUser(request, reply, user);
 }
 
-async function getSelf(this: FastifyInstance, request: FastifyRequest, reply: FastifyReply) {
+function getSelf(
+  this: FastifyInstance,
+  request: FastifyRequest,
+  reply: FastifyReply,
+): RestUser | undefined {
   return sendUser(request, reply, request.user!, true);
 }
 
 // this endpoint can only be used to modify perks, but implements checks as a generic update to follow REST semantics (and future-proofing)
-type PatchSelfRequest = { TokenizeUser: User; Body: {} };
+interface PatchSelfRequest {
+  TokenizeUser: User;
+  Body: Record<string, unknown>;
+}
 async function patchSelf(
   this: FastifyInstance,
   request: FastifyRequest<PatchSelfRequest>,
   reply: FastifyReply,
-) {
-  const update: Record<string, any> = { updatedAt: new Date() };
+): Promise<void> {
+  const update: Record<string, unknown> = { updatedAt: new Date() };
   const user = request.user!;
 
   if (!request.body || typeof request.body !== "object") {
@@ -167,7 +180,11 @@ async function patchSelf(
 //   return { token: spotify.accessToken };
 // }
 
-async function refreshPledge(this: FastifyInstance, request: FastifyRequest, reply: FastifyReply) {
+async function refreshPledge(
+  this: FastifyInstance,
+  request: FastifyRequest,
+  reply: FastifyReply,
+): Promise<void> {
   const patreonAccount = request.user!.accounts.patreon;
   const lastManualRefresh = request.user!.cutieStatus?.lastManualRefresh ?? 0;
   if (!patreonAccount) {
@@ -198,7 +215,7 @@ async function refreshPledge(this: FastifyInstance, request: FastifyRequest, rep
   reply.send(request.user!.cutieStatus || null);
 }
 
-export default async function (fastify: FastifyInstance): Promise<void> {
+export default function (fastify: FastifyInstance): void {
   fastify.route({
     method: "GET",
     url: "/@me",

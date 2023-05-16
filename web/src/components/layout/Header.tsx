@@ -1,6 +1,6 @@
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
-import { h } from "preact";
-import { useState, useContext } from "preact/hooks";
+import { VNode, h } from "preact";
+import { useContext, useState } from "preact/hooks";
 
 import { UserFlags } from "../../../../shared/flags";
 import UserContext from "../UserContext";
@@ -15,13 +15,13 @@ import Staff from "../../assets/badges/staff.svg";
 import style from "./header.module.css";
 import sharedStyle from "../shared.module.css";
 
-function User() {
+function User(): VNode {
   const user = useContext(UserContext);
   const isStaff = ((user?.flags ?? 0) & UserFlags.STAFF) !== 0;
 
   if (!user) {
     return (
-      /* @ts-expect-error */
+      /* @ts-expect-error doesn't like native */
       <a native href={Endpoints.LOGIN} className={sharedStyle.button}>
         Login with Discord
       </a>
@@ -37,14 +37,14 @@ function User() {
             {user.username}
             <span className={style.discriminator}>#{user.discriminator}</span>
           </div>
-          {/* @ts-ignore */}
+          {/* @ts-expect-error doesn't like native */}
           {isStaff && <Staff className={style.badge} />}
         </div>
         <div>
           <a className={style.link} href={Routes.ME}>
             Account
           </a>
-          {/* @ts-expect-error */}
+          {/* @ts-expect-error doesn't like native */}
           <a className={style.link} href={Endpoints.LOGOUT} native>
             Logout
           </a>
@@ -59,7 +59,7 @@ function User() {
   );
 }
 
-export default function Header() {
+export default function Header(): VNode {
   const [opened, setOpened] = useState(false);
 
   return (
@@ -69,7 +69,7 @@ export default function Header() {
           ? <img className={style.plug} src={spookycordPlug} alt='Replugged Logo'/>
           : <RepluggedPlug className={style.plug}/>}
         <RepluggedWordmark className={style.wordmark}/> */}
-        {/* @ts-ignore */}
+        {/* @ts-expect-error doesn't like native */}
         <RepluggedLogo className={style.plug} />
       </a>
 

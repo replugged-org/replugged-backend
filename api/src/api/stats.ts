@@ -1,18 +1,29 @@
-import type { User, MinimalUser } from "../../../types/users";
+/* eslint-disable @typescript-eslint/no-explicit-any */
+/* eslint-disable @typescript-eslint/explicit-function-return-type */
+import type { MinimalUser, User } from "../../../types/users";
 import type { FastifyInstance, FastifyReply, FastifyRequest } from "fastify";
 import type { Db, ObjectId } from "mongodb";
 import mongo from "mongodb";
 import { UserFlags } from "../flags.js";
 import { getOrCompute } from "../utils/cache.js";
 
-type Delta = { day: number; week: number; month: number };
+interface Delta {
+  day: number;
+  week: number;
+  month: number;
+}
 type DeltaAll = Delta & { allTime: number };
-type GraphOverTime = { count: number; allTime: number[]; month: number[]; week: number[] };
-type GraphPeriodic = {
+interface GraphOverTime {
+  count: number;
+  allTime: number[];
+  month: number[];
+  week: number[];
+}
+interface GraphPeriodic {
   month: Array<Record<string, number>>;
   week: Array<Record<string, number>>;
   day: Array<Record<string, number>>;
-};
+}
 type PeriodicData = Record<string, number> & { _id: ObjectId };
 
 function getDelta(pointsCount: number): DeltaAll {
@@ -39,7 +50,7 @@ function padArray(array: any[], to: number, withData: any = 0): any[] {
     .concat(array);
 }
 
-function datesOverTime(dates: number[], pointsCount: number = 50): GraphOverTime {
+function datesOverTime(dates: number[], pointsCount = 50): GraphOverTime {
   const delta = getDelta(pointsCount);
   const data: GraphOverTime = {
     count: dates.length,
@@ -232,7 +243,7 @@ async function numbers(
   };
 }
 
-export default async function (fastify: FastifyInstance): Promise<void> {
+export default function (fastify: FastifyInstance): void {
   fastify.mongo.db!.collection("users").createIndex("createdAt");
   fastify.get("/contributors", contributors);
   fastify.get("/numbers", numbers);

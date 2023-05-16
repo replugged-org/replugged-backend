@@ -1,21 +1,22 @@
-import type { FastifyInstance, FastifyRequest, FastifyReply } from "fastify";
+/* eslint-disable @typescript-eslint/explicit-function-return-type */
+import type { FastifyInstance, FastifyReply, FastifyRequest } from "fastify";
 import { DiscordEmbed } from "../../../../types/discord";
 import { UserFlags } from "../../flags.js";
 
-export type DatabaseTag = {
+export interface DatabaseTag {
   _id: string;
   content: string;
   embed?: DiscordEmbed;
-};
+}
 
-type RouteParams = {
+interface RouteParams {
   id: string;
-};
+}
 
-type ReadAllQuery = {
+interface ReadAllQuery {
   page: number;
   limit: number;
-};
+}
 
 async function read(
   this: FastifyInstance,
@@ -81,7 +82,7 @@ async function del(
   this.mongo.db!.collection("tags").deleteOne({ _id: request.params.id });
 }
 
-export default async function (fastify: FastifyInstance): Promise<void> {
+export default function (fastify: FastifyInstance): void {
   fastify.route({
     method: "GET",
     url: "/",

@@ -1,11 +1,12 @@
 import {
   type Attributes,
   type ComponentChild,
+  ComponentChildren,
+  VNode,
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   h,
-  ComponentChildren,
 } from "preact";
-import { useState, useCallback, useMemo, useEffect } from "preact/hooks";
+import { useCallback, useEffect, useMemo, useState } from "preact/hooks";
 
 import ChevronDown from "feather-icons/dist/icons/chevron-down.svg";
 
@@ -45,12 +46,12 @@ type SelectFieldProps = BaseFieldProps & {
   options: Array<{ id: string; name: string }>;
 };
 
-type FieldState = {
+interface FieldState {
   id: string;
   note?: ComponentChild;
   error?: ComponentChild;
   onChange: () => void;
-};
+}
 
 function useField(note?: ComponentChild, error?: ComponentChild, rk?: number): FieldState {
   const [prevError, setPrevError] = useState(error);
@@ -78,7 +79,7 @@ function useField(note?: ComponentChild, error?: ComponentChild, rk?: number): F
   };
 }
 
-function BaseField(props: BaseProps) {
+function BaseField(props: BaseProps): VNode {
   return (
     <div className={style.field}>
       <label className={style.label} for={props.id}>
@@ -92,7 +93,7 @@ function BaseField(props: BaseProps) {
   );
 }
 
-export function TextField(props: TextFieldProps) {
+export function TextField(props: TextFieldProps): VNode {
   const field = useField(props.note, props.error, props.rk);
   const inputElement = (
     <input
@@ -122,7 +123,7 @@ export function TextField(props: TextFieldProps) {
   );
 }
 
-export function TextareaField(props: TextFieldProps) {
+export function TextareaField(props: TextFieldProps): VNode {
   const field = useField(props.note, props.error, props.rk);
 
   return (
@@ -143,7 +144,7 @@ export function TextareaField(props: TextFieldProps) {
   );
 }
 
-export function CheckboxField(props: CheckboxFieldProps) {
+export function CheckboxField(props: CheckboxFieldProps): VNode {
   const field = useField(props.note, props.error, props.rk);
 
   return (
@@ -162,7 +163,7 @@ export function CheckboxField(props: CheckboxFieldProps) {
   );
 }
 
-export function SelectField(props: SelectFieldProps) {
+export function SelectField(props: SelectFieldProps): VNode {
   const field = useField(props.note, props.error, props.rk);
 
   return (
@@ -182,7 +183,7 @@ export function SelectField(props: SelectFieldProps) {
           </option>
         ))}
       </select>
-      {/* @ts-ignore */}
+      {/* @ts-expect-error idk */}
       <ChevronDown className={style.selectArrow} />
     </BaseField>
   );

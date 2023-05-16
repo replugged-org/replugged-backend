@@ -1,15 +1,16 @@
+/* eslint-disable @typescript-eslint/naming-convention */
 import { URLSearchParams } from "url";
 import { fetch } from "undici";
 import config from "../config.js";
 
-export type OAuthToken = {
+export interface OAuthToken {
   tokenType: string;
   accessToken: string;
   refreshToken?: string;
   expiresAt: number;
-};
+}
 
-export const OAuthEndpoints = <const>{
+export const OAuthEndpoints = {
   discord: {
     AUTHORIZE_URL: "https://discord.com/oauth2/authorize",
     TOKEN_URL: "https://discord.com/api/oauth2/token",
@@ -31,7 +32,7 @@ export const OAuthEndpoints = <const>{
     SELF_URL:
       "https://patreon.com/api/oauth2/v2/identity?include=memberships,memberships.currently_entitled_tiers,memberships.user&fields%5Bmember%5D=patron_status,full_name,last_charge_date,next_charge_date&fields%5Buser%5D=social_connections,email",
   },
-};
+} as const;
 
 export type OAuthProvider = keyof typeof OAuthEndpoints;
 
@@ -50,7 +51,12 @@ async function fetchToken(provider: OAuthProvider, params: URLSearchParams): Pro
     throw new Error(`Token exchange failed: ${response.status}: ${response.statusText}`);
   }
 
-  const rawToken = <any>await response.json();
+  const rawToken = (await response.json()) as {
+    token_type: string;
+    refresh_token: string;
+    access_token: string;
+    expires_in: number;
+  };
 
   const token: OAuthToken = {
     tokenType: rawToken.token_type,
@@ -81,7 +87,7 @@ export function getAuthorizationUrl(
   return `${OAuthEndpoints[provider].AUTHORIZE_URL}?${params.toString()}`;
 }
 
-export async function getAuthTokens(
+export function getAuthTokens(
   provider: OAuthProvider,
   redirect: string,
   code: string,
@@ -96,10 +102,7 @@ export async function getAuthTokens(
   return fetchToken(provider, body);
 }
 
-export async function refreshAuthTokens(
-  provider: OAuthProvider,
-  refresh: string,
-): Promise<OAuthToken> {
+export function refreshAuthTokens(provider: OAuthProvider, refresh: string): Promise<OAuthToken> {
   const body = new URLSearchParams();
   body.set("grant_type", "refresh_token");
   body.set("client_id", config[provider].clientID);
@@ -109,20 +112,23 @@ export async function refreshAuthTokens(
   return fetchToken(provider, body);
 }
 
-export async function fetchAccount<TAccount = unknown>(
+export function fetchAccount<TAccount = unknown>(
   provider: OAuthProvider,
   token: OAuthToken,
 ): Promise<TAccount> {
   const authorization = `${token.tokenType ?? "Bearer"} ${token.accessToken}`;
-  return <Promise<TAccount>>fetch(OAuthEndpoints[provider].SELF_URL, {
+  return fetch(OAuthEndpoints[provider].SELF_URL, {
     headers: {
       accept: "application/json",
       authorization,
     },
-  }).then((r: any) => r.json());
+  }).then((r) => r.json()) as Promise<TAccount>;
 }
 
-export function toMongoFields(token: OAuthToken, platform: string) {
+export function toMongoFields(
+  token: OAuthToken,
+  platform: string,
+): Record<string, string | number> {
   const res = {
     [`accounts.${platform}.tokenType`]: token.tokenType,
     [`accounts.${platform}.accessToken`]: token.accessToken,

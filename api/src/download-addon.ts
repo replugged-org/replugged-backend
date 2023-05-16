@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 // For CLI usage
 // npm run download-addon <user/repo> [addonId]
 
@@ -9,7 +10,7 @@ import { writeFile } from "fs/promises";
 
 const ADDONS_FOLDER = STORAGE_FOLDER("addons");
 
-const token = config.github.token;
+const { token } = config.github;
 
 const headers: Record<string, string> = {};
 if (token) {

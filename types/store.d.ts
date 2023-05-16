@@ -2,19 +2,19 @@ import { ObjectId } from "mongodb";
 // 0 = Eligible; 1 = Closed; 2 = Banned
 export type Eligibility = 0 | 1 | 2;
 
-export type EligibilityStatus = {
+export interface EligibilityStatus {
   publish: Eligibility;
   verification: Eligibility;
   hosting: Eligibility;
   reporting: Eligibility;
-};
+}
 
 export enum Visibility {
   PUBLIC = 0,
   PRIVATE = 1,
 }
 
-type StoreItem = {
+interface StoreItem {
   type: "plugin" | "theme";
   description: string;
   author: string;
@@ -30,22 +30,22 @@ type StoreItem = {
   lastCommitTime: Date;
 
   nsfw: boolean;
-};
+}
 
-type PendingForm = {
+interface PendingForm {
   reviewed?: false;
   approved?: boolean;
   reviewer?: null;
   reviewReason?: null;
   submitter: string;
-};
-type ReviewedForm = {
+}
+interface ReviewedForm {
   reviewed: true;
   approved: boolean;
   reviewer: string;
   reviewReason?: string;
   submitter?: string;
-};
+}
 
 export type Form = (PendingForm | ReviewedForm) & {
   _id: ObjectId;

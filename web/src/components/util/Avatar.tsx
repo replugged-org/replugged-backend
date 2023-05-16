@@ -1,18 +1,18 @@
 import type { MinimalUser } from "../../../../types/users";
-import { useState, useCallback } from "preact/hooks";
+import { useCallback, useState } from "preact/hooks";
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
-import { h } from "preact";
+import { VNode, h } from "preact";
 
 import { Endpoints } from "../../constants";
 
 import style from "./avatar.module.css";
 
-type AvatarProps = {
+interface AvatarProps {
   user: MinimalUser;
   class?: string;
-};
+}
 
-export function DiscordAvatar({ user, class: className }: AvatarProps) {
+export function DiscordAvatar({ user, class: className }: AvatarProps): VNode {
   const avatar = user.avatar
     ? Endpoints.USER_AVATAR_DISCORD(user._id, user.avatar)
     : Endpoints.DEFAULT_AVATAR_DISCORD(Number(user.discriminator));
@@ -33,7 +33,7 @@ export function DiscordAvatar({ user, class: className }: AvatarProps) {
   );
 }
 
-export default function Avatar({ user, class: className }: AvatarProps) {
+export default function Avatar({ user, class: className }: AvatarProps): VNode {
   return (
     <img
       src={Endpoints.USER_AVATAR(user._id)}

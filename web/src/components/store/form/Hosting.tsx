@@ -1,15 +1,15 @@
-import type { Attributes } from "preact";
+import type { Attributes, VNode } from "preact";
 import type { Eligibility } from "../../../../../types/store";
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 import { h } from "preact";
 import { useTitle } from "hoofd/preact";
 
 import FormLayout from "./Layout";
-import { TextField, TextareaField, CheckboxField } from "../../util/Form";
+import { CheckboxField, TextField, TextareaField } from "../../util/Form";
 
 type FormProps = Attributes & { eligibility?: Eligibility };
 
-export default function HostingForm({ eligibility }: FormProps) {
+export default function HostingForm({ eligibility }: FormProps): VNode {
   useTitle("Host a backend");
 
   return (

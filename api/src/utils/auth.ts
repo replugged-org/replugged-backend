@@ -10,7 +10,9 @@ import config from "../config.js";
 // import { UserFlags } from '../flags.js'
 import { createSigner, createVerifier } from "fast-jwt";
 
-export type JWTPayload = { id: string };
+export interface JWTPayload {
+  id: string;
+}
 
 export enum TokenType {
   WEB,
@@ -34,7 +36,7 @@ export const Verifiers = {
   }),
 };
 
-export function generateToken(this: FastifyReply, payload: JWTPayload, type: TokenType) {
+export function generateToken(this: FastifyReply, payload: JWTPayload, type: TokenType): string {
   const signer = createSigner({
     key: KEY,
     algorithm: "HS512",

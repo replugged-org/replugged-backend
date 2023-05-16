@@ -1,5 +1,6 @@
 import {
   type JSX,
+  VNode,
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   h,
 } from "preact";
@@ -18,7 +19,7 @@ type AuthBoundaryProps = {
   staff?: boolean;
 } & Record<string, unknown>;
 
-export default function AuthBoundary({ children, staff }: AuthBoundaryProps) {
+export default function AuthBoundary({ children, staff }: AuthBoundaryProps): VNode {
   const user = useContext(UserContext);
   const [{ url: path }] = useRouter();
 
@@ -37,7 +38,7 @@ export default function AuthBoundary({ children, staff }: AuthBoundaryProps) {
       <main>
         <h1>You must be authenticated to see this!</h1>
         <p>
-          {/* @ts-ignore */}
+          {/* @ts-expect-error idk */}
           <a href={`${Endpoints.LOGIN}?redirect=${path}`} native>
             Login
           </a>

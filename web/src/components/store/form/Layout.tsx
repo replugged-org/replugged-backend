@@ -1,36 +1,42 @@
 import type { Attributes, ComponentChild, VNode } from "preact";
 import type { Eligibility } from "../../../../../types/store";
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
-import { h, cloneElement, Fragment } from "preact";
-import { useState, useContext, useCallback, useMemo, useLayoutEffect } from "preact/hooks";
+import { Fragment, cloneElement, h } from "preact";
+import { useCallback, useLayoutEffect, useMemo, useState } from "preact/hooks";
 
 import Spinner from "../../util/Spinner";
-import UserContext from "../../UserContext";
 import { Endpoints, Routes } from "../../../constants";
 
 import style from "../store.module.css";
 import sharedStyle from "../../shared.module.css";
 
-type FormProps = {
-  children: VNode<any>[];
+type FormChild = VNode<{
+  name: string;
+}>;
+
+interface FormProps {
+  children: FormChild[];
   onNext: () => void;
   onError: () => void;
   onLimit: () => void;
   id: string;
-};
+}
 type FormLayoutProps = Attributes & {
   id: string;
   title: string;
-  children: VNode[];
+  children: FormChild[];
   eligibility?: Eligibility;
 };
-type PawaScreenProps = { headline: ComponentChild; text: ComponentChild };
+interface PawaScreenProps {
+  headline: ComponentChild;
+  text: ComponentChild;
+}
 
 const button = `${sharedStyle.button} ${style.button}`;
 
-function Intro({ id, onNext }: { id: string; onNext: () => void }) {
-  const isLoggedIn = Boolean(useContext(UserContext));
-  const path = typeof location !== "undefined" ? location.pathname : "";
+function Intro(_args: { id: string; onNext: () => void }): VNode {
+  // const isLoggedIn = Boolean(useContext(UserContext));
+  // const path = typeof location !== "undefined" ? location.pathname : "";
 
   return (
     <span>Coming soon</span>
@@ -53,12 +59,12 @@ function Intro({ id, onNext }: { id: string; onNext: () => void }) {
   );
 }
 
-function Form({ children, onNext, onError, onLimit, id }: FormProps) {
+function Form({ children, onNext, onError, onLimit, id }: FormProps): VNode {
   // [Cynthia] this is used to force re-render of form fields, to help with errors sometimes not showing up
   const [renderKey, setRenderKey] = useState(0);
   const [isSubmitting, setSubmitting] = useState(false);
   const [errors, setErrorsRaw] = useState<Record<string, string>>({});
-  function setErrors(e: Record<string, string>) {
+  function setErrors(e: Record<string, string>): void {
     setErrorsRaw(e);
     setRenderKey((k) => ++k);
     setSubmitting(false);
@@ -71,7 +77,7 @@ function Form({ children, onNext, onError, onLimit, id }: FormProps) {
       e.preventDefault();
       setSubmitting(true);
       const form = e.target as HTMLFormElement;
-      const obj: Record<string, any> = {};
+      const obj: Record<string, unknown> = {};
       const err: Record<string, string> = {};
 
       for (const name of names) {
@@ -138,7 +144,7 @@ function Form({ children, onNext, onError, onLimit, id }: FormProps) {
   );
 }
 
-function PawaScreen({ headline, text }: PawaScreenProps) {
+function PawaScreen({ headline, text }: PawaScreenProps): VNode {
   return (
     <div className={style.pawaScreen}>
       <hr />
@@ -148,7 +154,7 @@ function PawaScreen({ headline, text }: PawaScreenProps) {
   );
 }
 
-export default function FormLayout({ id, title, children, eligibility }: FormLayoutProps) {
+export default function FormLayout({ id, title, children, eligibility }: FormLayoutProps): VNode {
   const [stage, setStage] = useState(0);
   useLayoutEffect(() => {
     document.querySelector("header + div")!.scrollTop = 0;

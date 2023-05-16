@@ -1,11 +1,10 @@
-import { type JSX, h, Fragment } from "preact";
-import { useContext, useState, useCallback, useMemo } from "preact/hooks";
+import { Fragment, type JSX, VNode, h } from "preact";
+import { useCallback, useContext, useMemo, useState } from "preact/hooks";
 import { useTitle } from "hoofd/preact";
 import { UserFlags } from "../../../../shared/flags.js";
 
 import { TextField } from "../util/Form.jsx";
 
-import Donator from "./Donator";
 import Profile from "./Profile";
 import Spinner from "../util/Spinner";
 import Modal from "../util/Modal";
@@ -23,13 +22,13 @@ import AlertCircle from "feather-icons/dist/icons/alert-circle.svg";
 import style from "./account.module.css";
 import sharedStyle from "../shared.module.css";
 
-type LinkedAccountProps = {
+interface LinkedAccountProps {
   platform: string;
   icon: typeof Spotify;
   explainer: string | JSX.Element;
   account?: string;
   refreshEndpoint?: string;
-};
+}
 
 function LinkedAccount({
   platform,
@@ -37,7 +36,7 @@ function LinkedAccount({
   account,
   explainer,
   refreshEndpoint,
-}: LinkedAccountProps) {
+}: LinkedAccountProps): VNode {
   const [refreshing, setRefreshing] = useState(false);
   const [refreshError, setRefreshError] = useState<string | null>(null);
   const refresh = useCallback(async () => {
@@ -63,15 +62,15 @@ function LinkedAccount({
         <span>{account ?? "No account linked"}</span>
         <div className={style.linkedAccountActions}>
           {!account && (
-            // @ts-expect-error
+            // @ts-expect-error native
             <a native href={Endpoints.LINK_ACCOUNT(platform)} className={style.linkedAccountAction}>
               <Link />
               <span>Link accounts</span>
             </a>
           )}
           {!refreshing && account && (
-            // @ts-expect-error
             <a
+              // @ts-expect-error native
               native
               href={Endpoints.UNLINK_ACCOUNT(platform)}
               className={style.linkedAccountAction}>
@@ -106,7 +105,7 @@ function LinkedAccount({
   );
 }
 
-function PerksEdit({ onReturn }: { onReturn: () => void }) {
+function PerksEdit({ onReturn }: { onReturn: () => void }): VNode {
   const user = useContext(UserContext)!;
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | undefined>();
@@ -218,7 +217,7 @@ function PerksEdit({ onReturn }: { onReturn: () => void }) {
   );
 }
 
-function ManagePerks() {
+function ManagePerks(): VNode {
   const user = useContext(UserContext)!;
   const [editing, setEditing] = useState(false);
 
@@ -234,7 +233,7 @@ function ManagePerks() {
   );
 }
 
-export default function Account() {
+export default function Account(): VNode {
   useTitle("My Account");
   const user = useContext(UserContext)!;
   const [deletingAccount, setDeletingAccount] = useState(false);

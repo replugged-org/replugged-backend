@@ -1,10 +1,10 @@
-import type { Attributes, JSX } from "preact";
+import type { Attributes, JSX, VNode } from "preact";
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
-import { h, cloneElement } from "preact";
+import { cloneElement, h } from "preact";
 
 import style from "./soon.module.css";
 
-export default function Soon() {
+export default function Soon(): VNode {
   return (
     <main className={style.container}>
       <img
@@ -18,7 +18,7 @@ export default function Soon() {
   );
 }
 
-export function SoonRoute({ children, ...props }: Attributes & { children: JSX.Element }) {
+export function SoonRoute({ children, ...props }: Attributes & { children: JSX.Element }): VNode {
   if (import.meta.env.PROD) {
     return <Soon />;
   }
