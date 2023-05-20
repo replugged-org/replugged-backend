@@ -55,7 +55,7 @@ function listAddons(type: AddonType): Manifest[] {
   return addons;
 }
 
-async function getAddonIdsFromDisc(): Promise<string[]> {
+async function getAddonIdsFromDisk(): Promise<string[]> {
   const fullPath = path.join(ADDONS_FOLDER, "manifests");
   if (!(await exists(fullPath))) return [];
   const fileNames = await readdir(fullPath);
@@ -63,7 +63,7 @@ async function getAddonIdsFromDisc(): Promise<string[]> {
 }
 
 async function populateCache(): Promise<void> {
-  const ids = await getAddonIdsFromDisc();
+  const ids = await getAddonIdsFromDisk();
   Promise.all(ids.map((id) => loadManifest(id)));
 }
 populateCache();
