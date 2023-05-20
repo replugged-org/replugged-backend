@@ -14,7 +14,7 @@ const { token } = config.github;
 
 const headers: Record<string, string> = {};
 if (token) {
-  headers.Authorization = `token ${token}`;
+  headers.Authorization = `Bearer ${token}`;
 }
 
 console.log(`Getting latest release for replugged`);
