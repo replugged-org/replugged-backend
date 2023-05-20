@@ -14,7 +14,7 @@ const { token } = config.github;
 
 const headers: Record<string, string> = {};
 if (token) {
-  headers.Authorization = `token ${token}`;
+  headers.Authorization = `Bearer ${token}`;
 }
 
 const [repoId, addonId] = process.argv.slice(2);
