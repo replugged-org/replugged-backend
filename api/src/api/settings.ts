@@ -67,6 +67,7 @@ async function del(
 
 export default function (fastify: FastifyInstance, _: unknown, done: () => void): void {
   if (process.env.NODE_ENV !== "development") {
+    done();
     return;
   }
 
