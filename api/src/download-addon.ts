@@ -66,12 +66,15 @@ console.log(`Asar: ${asarUrl}`);
 const manifestRes = (await fetch(manifestUrl, {
   headers,
 }).then((res) => res.json())) as any;
-const typePath = manifestRes.type.replace(/^replugged-/, "");
+manifestRes.updater = {
+  type: "store",
+  id: manifestRes.id,
+};
 const asarRes = await fetch(asarUrl, {
   headers,
 }).then((res) => res.arrayBuffer());
-const manifestPath = path.join(ADDONS_FOLDER, "manifests", typePath, `${manifestAddonId}.json`);
-const asarPath = path.join(ADDONS_FOLDER, "asars", typePath, `${manifestAddonId}.asar`);
+const manifestPath = path.join(ADDONS_FOLDER, "manifests", `${manifestAddonId}.json`);
+const asarPath = path.join(ADDONS_FOLDER, "asars", `${manifestAddonId}.asar`);
 [manifestPath, asarPath].forEach(createDirForFile);
 await writeFile(manifestPath, JSON.stringify(manifestRes, null, 2));
 await writeFile(asarPath, Buffer.from(asarRes));
