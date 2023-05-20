@@ -81,7 +81,7 @@ async function del(
   reply.code(204).send();
 }
 
-export default function (fastify: FastifyInstance): void {
+export default function (fastify: FastifyInstance, _: unknown, done: () => void): void {
   if (process.env.NODE_ENV !== "development") {
     return;
   }
@@ -109,4 +109,5 @@ export default function (fastify: FastifyInstance): void {
     handler: del,
     config: { auth: { allowClient: true } },
   });
+  done();
 }

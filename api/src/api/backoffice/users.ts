@@ -295,7 +295,7 @@ async function getUserCount(this: FastifyInstance) {
   return users;
 }
 
-export default function (fastify: FastifyInstance): void {
+export default function (fastify: FastifyInstance, _: unknown, done: () => void): void {
   // Main routes
 
   fastify.route({
@@ -368,4 +368,5 @@ export default function (fastify: FastifyInstance): void {
   fastify.get("/search", { schema: void 0 }, searchUsers);
   fastify.post("/:id(\\d{17,})/ban", { schema: void 0 }, banUser);
   fastify.post("/:id(\\d{17,})/refresh-pledge", { schema: void 0 }, refreshUserPledge);
+  done();
 }

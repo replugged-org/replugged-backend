@@ -4,7 +4,8 @@ import fastifyCookie from "@fastify/cookie";
 import fastifyMongodb from "@fastify/mongodb";
 import fastifyRawBody from "fastify-raw-body";
 
-// @ts-expect-error pls shut up ts
+// eslint-disable-next-line @typescript-eslint/ban-ts-comment, @typescript-eslint/prefer-ts-expect-error
+// @ts-ignore pls shut up ts
 import config from "./config.js";
 
 import { Verifiers, generateToken } from "./utils/auth.js";

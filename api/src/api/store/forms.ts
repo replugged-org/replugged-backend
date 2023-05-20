@@ -312,7 +312,7 @@ async function hostingForm(
   return finalizeForm(this.mongo.db!, request.user!, "hosting", request.body, reply);
 }
 
-export default function (fastify: FastifyInstance): void {
+export default function (fastify: FastifyInstance, _: unknown, done: () => void): void {
   // if (process.env.NODE_ENV !== 'development') return
 
   fastify.get("/eligibility", { config: { auth: { optional: true } } }, (request) =>
@@ -329,4 +329,5 @@ export default function (fastify: FastifyInstance): void {
     { config: { auth: {} }, schema: hostingSchema },
     hostingForm,
   );
+  done();
 }

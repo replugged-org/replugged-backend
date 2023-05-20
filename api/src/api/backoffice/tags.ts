@@ -82,7 +82,7 @@ async function del(
   this.mongo.db!.collection("tags").deleteOne({ _id: request.params.id });
 }
 
-export default function (fastify: FastifyInstance): void {
+export default function (fastify: FastifyInstance, _: unknown, done: () => void): void {
   fastify.route({
     method: "GET",
     url: "/",
@@ -126,4 +126,5 @@ export default function (fastify: FastifyInstance): void {
       },
     },
   });
+  done();
 }

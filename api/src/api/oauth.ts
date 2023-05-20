@@ -298,7 +298,7 @@ async function unlink(this: FastifyInstance, request: FastifyRequest, reply: Rep
   reply.redirect("/me");
 }
 
-function oauthPlugin(fastify: FastifyInstance, options: OAuthOptions): void {
+function oauthPlugin(fastify: FastifyInstance, options: OAuthOptions, done: () => void): void {
   fastify.route({
     method: "GET",
     url: "/",
@@ -328,9 +328,10 @@ function oauthPlugin(fastify: FastifyInstance, options: OAuthOptions): void {
       auth: {},
     },
   });
+  done();
 }
 
-export default function (fastify: FastifyInstance): void {
+export default function (fastify: FastifyInstance, _: unknown, done: () => void): void {
   fastify.register(oauthPlugin, {
     prefix: "/discord",
     data: {
@@ -377,4 +378,5 @@ export default function (fastify: FastifyInstance): void {
       scopes: ["identity", "identity[email]"],
     },
   });
+  done();
 }

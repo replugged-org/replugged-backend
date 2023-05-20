@@ -243,8 +243,9 @@ async function numbers(
   };
 }
 
-export default function (fastify: FastifyInstance): void {
+export default function (fastify: FastifyInstance, _: unknown, done: () => void): void {
   fastify.mongo.db!.collection("users").createIndex("createdAt");
   fastify.get("/contributors", contributors);
   fastify.get("/numbers", numbers);
+  done();
 }

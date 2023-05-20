@@ -4,7 +4,7 @@ import type { FastifyInstance } from "fastify";
 import formModule from "./forms.js";
 import itemsModule from "./items.js";
 
-export default function (fastify: FastifyInstance): void {
+export default function (fastify: FastifyInstance, _: unknown, done: () => void): void {
   //   fastify.get('/suggestions', (_request: FastifyRequest, reply: FastifyReply) => {
   //     reply.header('cache-control', 'public, max-age=86400')
   //     fetchSuggestions()
@@ -12,4 +12,5 @@ export default function (fastify: FastifyInstance): void {
 
   fastify.register(formModule, { prefix: "/forms" });
   fastify.register(itemsModule, { prefix: "/items" });
+  done();
 }

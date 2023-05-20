@@ -215,7 +215,7 @@ async function refreshPledge(
   reply.send(request.user!.cutieStatus || null);
 }
 
-export default function (fastify: FastifyInstance): void {
+export default function (fastify: FastifyInstance, _: unknown, done: () => void): void {
   fastify.route({
     method: "GET",
     url: "/@me",
@@ -264,4 +264,5 @@ export default function (fastify: FastifyInstance): void {
   });
 
   fastify.register(settingsModule, { prefix: "/@me/settings" });
+  done();
 }

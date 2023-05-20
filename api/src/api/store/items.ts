@@ -51,8 +51,8 @@ import { FastifyInstance /* FastifyReply, FastifyRequest*/ } from "fastify";
 //     return entity
 // }
 
- 
-export default async function (_fastify: FastifyInstance): Promise<void> {
+export default function (_fastify: FastifyInstance, _: unknown, done: () => void): void {
   // fastify.get('/plugins', fetchPlugins)
   // fastify.get('/plugins/:id', fetchPlugin)
+  done();
 }

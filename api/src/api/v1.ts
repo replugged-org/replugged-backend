@@ -14,7 +14,7 @@ function logout(_: FastifyRequest, reply: FastifyReply): void {
   reply.setCookie("token", "", { maxAge: 0, path: "/" }).redirect("/");
 }
 
-export default function (fastify: FastifyInstance): void {
+export default function (fastify: FastifyInstance, _: unknown, done: () => void): void {
   fastify.get(
     "/login",
     (req: FastifyRequest, reply: FastifyReply) =>
@@ -31,4 +31,5 @@ export default function (fastify: FastifyInstance): void {
   fastify.register(badgesModule, { prefix: "/badges" });
   fastify.register(storeModule, { prefix: "/store" });
   fastify.register(legacyLinking);
+  done();
 }
