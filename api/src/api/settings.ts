@@ -1,28 +1,12 @@
 import type { FastifyInstance, FastifyReply, FastifyRequest } from "fastify";
 import { URL } from "url";
 import { rename, unlink } from "fs/promises";
-import { createReadStream, createWriteStream, existsSync, mkdirSync } from "fs";
+import { createReadStream, createWriteStream, existsSync } from "fs";
+import { STORAGE_FOLDER } from "../utils/misc.js";
 
 const SETTINGS_UPLOAD_LIMIT = 1e8; // 100MB
 const SETTINGS_UPLOAD_EYES = 1e6; // 1MB
-export const SETTINGS_STORAGE_FOLDER = (() => {
-  switch (process.platform) {
-    case "linux":
-      return new URL("file:///var/lib/replugged-backend/settings/");
-    case "win32":
-      return "C:\\RepluggedData\\settings";
-    case "darwin":
-      return `${process.env.HOME}/Library/Application Support/replugged-backend/settings`;
-    default:
-      throw new Error(`Unsupported platform: ${process.platform}`);
-  }
-})();
-
-if (!existsSync(SETTINGS_STORAGE_FOLDER)) {
-  mkdirSync(SETTINGS_STORAGE_FOLDER, {
-    recursive: true,
-  });
-}
+export const SETTINGS_STORAGE_FOLDER = STORAGE_FOLDER("settings");
 
 const locks = new Set<string>();
 
