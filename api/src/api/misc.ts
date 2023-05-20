@@ -45,9 +45,10 @@ function hibiscus(
 }
 
 /** @deprecated */
-export default function (fastify: FastifyInstance): void {
+export default function (fastify: FastifyInstance, _: unknown, done: () => void): void {
   fastify.get("/plug/:color([a-fA-F0-9]{6})", plug);
 
   // "Polyfill" for new donator perks for tier 1 & legacy donators
   fastify.get("/hibiscus/:color([a-fA-F0-9]{6}).svg", hibiscus);
+  done();
 }

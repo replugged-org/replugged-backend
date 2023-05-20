@@ -96,7 +96,7 @@ async function avatar(
   );
 }
 
-export default function (fastify: FastifyInstance): void {
+export default function (fastify: FastifyInstance, _: unknown, done: () => void): void {
   fastify.route({
     method: "GET",
     url: "/:id(\\d+).png",
@@ -109,4 +109,5 @@ export default function (fastify: FastifyInstance): void {
       },
     },
   });
+  done();
 }

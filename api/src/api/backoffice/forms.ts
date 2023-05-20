@@ -173,7 +173,7 @@ async function read(
   return entity;
 }
 
-export default function (fastify: FastifyInstance) {
+export default function (fastify: FastifyInstance, _: unknown, done: () => void) {
   fastify.route({
     method: "GET",
     url: "/",
@@ -228,4 +228,5 @@ export default function (fastify: FastifyInstance) {
       },
     },
   });
+  done();
 }

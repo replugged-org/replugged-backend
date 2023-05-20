@@ -4,7 +4,7 @@ import usersModule from "./users.js";
 import formsModule from "./forms.js";
 import tagsModule from "./tags.js";
 
-export default function (fastify: FastifyInstance): void {
+export default function (fastify: FastifyInstance, _: unknown, done: () => void): void {
   fastify.register(usersModule, { prefix: "/users" });
   // abuse monitoring
 
@@ -17,4 +17,5 @@ export default function (fastify: FastifyInstance): void {
   // store reports
 
   // super secret event
+  done();
 }

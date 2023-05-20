@@ -26,6 +26,7 @@ function legacy(request: FastifyRequest, reply: FastifyReply): void {
 }
 
 /** @deprecated */
-export default function (fastify: FastifyInstance): void {
+export default function (fastify: FastifyInstance, _: unknown, done: () => void): void {
   fastify.get("/users/@me/link/legacy", { config: { auth: { optional: true } } }, legacy);
+  done();
 }

@@ -69,7 +69,7 @@ async function populateCache(): Promise<void> {
 populateCache();
 setInterval(populateCache, CACHE_DURATION);
 
-export default function (fastify: FastifyInstance): void {
+export default function (fastify: FastifyInstance, _: unknown, done: () => void): void {
   fastify.get<{
     Params: {
       id: string;
@@ -140,4 +140,5 @@ export default function (fastify: FastifyInstance): void {
       results: manifests.slice(start, end),
     };
   });
+  done();
 }

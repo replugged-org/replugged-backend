@@ -1,8 +1,7 @@
 import type { FastifyInstance } from "fastify";
-// import { fetchSuggestions } from './suggestions.js'
-
 import itemsModule from "./items.js";
 
-export default function (fastify: FastifyInstance): void {
+export default function (fastify: FastifyInstance, _: unknown, done: () => void): void {
   fastify.register(itemsModule, { prefix: "/" });
+  done();
 }

@@ -33,6 +33,7 @@ async function getGuildBadges(
   reply.send(badges);
 }
 
-export default function (fastify: FastifyInstance): void {
+export default function (fastify: FastifyInstance, _: unknown, done: () => void): void {
   fastify.get("/guilds", getGuildBadges);
+  done();
 }
