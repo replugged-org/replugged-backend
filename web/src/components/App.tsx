@@ -28,7 +28,7 @@ import NotFound from "./NotFound";
 import { Routes } from "../constants";
 import AuthBoundary from "./util/AuthBoundary";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { Toaster } from "react-hot-toast";
+import Toaster from "./util/Toaster";
 
 interface AppProps {
   user?: null | User;
@@ -66,11 +66,7 @@ export default function App(props: AppProps): VNode {
     <QueryClientProvider client={queryClient}>
       <UserContext.Provider value={props?.user}>
         <Header />
-        <Toaster
-          style={{
-            marginTop: "72px",
-          }}
-        />
+        <Toaster />
         <Suspense fallback={loading}>
           <Router url={props?.url} onChange={change}>
             <Route path={Routes.HOME} component={Homepage} />
