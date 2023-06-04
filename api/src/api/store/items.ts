@@ -2,6 +2,7 @@ import { FastifyInstance } from "fastify";
 import { STORAGE_FOLDER } from "../../utils/misc.js";
 import path from "path";
 import { readFile, readdir, stat } from "fs/promises";
+import { StoreItem } from "../../../../types/store.js";
 
 async function exists(path: string): Promise<boolean> {
   try {
@@ -13,26 +14,20 @@ async function exists(path: string): Promise<boolean> {
 }
 
 const ADDONS_FOLDER = STORAGE_FOLDER("addons");
-const RESULTS_PER_PAGE = 20;
 
 const ADDON_TYPES = ["plugin", "theme"] as const;
 type AddonType = (typeof ADDON_TYPES)[number];
-type Manifest = {
-  id: string;
-  name: string;
-  type: "replugged-plugin" | "replugged-theme" | "replugged";
-} & Record<string, unknown>; // TODO: possibly type this
 
-const manifestCache = new Map<string, Manifest>();
+const manifestCache = new Map<string, StoreItem>();
 const CACHE_DURATION = 1000 * 60 * 1;
 
-async function getManifest(id: string): Promise<Manifest | null> {
+async function getManifest(id: string): Promise<StoreItem | null> {
   if (manifestCache.has(id)) {
     return manifestCache.get(id)!;
   }
   return await loadManifest(id);
 }
-async function loadManifest(id: string): Promise<Manifest | null> {
+async function loadManifest(id: string): Promise<StoreItem | null> {
   const fullPath = path.join(ADDONS_FOLDER, "manifests", `${id}.json`);
   if (!(await exists(fullPath))) return null;
   const manifestContent = await readFile(fullPath, "utf-8");
@@ -47,7 +42,7 @@ async function getAsar(id: string): Promise<Buffer | null> {
   return readFile(fullPath);
 }
 
-function listAddons(type: AddonType): Manifest[] {
+function listAddons(type: AddonType): StoreItem[] {
   const addons = Array.from(manifestCache.values())
     .filter((x) => x.type === `replugged-${type}`)
     .sort((a, b) => a.name.localeCompare(b.name));
@@ -103,6 +98,7 @@ export default function (fastify: FastifyInstance, _: unknown, done: () => void)
     };
     Querystring: {
       page?: string;
+      items?: string;
     };
   }>("/list/:type", (request, reply) => {
     // @ts-expect-error includes bs
@@ -121,9 +117,22 @@ export default function (fastify: FastifyInstance, _: unknown, done: () => void)
       });
       return;
     }
+    const perPage = parseInt(request.query.items ?? "10", 10);
+    if (isNaN(perPage) || perPage % 1 !== 0 || perPage < 1) {
+      reply.code(400).send({
+        error: `Invalid items per page: ${request.query.items}`,
+      });
+      return;
+    }
+    if (perPage > 100) {
+      reply.code(400).send({
+        error: `Items per page cannot be greater than 100`,
+      });
+      return;
+    }
 
     const manifests = listAddons(type);
-    const numPages = Math.ceil(manifests.length / RESULTS_PER_PAGE);
+    const numPages = Math.ceil(manifests.length / perPage);
     if (page > numPages) {
       reply.code(404).send({
         error: `Page ${page} not found`,
@@ -131,8 +140,8 @@ export default function (fastify: FastifyInstance, _: unknown, done: () => void)
       return;
     }
 
-    const start = (page - 1) * RESULTS_PER_PAGE;
-    const end = start + RESULTS_PER_PAGE;
+    const start = (page - 1) * perPage;
+    const end = start + perPage;
 
     return {
       page,

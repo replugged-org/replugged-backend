@@ -1,5 +1,4 @@
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-import { VNode, h } from "preact";
+import { VNode } from "preact";
 import { Routes } from "../../constants";
 import style from "./footer.module.css";
 

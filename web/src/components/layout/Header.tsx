@@ -1,5 +1,4 @@
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-import { VNode, h } from "preact";
+import { VNode } from "preact";
 import { useContext, useState } from "preact/hooks";
 
 import { UserFlags } from "../../../../shared/flags";
@@ -76,6 +75,12 @@ export default function Header(): VNode {
       <nav className={style.nav}>
         <a className={style.navLink} href={Routes.DOWNLOAD}>
           Download
+        </a>
+        <a className={style.navLink} href={Routes.STORE_PLUGINS}>
+          Plugins
+        </a>
+        <a className={style.navLink} href={Routes.STORE_THEMES}>
+          Themes
         </a>
         {/* <a className={style.navLink} href={Routes.STORE}>Store</a> */}
         <a className={style.navLink} href={Routes.CONTRIBUTORS}>

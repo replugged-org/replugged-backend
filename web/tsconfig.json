@@ -1,11 +1,10 @@
 {
   "extends": "../tsconfig.json",
   "compilerOptions": {
-    "types": ["vite/client", "node"],
+    "types": ["node"],
     "outDir": "./dist",
-    "jsx": "preserve",
-    "jsxFactory": "h",
-    "jsxFragmentFactory": "Fragment",
+    "jsx": "react-jsx",
+    "jsxImportSource": "preact",
     "typeRoots": ["./node_modules/@types"]
   },
   "include": ["./src/**/*", "server.js"]

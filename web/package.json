@@ -17,6 +17,7 @@
   },
   "dependencies": {
     "@preact/preset-vite": "^2.3.0",
+    "@tanstack/react-query": "^4.29.12",
     "cors": "^2.8.5",
     "express": "^4.18.2",
     "feather-icons": "^4.29.0",
@@ -27,9 +28,11 @@
     "preact-render-to-string": "^5.2.1",
     "preact-router": "^4.1.0",
     "prismjs": "^1.28.0",
+    "react-hot-toast": "^2.4.1",
+    "react-intersection-observer": "^9.4.4",
     "simple-icons": "^7.5.0",
     "twemoji": "^14.0.2",
-    "vite": "^3.0.3"
+    "vite": "^4.3.9"
   },
   "devDependencies": {
     "@babel/core": "^7.20.7",

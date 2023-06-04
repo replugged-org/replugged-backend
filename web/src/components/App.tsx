@@ -1,5 +1,4 @@
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-import { VNode, h } from "preact";
+import { VNode } from "preact";
 import { Suspense, lazy } from "preact/compat";
 import { useTitleTemplate } from "hoofd/preact";
 import { useCallback, useEffect, useMemo } from "preact/hooks";
@@ -28,6 +27,8 @@ import NotFound from "./NotFound";
 
 import { Routes } from "../constants";
 import AuthBoundary from "./util/AuthBoundary";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { Toaster } from "react-hot-toast";
 
 interface AppProps {
   user?: null | User;
@@ -59,36 +60,45 @@ export default function App(props: AppProps): VNode {
 
   useTitleTemplate("%s - Replugged");
 
+  const queryClient = new QueryClient();
+
   return (
-    <UserContext.Provider value={props?.user}>
-      <Header />
-      <Suspense fallback={loading}>
-        <Router url={props?.url} onChange={change}>
-          <Route path={Routes.HOME} component={Homepage} />
-          <Route path={Routes.DOWNLOAD} component={Download} />
-          <Redirect path="/installation" to={Routes.DOWNLOAD} />
-          <Route path={Routes.ME} component={AuthBoundary}>
-            <Account />
-          </Route>
+    <QueryClientProvider client={queryClient}>
+      <UserContext.Provider value={props?.user}>
+        <Header />
+        <Toaster
+          style={{
+            marginTop: "72px",
+          }}
+        />
+        <Suspense fallback={loading}>
+          <Router url={props?.url} onChange={change}>
+            <Route path={Routes.HOME} component={Homepage} />
+            <Route path={Routes.DOWNLOAD} component={Download} />
+            <Redirect path="/installation" to={Routes.DOWNLOAD} />
+            <Route path={Routes.ME} component={AuthBoundary}>
+              <Account />
+            </Route>
 
-          <Route path={Routes.CONTRIBUTORS} component={Contributors} />
-          <Route path={Routes.STATS} component={Stats} />
-          <Route path={Routes.BRANDING} component={Branding} />
-          <Route path={Routes.INSTALL} component={Install} />
+            <Route path={Routes.CONTRIBUTORS} component={Contributors} />
+            <Route path={Routes.STATS} component={Stats} />
+            <Route path={Routes.BRANDING} component={Branding} />
+            <Route path={Routes.INSTALL} component={Install} />
 
-          <Route path={Routes.STORE} component={Storefront} />
+            <Route path={`${Routes.STORE}/:path*`} component={Storefront} />
 
-          <Route path={Routes.TERMS} component={Terms} />
-          <Route path={Routes.PRIVACY} component={Privacy} />
+            <Route path={Routes.TERMS} component={Terms} />
+            <Route path={Routes.PRIVACY} component={Privacy} />
 
-          <Route path={`${Routes.BACKOFFICE}/:path*`} component={AuthBoundary} staff>
-            <Admin />
-          </Route>
+            <Route path={`${Routes.BACKOFFICE}/:path*`} component={AuthBoundary} staff>
+              <Admin />
+            </Route>
 
-          <Route default ctx={props?.ctx} component={NotFound} />
-        </Router>
-      </Suspense>
-      <Footer />
-    </UserContext.Provider>
+            <Route default ctx={props?.ctx} component={NotFound} />
+          </Router>
+        </Suspense>
+        <Footer />
+      </UserContext.Provider>
+    </QueryClientProvider>
   );
 }
