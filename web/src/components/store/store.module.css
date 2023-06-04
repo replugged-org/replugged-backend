@@ -3,8 +3,6 @@
 }
 
 .header {
-  font-size: 3em;
-  font-weight: 600;
   margin-bottom: 24px;
 }
 
@@ -45,7 +43,6 @@
 
 .item-header {
   font-size: 1.5em;
-  font-weight: 600;
 }
 
 .item-author {
