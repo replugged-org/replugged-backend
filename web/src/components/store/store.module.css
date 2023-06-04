@@ -48,6 +48,14 @@
   font-weight: 600;
 }
 
+.item-author {
+  font-size: 1em;
+  font-weight: 400;
+  color: var(--text-dark);
+  margin-top: 4px;
+  margin-bottom: 8px;
+}
+
 .item-description {
   font-size: 1em;
   line-height: 1.5em;

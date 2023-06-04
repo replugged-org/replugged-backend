@@ -12,6 +12,7 @@ import { useEffect, useState } from "preact/hooks";
 import Spinner from "../util/Spinner";
 import { useInView } from "react-intersection-observer";
 import { useDebounce } from "react-use";
+import { toArray } from "../util/misc";
 
 type StoreKind = "plugin" | "theme";
 
@@ -74,13 +75,36 @@ function installAddon(identifier: string): Promise<void> {
   });
 }
 
+const formatAuthors = (authors: StoreItem["author"]): string => {
+  const authorNames = toArray(authors).map((author) => author.name);
+
+  if (authorNames.length === 0) return "unknown"; // Should never happen
+
+  if (authorNames.length === 1) {
+    return `${authorNames[0]}`;
+  }
+  if (authorNames.length === 2) {
+    return `${authorNames[0]} and ${authorNames[1]}`;
+  }
+  if (authorNames.length === 3) {
+    return `${authorNames[0]}, ${authorNames[1]}, and ${authorNames[2]}`;
+  }
+
+  return `${authorNames[0]}, ${authorNames[1]}, ${authorNames[2]}, and ${
+    authorNames.length - 3
+  } more`;
+};
+
 function Item(item: StoreItem): VNode {
   const [isInstalling, setIsInstalling] = useState(false);
+
+  const authors = formatAuthors(item.author);
 
   return (
     <div class={style.item}>
       <div>
         <h2 class={style.itemHeader}>{item.name}</h2>
+        <p class={style.itemAuthor}>by {authors}</p>
         <p class={style.itemDescription}>{item.description}</p>
       </div>
       <button
