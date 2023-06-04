@@ -2,7 +2,8 @@ import type { Attributes } from "preact";
 import { VNode } from "preact";
 import style from "./store.module.css";
 import sharedStyle from "../shared.module.css";
-import { useInfiniteQuery } from "@tanstack/react-query";
+import formStyle from "../util/form.module.css";
+import { UseInfiniteQueryResult, useInfiniteQuery } from "@tanstack/react-query";
 import { useTitle } from "hoofd";
 import { PaginatedStore, StoreItem } from "../../../../types/store";
 import install from "../../install";
@@ -10,6 +11,7 @@ import { toast } from "react-hot-toast";
 import { useEffect, useState } from "preact/hooks";
 import Spinner from "../util/Spinner";
 import { useInView } from "react-intersection-observer";
+import { useDebounce } from "react-use";
 
 type StoreKind = "plugin" | "theme";
 
@@ -95,81 +97,114 @@ function Item(item: StoreItem): VNode {
   );
 }
 
-function LoadMore(props: {
-  fetchNextPage: () => void;
-  hasNextPage: boolean;
-  isFetchingNextPage: boolean;
-}): VNode | null {
+function LoadMore({
+  fetchNextPage,
+  hasNextPage,
+  isFetchingNextPage,
+}: UseInfiniteQueryResult<PaginatedStore>): VNode | null {
   const { ref, inView } = useInView();
 
   useEffect(() => {
-    if (inView && !props.isFetchingNextPage && props.hasNextPage) props.fetchNextPage();
-  }, [inView, props.hasNextPage, props.isFetchingNextPage, props.fetchNextPage]);
+    if (inView && !isFetchingNextPage && hasNextPage) fetchNextPage();
+  }, [inView, hasNextPage, isFetchingNextPage, fetchNextPage]);
 
-  if (!props.hasNextPage) return null;
+  if (!hasNextPage) return null;
 
   return (
     <button
       class={`${sharedStyle.button} ${style.loadMoreButton}`}
-      onClick={props.fetchNextPage}
+      onClick={() => fetchNextPage()}
       ref={ref}
-      disabled={props.isFetchingNextPage}>
-      {props.isFetchingNextPage ? "Loading..." : "Load More"}
+      disabled={isFetchingNextPage}>
+      {isFetchingNextPage ? "Loading..." : "Load More"}
     </button>
+  );
+}
+
+function StoreBody(
+  props: UseInfiniteQueryResult<PaginatedStore> & {
+    items: StoreItem[];
+    query: string;
+  },
+): VNode {
+  if (props.isLoading) {
+    return <Spinner class={style.fullGrid} />;
+  }
+
+  if (props.isError) {
+    return <p class={style.fullGrid}>Failed to load store items.</p>;
+  }
+
+  if (props.items.length === 0) {
+    return <p class={style.fullGrid}>{props.query ? "No results found" : "No items found"}</p>;
+  }
+
+  return (
+    <>
+      {props.items.map(Item)}
+      <LoadMore {...props} />
+    </>
   );
 }
 
 export default function Store({ kind }: StoreProps): VNode {
   useTitle("Plugins");
 
-  const { isLoading, isError, data, fetchNextPage, hasNextPage, isFetchingNextPage } =
-    useInfiniteQuery<PaginatedStore>({
-      queryKey: ["store", kind],
-      queryFn: async ({ pageParam: page }) => {
-        const query = new URLSearchParams({
-          page: page?.toString() ?? "1",
-          items: (12).toString(),
-        });
+  const [query, setQuery] = useState("");
+  const [debouncedQuery, setDebouncedQuery] = useState(query);
 
-        const res = await fetch(`/api/store/list/${kind}?${query}`);
-        if (!res.ok) throw new Error("Failed to fetch store items.");
-        return res.json();
-      },
-      getNextPageParam: (lastPage) => {
-        const { page, numPages } = lastPage;
-        if (page >= numPages) return undefined;
-        return page + 1;
-      },
-    });
+  useDebounce(
+    () => {
+      setDebouncedQuery(query);
+    },
+    500,
+    [query],
+  );
 
-  if (isLoading) {
-    return (
-      <main class={style.main}>
-        <h1 class={style.header}>{LABELS[kind]}</h1>
-        <Spinner />
-      </main>
-    );
-  }
-  if (isError) {
-    return (
-      <main class={style.main}>
-        <h1 class={style.header}>{LABELS[kind]}</h1>
-        <p>Failed to load store items.</p>
-      </main>
-    );
-  }
+  const itemsQuery = useInfiniteQuery<PaginatedStore>({
+    queryKey: ["store", kind, debouncedQuery],
+    queryFn: async ({ pageParam: page }) => {
+      const queryString = new URLSearchParams({
+        page: page?.toString() ?? "1",
+        items: (12).toString(),
+        query: debouncedQuery,
+      });
 
-  const items = data?.pages.map((page) => page.results).flat() ?? [];
+      const res = await fetch(`/api/store/list/${kind}?${queryString}`);
+      const json = await res.json();
+      if (!res.ok) {
+        if (res.status === 404 && json.error === "NOT_FOUND") {
+          return { numPages: 0, page: 1, results: [] };
+        }
+
+        throw new Error("Failed to fetch store items.");
+      }
+      return json;
+    },
+    getNextPageParam: (lastPage) => {
+      const { page, numPages } = lastPage;
+      if (page >= numPages) return undefined;
+      return page + 1;
+    },
+  });
+
+  const items = itemsQuery.data?.pages.map((page) => page.results).flat() ?? [];
 
   return (
     <main class={style.main}>
       <h1 class={style.header}>{LABELS[kind]}</h1>
-      <div class={style.grid}>{items.map(Item)}</div>
-      <LoadMore
-        fetchNextPage={fetchNextPage}
-        hasNextPage={hasNextPage ?? false}
-        isFetchingNextPage={isFetchingNextPage}
-      />
+      <div class={style.grid}>
+        {items.length > 0 || debouncedQuery ? (
+          <input
+            class={`${formStyle.textField} ${style.search}`}
+            type="text"
+            placeholder="Search"
+            value={query}
+            onInput={(e) => setQuery(e.currentTarget.value)}
+          />
+        ) : null}
+        <StoreBody {...itemsQuery} items={items} query={query} />
+      </div>
     </main>
   );
 }

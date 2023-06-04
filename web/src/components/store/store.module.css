@@ -26,6 +26,14 @@
   }
 }
 
+.search {
+  grid-column-end: -1;
+}
+
+.full-grid {
+  grid-column: 1 / -1;
+}
+
 .item {
   display: flex;
   flex-direction: column;
