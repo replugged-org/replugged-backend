@@ -190,7 +190,9 @@ function StoreBody(
   return (
     <>
       {props.items.map(Item)}
-      <LoadMore {...props} />
+      <div className={`${style.fullGrid} ${style.loadMoreWrapper}`}>
+        <LoadMore {...props} />
+      </div>
     </>
   );
 }
