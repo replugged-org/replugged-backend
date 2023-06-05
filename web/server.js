@@ -49,6 +49,16 @@ const meta = [
     title: "Branding",
     description: "Replugged branding guidelines and assets.",
   },
+  {
+    match: ["/store/plugins"],
+    title: "Plugins",
+    description: "Explore and install plugins for Replugged.",
+  },
+  {
+    match: ["/store/themes"],
+    title: "Themes",
+    description: "Explore and install themes for Replugged.",
+  },
 ];
 
 const defaultMeta = meta[0];
