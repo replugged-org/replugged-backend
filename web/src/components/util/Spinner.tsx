@@ -1,9 +1,9 @@
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-import { VNode, h } from "preact";
+import { VNode } from "preact";
 
 import style from "./spinner.module.css";
 
 interface SpinnerProps {
+  class?: string;
   balls?: boolean;
 }
 

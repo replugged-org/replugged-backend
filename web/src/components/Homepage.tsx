@@ -36,6 +36,7 @@ function Feature({ icon, title, description, note, link }: FeatureProps): VNode 
       {note && <p className={style.note}>{note}</p>}
       {link && (
         <a href={link.href} className={style.featureLink}>
+          {/* @ts-expect-error aaa */}
           <ArrowRight />
           <span>{link.label}</span>
         </a>
@@ -84,7 +85,7 @@ export default function Homepage(): VNode {
               icon={Plugin}
               title="Plugins"
               description="Add new features to your Discord client, or enhance already existing ones by extending them. You can even write your own plugins!"
-              // link={{ href: Routes.STORE_PLUGINS, label: 'Explore available plugins' }}
+              link={{ href: Routes.STORE_PLUGINS, label: "Explore available plugins" }}
             />
             <Feature
               icon={Theme}
@@ -92,7 +93,7 @@ export default function Homepage(): VNode {
               description={
                 "Give your Discord client a fresh new look, that matches your taste. You're no longer limited by what Discord gave you, only imagination!"
               }
-              // link={{ href: Routes.STORE_THEMES, label: 'Explore available themes' }}
+              link={{ href: Routes.STORE_THEMES, label: "Explore available themes" }}
             />
             <Feature
               icon={PenTool}

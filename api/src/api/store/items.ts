@@ -1,7 +1,8 @@
 import { FastifyInstance } from "fastify";
-import { STORAGE_FOLDER } from "../../utils/misc.js";
+import { STORAGE_FOLDER, toArray } from "../../utils/misc.js";
 import path from "path";
 import { readFile, readdir, stat } from "fs/promises";
+import { StoreItem } from "../../../../types/store.js";
 
 async function exists(path: string): Promise<boolean> {
   try {
@@ -13,26 +14,20 @@ async function exists(path: string): Promise<boolean> {
 }
 
 const ADDONS_FOLDER = STORAGE_FOLDER("addons");
-const RESULTS_PER_PAGE = 20;
 
 const ADDON_TYPES = ["plugin", "theme"] as const;
 type AddonType = (typeof ADDON_TYPES)[number];
-type Manifest = {
-  id: string;
-  name: string;
-  type: "replugged-plugin" | "replugged-theme" | "replugged";
-} & Record<string, unknown>; // TODO: possibly type this
 
-const manifestCache = new Map<string, Manifest>();
+const manifestCache = new Map<string, StoreItem>();
 const CACHE_DURATION = 1000 * 60 * 1;
 
-async function getManifest(id: string): Promise<Manifest | null> {
+async function getManifest(id: string): Promise<StoreItem | null> {
   if (manifestCache.has(id)) {
     return manifestCache.get(id)!;
   }
   return await loadManifest(id);
 }
-async function loadManifest(id: string): Promise<Manifest | null> {
+async function loadManifest(id: string): Promise<StoreItem | null> {
   const fullPath = path.join(ADDONS_FOLDER, "manifests", `${id}.json`);
   if (!(await exists(fullPath))) return null;
   const manifestContent = await readFile(fullPath, "utf-8");
@@ -47,12 +42,44 @@ async function getAsar(id: string): Promise<Buffer | null> {
   return readFile(fullPath);
 }
 
-function listAddons(type: AddonType): Manifest[] {
+function listAddons(type: AddonType, query?: string | undefined): StoreItem[] {
   const addons = Array.from(manifestCache.values())
     .filter((x) => x.type === `replugged-${type}`)
     .sort((a, b) => a.name.localeCompare(b.name));
 
-  return addons;
+  const normalize = (str: string): string => str.toLowerCase().trim().replace(/\s+/g, " ");
+  const normalizedQuery = normalize(query || "");
+
+  const filteredAddons = query
+    ? addons
+        .filter((x) =>
+          [x.name, x.description, ...toArray(x.author).map((x) => x.name)].some((x) =>
+            normalize(x).includes(normalizedQuery),
+          ),
+        )
+        .sort((a, b) => {
+          // "Relevance" sorting
+          // Prioritize name matches, then names that start with the query, then description matches
+
+          const aNameMatch = normalize(a.name).includes(normalizedQuery);
+          const bNameMatch = normalize(b.name).includes(normalizedQuery);
+          if (aNameMatch && !bNameMatch) return -1;
+          if (!aNameMatch && bNameMatch) return 1;
+
+          const aNameStartsWith = normalize(a.name).startsWith(normalizedQuery);
+          const bNameStartsWith = normalize(b.name).startsWith(normalizedQuery);
+          if (aNameStartsWith && !bNameStartsWith) return -1;
+          if (!aNameStartsWith && bNameStartsWith) return 1;
+
+          const aDescMatch = normalize(a.description).includes(normalizedQuery);
+          const bDescMatch = normalize(b.description).includes(normalizedQuery);
+          if (aDescMatch && !bDescMatch) return -1;
+
+          return 0;
+        })
+    : addons;
+
+  return filteredAddons;
 }
 
 async function getAddonIdsFromDisk(): Promise<string[]> {
@@ -103,6 +130,8 @@ export default function (fastify: FastifyInstance, _: unknown, done: () => void)
     };
     Querystring: {
       page?: string;
+      items?: string;
+      query?: string;
     };
   }>("/list/:type", (request, reply) => {
     // @ts-expect-error includes bs
@@ -121,18 +150,31 @@ export default function (fastify: FastifyInstance, _: unknown, done: () => void)
       });
       return;
     }
-
-    const manifests = listAddons(type);
-    const numPages = Math.ceil(manifests.length / RESULTS_PER_PAGE);
-    if (page > numPages) {
-      reply.code(404).send({
-        error: `Page ${page} not found`,
+    const perPage = parseInt(request.query.items ?? "10", 10);
+    if (isNaN(perPage) || perPage % 1 !== 0 || perPage < 1) {
+      reply.code(400).send({
+        error: `Invalid items per page: ${request.query.items}`,
+      });
+      return;
+    }
+    if (perPage > 100) {
+      reply.code(400).send({
+        error: `Items per page cannot be greater than 100`,
       });
       return;
     }
 
-    const start = (page - 1) * RESULTS_PER_PAGE;
-    const end = start + RESULTS_PER_PAGE;
+    const manifests = listAddons(type, request.query.query);
+    const numPages = Math.ceil(manifests.length / perPage);
+    if (page > numPages) {
+      reply.code(404).send({
+        error: "NOT_FOUND",
+      });
+      return;
+    }
+
+    const start = (page - 1) * perPage;
+    const end = start + perPage;
 
     return {
       page,

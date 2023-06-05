@@ -120,22 +120,22 @@ function rpcInstall(ws: WebSocket, data: InstallData): Promise<Response> {
 
 interface InstallProps {
   data: InstallData;
-  onConnect: () => void;
-  onFinish: (response: Response) => void;
+  onConnect?: () => void;
+  onFinish?: (response: Response) => void;
 }
 
 export default async function install({ data, onConnect, onFinish }: InstallProps): Promise<void> {
   for (let port = MIN_PORT; port <= MAX_PORT; port++) {
     try {
       const ws = await tryPort(port);
-      onConnect();
+      onConnect?.();
       const info = await rpcInstall(ws, data);
-      onFinish(info);
+      onFinish?.(info);
       return;
     } catch {}
   }
 
-  onFinish({
+  onFinish?.({
     kind: "UNREACHABLE",
   });
 }

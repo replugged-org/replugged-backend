@@ -13,23 +13,30 @@ export enum Visibility {
   PUBLIC = 0,
   PRIVATE = 1,
 }
+interface Author {
+  name: string;
+  discordID?: string;
+  github?: string;
+}
 
-interface StoreItem {
-  type: "plugin" | "theme";
+export interface StoreItem {
+  id: string;
+  name: string;
   description: string;
-  author: string;
-  visibility: Visibility;
+  author: Author | Author[];
+  version: string;
+  updater?: {
+    type: "store" | "github";
+    id: string;
+  };
+  license: string;
+  type: "replugged-plugin" | "replugged-theme" | "replugged";
+}
 
-  repository: string;
-  branch: string;
-
-  stars: number;
-  downloads: number;
-
-  lastCommit: string;
-  lastCommitTime: Date;
-
-  nsfw: boolean;
+export interface PaginatedStore {
+  page: number;
+  numPages: number;
+  results: StoreItem[];
 }
 
 interface PendingForm {
