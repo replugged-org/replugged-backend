@@ -84,7 +84,7 @@ function installAddon(identifier: string): Promise<void> {
               break;
             case "UNREACHABLE":
               toast.error(
-                "Could not connect to Replugged, please make Discord is open with the latest version of Replugged installed and try again.",
+                "Could not connect to Replugged, please make sure Discord is open with the latest version of Replugged installed and try again.",
                 {
                   id: toastId,
                 },
