@@ -153,8 +153,8 @@ function LoadMore({
   const { ref, inView } = useInView();
 
   useEffect(() => {
-    if (inView && !isFetchingNextPage && hasNextPage) fetchNextPage();
-  }, [inView, hasNextPage, isFetchingNextPage, fetchNextPage]);
+    if (inView) fetchNextPage();
+  }, [inView]);
 
   if (!hasNextPage) return null;
 
