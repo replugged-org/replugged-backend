@@ -35,7 +35,7 @@ const meta = [
     robots: "noindex",
   },
   {
-    match: ["/statistics"],
+    match: ["/stats"],
     title: "Statistics",
     description: "Statistics about Replugged and its users.",
   },
