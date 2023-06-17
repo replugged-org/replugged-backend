@@ -3,7 +3,7 @@ import { VNode } from "preact";
 import style from "./storeItemPage.module.css";
 import sharedStyle from "../shared.module.css";
 import { useQuery } from "@tanstack/react-query";
-import { useTitle } from "hoofd";
+import { useTitle } from "hoofd/preact";
 import { StoreItem } from "../../../../types/store";
 import { useState } from "preact/hooks";
 import Spinner from "../util/Spinner";

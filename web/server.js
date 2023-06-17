@@ -53,12 +53,12 @@ const meta = [
   },
   {
     match: ["/store/plugins"],
-    title: "Plugins",
+    title: "Replugged Plugins",
     description: "Explore and install plugins for Replugged.",
   },
   {
     match: ["/store/themes"],
-    title: "Themes",
+    title: "Replugged Themes",
     description: "Explore and install themes for Replugged.",
   },
   {

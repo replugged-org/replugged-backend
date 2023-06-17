@@ -4,7 +4,7 @@ import style from "./store.module.css";
 import sharedStyle from "../shared.module.css";
 import formStyle from "../util/form.module.css";
 import { UseInfiniteQueryResult, useInfiniteQuery } from "@tanstack/react-query";
-import { useTitle } from "hoofd";
+import { useTitle } from "hoofd/preact";
 import { PaginatedStore, StoreItem } from "../../../../types/store";
 import { useEffect, useState } from "preact/hooks";
 import Spinner from "../util/Spinner";
@@ -130,7 +130,7 @@ function StoreBody(
 }
 
 export default function Store({ kind }: StoreProps): VNode {
-  useTitle("Plugins");
+  useTitle(`Replugged ${LABELS[kind]}`);
 
   const [query, setQuery] = useState("");
   const [debouncedQuery, setDebouncedQuery] = useState(query);
@@ -174,7 +174,7 @@ export default function Store({ kind }: StoreProps): VNode {
 
   return (
     <main class={style.main}>
-      <h1 class={style.header}>{LABELS[kind]}</h1>
+      <h1 class={style.header}>Replugged {LABELS[kind]}</h1>
       <div class={style.grid}>
         {items.length > 0 || debouncedQuery ? (
           <input
