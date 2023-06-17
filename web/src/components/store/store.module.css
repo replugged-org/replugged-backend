@@ -82,3 +82,8 @@
   margin-top: 24px;
   align-self: center;
 }
+
+.scroll-buttons {
+  display: flex;
+  gap: 8px;
+}

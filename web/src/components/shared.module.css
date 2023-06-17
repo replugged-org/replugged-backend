@@ -62,7 +62,8 @@
   text-decoration: none;
 }
 
-.button:disabled {
+.button:disabled,
+.button[disabled] {
   cursor: not-allowed;
   -webkit-filter: brightness(0.7);
   filter: brightness(0.7);

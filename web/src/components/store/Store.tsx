@@ -78,32 +78,61 @@ function Item(item: StoreItem): VNode {
 }
 
 function LoadMore({
+  minPage,
+  maxPage,
+  fetchPreviousPage,
   fetchNextPage,
-  hasNextPage,
+  isFetchingPreviousPage,
   isFetchingNextPage,
-}: UseInfiniteQueryResult<PaginatedStore>): VNode | null {
+  hasNextPage,
+}: UseInfiniteQueryResult<PaginatedStore> & { minPage: number; maxPage: number }): VNode | null {
   const { ref, inView } = useInView();
 
   useEffect(() => {
-    if (inView) fetchNextPage();
-  }, [inView]);
+    if (inView && hasNextPage && minPage === 1) {
+      fetchNextPage();
+    }
+  }, [inView, hasNextPage, minPage]);
 
-  if (!hasNextPage) return null;
+  const hasPreviousPage = minPage > 1;
+  console.log(minPage, maxPage, hasPreviousPage, hasNextPage);
+  if (!hasPreviousPage && !hasNextPage) return null;
 
   return (
-    <button
-      class={`${sharedStyle.button} ${style.loadMoreButton}`}
-      onClick={() => fetchNextPage()}
-      ref={ref}
-      disabled={isFetchingNextPage}>
-      {isFetchingNextPage ? "Loading..." : "Load More"}
-    </button>
+    <div class={style.scrollButtons} ref={ref}>
+      <a
+        class={`${sharedStyle.button} ${style.loadMoreButton}`}
+        rel="prev"
+        href={`?page=${minPage - 1}`}
+        onClick={(e) => {
+          e.preventDefault();
+          window.history.pushState({}, "", `?page=${minPage - 1}`);
+          fetchPreviousPage();
+        }}
+        disabled={isFetchingPreviousPage || !hasPreviousPage}>
+        {isFetchingPreviousPage ? "Loading..." : "Previous"}
+      </a>
+      <a
+        rel={hasPreviousPage ? "next" : undefined}
+        href={`?page=${maxPage + 1}`}
+        class={`${sharedStyle.button} ${style.loadMoreButton}`}
+        onClick={(e) => {
+          e.preventDefault();
+          window.history.pushState({}, "", `?page=${maxPage + 1}`);
+          fetchNextPage();
+        }}
+        disabled={isFetchingNextPage || !hasNextPage}>
+        {isFetchingNextPage ? "Loading..." : "Next"}
+      </a>
+    </div>
   );
 }
 
 function StoreBody(
   props: UseInfiniteQueryResult<PaginatedStore> & {
     items: StoreItem[];
+    minPage: number;
+    maxPage: number;
     query: string;
   },
 ): VNode {
@@ -135,6 +164,8 @@ export default function Store({ kind }: StoreProps): VNode {
   const [query, setQuery] = useState("");
   const [debouncedQuery, setDebouncedQuery] = useState(query);
 
+  const pageQuery = new URLSearchParams(location.search).get("page");
+
   useDebounce(
     () => {
       setDebouncedQuery(query);
@@ -147,8 +178,8 @@ export default function Store({ kind }: StoreProps): VNode {
     queryKey: ["store", kind, debouncedQuery],
     queryFn: async ({ pageParam: page }) => {
       const queryString = new URLSearchParams({
-        page: page?.toString() ?? "1",
-        items: (12).toString(),
+        page: page?.toString() ?? pageQuery ?? "1",
+        items: (4).toString(),
         query: debouncedQuery,
       });
 
@@ -163,6 +194,11 @@ export default function Store({ kind }: StoreProps): VNode {
       }
       return json;
     },
+    getPreviousPageParam: (firstPage) => {
+      const { page } = firstPage;
+      if (page <= 1) return undefined;
+      return page - 1;
+    },
     getNextPageParam: (lastPage) => {
       const { page, numPages } = lastPage;
       if (page >= numPages) return undefined;
@@ -171,6 +207,8 @@ export default function Store({ kind }: StoreProps): VNode {
   });
 
   const items = itemsQuery.data?.pages.map((page) => page.results).flat() ?? [];
+  const minPage = itemsQuery.data?.pages?.[0]?.page ?? 1;
+  const maxPage = itemsQuery.data?.pages?.at(-1)?.page ?? 1;
 
   return (
     <main class={style.main}>
@@ -185,7 +223,13 @@ export default function Store({ kind }: StoreProps): VNode {
             onInput={(e) => setQuery(e.currentTarget.value)}
           />
         ) : null}
-        <StoreBody {...itemsQuery} items={items} query={query} />
+        <StoreBody
+          {...itemsQuery}
+          items={items}
+          minPage={minPage}
+          maxPage={maxPage}
+          query={query}
+        />
       </div>
     </main>
   );
