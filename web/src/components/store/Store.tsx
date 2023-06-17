@@ -6,13 +6,13 @@ import formStyle from "../util/form.module.css";
 import { UseInfiniteQueryResult, useInfiniteQuery } from "@tanstack/react-query";
 import { useTitle } from "hoofd";
 import { PaginatedStore, StoreItem } from "../../../../types/store";
-import install from "../../install";
-import { toast } from "react-hot-toast";
 import { useEffect, useState } from "preact/hooks";
 import Spinner from "../util/Spinner";
 import { useInView } from "react-intersection-observer";
 import { useDebounce } from "react-use";
 import { toArray } from "../util/misc";
+import { installAddon } from "./utils";
+import { Routes } from "../../constants";
 
 type StoreKind = "plugin" | "theme";
 
@@ -22,82 +22,6 @@ const LABELS: Record<StoreKind, string> = {
   plugin: "Plugins",
   theme: "Themes",
 };
-
-const toastIdMap = new Map<string, string>();
-
-function installAddon(identifier: string): Promise<void> {
-  if (toastIdMap.has(identifier)) {
-    // Dismiss any existing toasts for the same addon
-    toast.dismiss(toastIdMap.get(identifier)!);
-  }
-
-  const toastId = toast.loading("Connecting...");
-  toastIdMap.set(identifier, toastId);
-
-  let lastToast = Date.now();
-  let state: "connecting" | "installing" | "done" = "connecting";
-
-  return new Promise((resolve) => {
-    install({
-      data: {
-        identifier,
-      },
-      onConnect: () => {
-        state = "installing";
-        const waitToToast = Math.max(0, 500 - (Date.now() - lastToast));
-        setTimeout(() => {
-          if (state !== "installing") return;
-          toast.loading(
-            "Connected to Replugged, please confirm the addon installation in Discord.",
-            {
-              id: toastId,
-            },
-          );
-          lastToast = Date.now();
-        }, waitToToast);
-      },
-      onFinish: (res) => {
-        state = "done";
-        const waitToToast = Math.max(0, 500 - (Date.now() - lastToast));
-
-        setTimeout(() => {
-          switch (res.kind) {
-            case "SUCCESS":
-              toast.success(`${res.manifest.name} was successfully installed.`, {
-                id: toastId,
-              });
-              break;
-            case "ALREADY_INSTALLED":
-              toast.error(`${res.manifest.name} is already installed.`, {
-                id: toastId,
-              });
-              break;
-            case "FAILED":
-              toast.error("Failed to get addon info.", {
-                id: toastId,
-              });
-              break;
-            case "CANCELLED":
-              toast.error("Installation cancelled.", {
-                id: toastId,
-              });
-              break;
-            case "UNREACHABLE":
-              toast.error(
-                "Could not connect to Replugged, please make sure Discord is open with the latest version of Replugged installed and try again.",
-                {
-                  id: toastId,
-                },
-              );
-              break;
-          }
-
-          resolve();
-        }, waitToToast);
-      },
-    });
-  });
-}
 
 const formatAuthors = (authors: StoreItem["author"]): string => {
   const authorNames = toArray(authors).map((author) => author.name);
@@ -125,23 +49,31 @@ function Item(item: StoreItem): VNode {
   const authors = formatAuthors(item.author);
 
   return (
-    <div class={style.item}>
-      <div>
-        <h2 class={style.itemHeader}>{item.name}</h2>
-        <p class={style.itemAuthor}>by {authors}</p>
-        <p class={style.itemDescription}>{item.description}</p>
+    <a class={sharedStyle.linkWrap} href={Routes.STORE_ITEM_FN(item.id)}>
+      <div class={style.item}>
+        <div>
+          <h2 class={style.itemHeader}>{item.name}</h2>
+          <p class={style.itemAuthor}>by {authors}</p>
+          <p class={style.itemDescription}>{item.description}</p>
+        </div>
+        <div class={style.itemButton}>
+          {" "}
+          <a class={sharedStyle.buttonLink} href={Routes.STORE_ITEM_FN(item.id)}>
+            Details
+          </a>
+          <button
+            class={sharedStyle.button}
+            onClick={async () => {
+              setIsInstalling(true);
+              await installAddon(item.id);
+              setIsInstalling(false);
+            }}
+            disabled={isInstalling}>
+            {isInstalling ? "Installing..." : "Install"}
+          </button>
+        </div>
       </div>
-      <button
-        class={`${sharedStyle.button} ${style.itemButton}`}
-        onClick={async () => {
-          setIsInstalling(true);
-          await installAddon(item.id);
-          setIsInstalling(false);
-        }}
-        disabled={isInstalling}>
-        {isInstalling ? "Installing..." : "Install"}
-      </button>
-    </div>
+    </a>
   );
 }
 

@@ -98,6 +98,7 @@
 
 .button-link {
   color: var(--blurple);
+  gap: 0px;
 }
 
 .button-link:hover {
@@ -107,4 +108,11 @@
 .icon {
   width: 18px;
   height: 18px;
+}
+
+a.link-wrap {
+  box-shadow: none;
+  text-decoration: none;
+  color: inherit;
+  display: contents;
 }

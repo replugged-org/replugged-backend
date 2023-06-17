@@ -30,7 +30,9 @@ export interface StoreItem {
     id: string;
   };
   license: string;
-  type: "replugged-plugin" | "replugged-theme" | "replugged";
+  type: "replugged-plugin" | "replugged-theme";
+  source?: string;
+  image?: string | string[];
 }
 
 export interface PaginatedStore {

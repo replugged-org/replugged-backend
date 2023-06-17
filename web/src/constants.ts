@@ -62,6 +62,8 @@ export const Routes = {
   STORE_VERIFICATION: "/store/forms/verification",
   STORE_HOSTING: "/store/forms/hosting",
   STORE_COPYRIGHT: "/store/copyright",
+  STORE_ITEM: "/store/:id",
+  STORE_ITEM_FN: (id: string) => `/store/${id}/`, // Vite doesn't like the dots in the path but the trailing slash fixes that. Works fine w/o it in prod.
 
   DOCS: "https://guide.replugged.dev",
   DOCS_ITEM: (cat: string, doc: string) => `/docs/${cat}/${doc}`,

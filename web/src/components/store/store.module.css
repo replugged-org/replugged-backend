@@ -39,6 +39,12 @@
   background-color: var(--background-secondary);
   border-radius: 4px;
   padding: 15px;
+  transition: transform 0.2s ease-in-out;
+}
+
+.item:hover,
+.item:focus {
+  transform: scale(1.05);
 }
 
 .item-header {
@@ -63,6 +69,8 @@
 .item-button {
   margin-top: 12px;
   align-self: flex-end;
+  display: flex;
+  gap: 16px;
 }
 
 .load-more-wrapper {

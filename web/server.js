@@ -6,6 +6,8 @@ const app = express();
 const index = fs.readFileSync("dist/index.html", "utf8");
 const distFiles = fs.readdirSync("dist").filter((x) => !["assets", "index.html"].includes(x));
 
+const STORE_ITEM_RGX = /^\/store\/([^/]+)/;
+
 const meta = [
   {
     match: [],
@@ -59,6 +61,28 @@ const meta = [
     title: "Themes",
     description: "Explore and install themes for Replugged.",
   },
+  {
+    match: [STORE_ITEM_RGX],
+    data: async (path) => {
+      const id = path.match(STORE_ITEM_RGX)[1];
+      if (["plugins", "themes"].includes(id.toLowerCase())) return null;
+      const data = await fetch(
+        `http://localhost:${process.env.BACKEND_PORT ?? 8080}/api/store/${id}`,
+      )
+        .then((r) => r.json())
+        .catch(() => null);
+      if (!data || data.error) return null;
+      const type = {
+        "replugged-plugin": "Plugin",
+        "replugged-theme": "Theme",
+      }[data.type];
+      if (!type) return null;
+      return {
+        title: `${data.name} - Replugged ${type}`,
+        description: data.description,
+      };
+    },
+  },
 ];
 
 const defaultMeta = meta[0];
@@ -78,7 +102,7 @@ distFiles.forEach((file) => {
   });
 });
 
-app.get("*", (req, res) => {
+app.get("*", async (req, res) => {
   // Create copy of index for this request
   let indexCopy = index;
 
@@ -90,8 +114,9 @@ app.get("*", (req, res) => {
         typeof matcher === "string" ? req.path === matcher : matcher.test(req.path),
       );
     }) ?? {};
+  const data = ("data" in currentMeta ? await currentMeta.data(req.path) : currentMeta) ?? {};
   // Apply default metadata
-  const mergedMeta = { ...defaultMeta, ...currentMeta };
+  const mergedMeta = { ...defaultMeta, ...data };
 
   // Replace variables
   // Repeat until no more variables are replaced
