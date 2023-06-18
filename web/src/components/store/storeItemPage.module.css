@@ -1,6 +1,6 @@
 .wrapper {
   display: flex;
-  align-items: flex-start;
+  flex-direction: column;
   gap: 24px;
 }
 
@@ -12,11 +12,17 @@
   display: flex;
   flex-direction: column;
   background-color: var(--background-secondary);
+  border-radius: 8px;
   padding: 16px;
   flex: 1;
 }
 
 @media (min-width: 768px) {
+  .wrapper {
+    flex-direction: row;
+    align-items: flex-start;
+  }
+
   .sidebar {
     flex: none;
     width: 300px;
