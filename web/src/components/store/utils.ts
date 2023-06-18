@@ -91,6 +91,7 @@ export function getAddons(): Promise<AddonList | null> {
       data: {},
       onFinish: (res) => {
         if ("kind" in res) return null;
+        if ("code" in res) return null;
 
         resolve(res);
       },
