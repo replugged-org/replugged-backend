@@ -5,9 +5,9 @@ export enum InstallResponseType {
   UNREACHABLE = "UNREACHABLE",
 }
 
-interface RPCMessage {
+interface RPCMessage<T = unknown> {
   cmd: string;
-  data: Response;
+  data: T;
   evt: string | null;
   nonce: string | null;
 }
@@ -93,43 +93,46 @@ function tryPort(port: number): Promise<WebSocket> {
   });
 }
 
-function rpcInstall(ws: WebSocket, data: InstallData): Promise<Response> {
-  const nonce = random();
-
-  ws.send(
-    JSON.stringify({
-      cmd: "REPLUGGED_INSTALL",
-      args: data,
-      nonce,
-    }),
-  );
-
-  return new Promise((resolve) => {
-    ws.addEventListener("message", (event) => {
-      const message = JSON.parse(event.data) as RPCMessage;
-      if (message.nonce !== nonce) {
-        return;
-      }
-
-      ws.close();
-
-      resolve(message.data);
-    });
-  });
-}
-
-interface InstallProps {
-  data: InstallData;
+interface RPCProps<Req = unknown, Res = unknown> {
+  data: Req;
   onConnect?: () => void;
-  onFinish?: (response: Response) => void;
+  onFinish?: (response: Res) => void;
 }
 
-export default async function install({ data, onConnect, onFinish }: InstallProps): Promise<void> {
+export async function rpc<Req = unknown, Res = unknown>({
+  cmd,
+  data,
+  onConnect,
+  onFinish,
+}: RPCProps<Req, Res | { kind: "UNREACHABLE" }> & { cmd: string }): Promise<void> {
   for (let port = MIN_PORT; port <= MAX_PORT; port++) {
     try {
       const ws = await tryPort(port);
       onConnect?.();
-      const info = await rpcInstall(ws, data);
+
+      const info = await new Promise<Res>((resolve) => {
+        const nonce = random();
+
+        ws.send(
+          JSON.stringify({
+            cmd,
+            args: data,
+            nonce,
+          }),
+        );
+
+        ws.addEventListener("message", (event) => {
+          const message = JSON.parse(event.data) as RPCMessage<Res>;
+          if (message.nonce !== nonce) {
+            return;
+          }
+
+          ws.close();
+
+          resolve(message.data);
+        });
+      });
+
       onFinish?.(info);
       return;
     } catch {}
@@ -137,5 +140,18 @@ export default async function install({ data, onConnect, onFinish }: InstallProp
 
   onFinish?.({
     kind: "UNREACHABLE",
+  });
+}
+
+export default async function install({
+  data,
+  onConnect,
+  onFinish,
+}: RPCProps<InstallData, Response>): Promise<void> {
+  return await rpc<InstallData, Response>({
+    cmd: "REPLUGGED_INSTALL",
+    data,
+    onConnect,
+    onFinish,
   });
 }

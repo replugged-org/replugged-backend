@@ -1,5 +1,4 @@
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-import { JSX, VNode, h } from "preact";
+import { JSX, VNode } from "preact";
 import { useTitle } from "hoofd/preact";
 
 import { Routes } from "../constants";

@@ -16,7 +16,11 @@ import { Routes } from "../../constants";
 
 type StoreKind = "plugin" | "theme";
 
-type StoreProps = Attributes & { kind: StoreKind };
+type StoreProps = Attributes & {
+  kind: StoreKind;
+  installedAddons: string[];
+  updateAddonList: () => Promise<void>;
+};
 
 const LABELS: Record<StoreKind, string> = {
   plugin: "Plugins",
@@ -43,7 +47,12 @@ const formatAuthors = (authors: StoreItem["author"]): string => {
   } more`;
 };
 
-function Item(item: StoreItem): VNode {
+function Item(
+  item: StoreItem & {
+    updateAddonList: () => Promise<void>;
+    installed: boolean;
+  },
+): VNode {
   const [isInstalling, setIsInstalling] = useState(false);
 
   const authors = formatAuthors(item.author);
@@ -57,19 +66,22 @@ function Item(item: StoreItem): VNode {
           <p class={style.itemDescription}>{item.description}</p>
         </div>
         <div class={style.itemButton}>
-          {" "}
           <a class={sharedStyle.buttonLink} href={Routes.STORE_ITEM_FN(item.id)}>
             Details
           </a>
           <button
             class={sharedStyle.button}
-            onClick={async () => {
-              setIsInstalling(true);
-              await installAddon(item.id);
-              setIsInstalling(false);
+            onClick={(e) => {
+              e.stopPropagation();
+              e.preventDefault();
+              (async () => {
+                setIsInstalling(true);
+                await installAddon(item.id, item.updateAddonList);
+                setIsInstalling(false);
+              })();
             }}
-            disabled={isInstalling}>
-            {isInstalling ? "Installing..." : "Install"}
+            disabled={item.installed || isInstalling}>
+            {item.installed ? "Installed" : isInstalling ? "Installing..." : "Install"}
           </button>
         </div>
       </div>
@@ -95,7 +107,6 @@ function LoadMore({
   }, [inView, hasNextPage, minPage]);
 
   const hasPreviousPage = minPage > 1;
-  console.log(minPage, maxPage, hasPreviousPage, hasNextPage);
   if (!hasPreviousPage && !hasNextPage) return null;
 
   return (
@@ -134,6 +145,8 @@ function StoreBody(
     minPage: number;
     maxPage: number;
     query: string;
+    installedAddons: string[];
+    updateAddonList: () => Promise<void>;
   },
 ): VNode {
   if (props.isLoading) {
@@ -150,7 +163,13 @@ function StoreBody(
 
   return (
     <>
-      {props.items.map(Item)}
+      {props.items.map((item) => (
+        <Item
+          {...item}
+          installed={props.installedAddons.includes(item.id)}
+          updateAddonList={props.updateAddonList}
+        />
+      ))}
       <div className={`${style.fullGrid} ${style.loadMoreWrapper}`}>
         <LoadMore {...props} />
       </div>
@@ -158,7 +177,7 @@ function StoreBody(
   );
 }
 
-export default function Store({ kind }: StoreProps): VNode {
+export default function Store({ kind, installedAddons, updateAddonList }: StoreProps): VNode {
   useTitle(`Replugged ${LABELS[kind]}`);
 
   const [query, setQuery] = useState("");
@@ -229,6 +248,8 @@ export default function Store({ kind }: StoreProps): VNode {
           minPage={minPage}
           maxPage={maxPage}
           query={query}
+          installedAddons={installedAddons}
+          updateAddonList={updateAddonList}
         />
       </div>
     </main>

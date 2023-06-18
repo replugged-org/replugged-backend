@@ -7,13 +7,17 @@ import { useTitle } from "hoofd/preact";
 import { StoreItem } from "../../../../types/store";
 import { useState } from "preact/hooks";
 import Spinner from "../util/Spinner";
-import { installAddon } from "./utils";
+import { AddonList, installAddon } from "./utils";
 import { toArray } from "../util/misc";
 import { RouteError } from "../../types";
 import ArrowHeadBack from "feather-icons/dist/icons/chevron-left.svg";
 import { Routes } from "../../constants";
 
-type StoreItemPageProps = Attributes & { id?: string };
+type StoreItemPageProps = Attributes & {
+  id?: string;
+  installedAddons: AddonList;
+  updateAddonList: () => Promise<void>;
+};
 
 type StoreKind = "plugin" | "theme";
 
@@ -32,7 +36,15 @@ const LABELS: Record<StoreKind, string> = {
   theme: "Themes",
 };
 
-function Install({ id }: { id: string }): VNode {
+function Install({
+  id,
+  installed,
+  updateAddonList,
+}: {
+  id: string;
+  installed: boolean;
+  updateAddonList: () => Promise<void>;
+}): VNode {
   const [isInstalling, setIsInstalling] = useState(false);
 
   return (
@@ -40,11 +52,11 @@ function Install({ id }: { id: string }): VNode {
       class={`${sharedStyle.button} ${style.itemButton}`}
       onClick={async () => {
         setIsInstalling(true);
-        await installAddon(id);
+        await installAddon(id, updateAddonList);
         setIsInstalling(false);
       }}
-      disabled={isInstalling}>
-      {isInstalling ? "Installing..." : "Install"}
+      disabled={installed || isInstalling}>
+      {installed ? "Installed" : isInstalling ? "Installing..." : "Install"}
     </button>
   );
 }
@@ -82,7 +94,11 @@ function getError(data: StoreItem | RouteError | undefined): string | undefined 
   return genericError;
 }
 
-export default function StoreItemPage({ id: inputId }: StoreItemPageProps): VNode {
+export default function StoreItemPage({
+  id: inputId,
+  installedAddons,
+  updateAddonList,
+}: StoreItemPageProps): VNode {
   const { isLoading, data } = useQuery<StoreItem | RouteError>(["store", inputId], () =>
     fetch(`/api/store/${inputId}`).then((res) => res.json()),
   );
@@ -109,6 +125,7 @@ export default function StoreItemPage({ id: inputId }: StoreItemPageProps): VNod
   const kind = TYPES[item.type];
   const label = LABELS[kind];
   const listRoute = LIST_ROUTES[kind];
+  const installed = Object.values(installedAddons).flat().includes(id);
 
   useTitle(`${name} - Replugged ${label}`);
 
@@ -150,7 +167,7 @@ export default function StoreItemPage({ id: inputId }: StoreItemPageProps): VNod
           </div>
         </div>
         <div class={style.sidebar}>
-          <Install id={id} />
+          <Install id={id} installed={installed} updateAddonList={updateAddonList} />
           <h2 class={style.detailsHeader}>Details</h2>
           <p class={style.details}>
             {details.map(({ label, value, truncate }) => {

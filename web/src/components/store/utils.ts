@@ -1,9 +1,12 @@
-import install from "../../install";
+import install, { rpc } from "../../install";
 import { toast } from "react-hot-toast";
 
 const toastIdMap = new Map<string, string>();
 
-export function installAddon(identifier: string): Promise<void> {
+export function installAddon(
+  identifier: string,
+  updateAddonList?: () => Promise<void>,
+): Promise<void> {
   if (toastIdMap.has(identifier)) {
     // Dismiss any existing toasts for the same addon
     toast.dismiss(toastIdMap.get(identifier)!);
@@ -38,12 +41,14 @@ export function installAddon(identifier: string): Promise<void> {
         state = "done";
         const waitToToast = Math.max(0, 500 - (Date.now() - lastToast));
 
-        setTimeout(() => {
+        setTimeout(async () => {
           switch (res.kind) {
             case "SUCCESS":
               toast.success(`${res.manifest.name} was successfully installed.`, {
                 id: toastId,
               });
+
+              await updateAddonList?.();
               break;
             case "ALREADY_INSTALLED":
               toast.error(`${res.manifest.name} is already installed.`, {
@@ -72,6 +77,22 @@ export function installAddon(identifier: string): Promise<void> {
 
           resolve();
         }, waitToToast);
+      },
+    });
+  });
+}
+
+export type AddonList = Record<"plugins" | "themes", string[]>;
+
+export function getAddons(): Promise<AddonList | null> {
+  return new Promise((resolve) => {
+    rpc<Record<string, never>, AddonList>({
+      cmd: "REPLUGGED_LIST_ADDONS",
+      data: {},
+      onFinish: (res) => {
+        if ("kind" in res) return null;
+
+        resolve(res);
       },
     });
   });
