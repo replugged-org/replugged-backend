@@ -179,7 +179,7 @@ export default function Store({ kind }: StoreProps): VNode {
     queryFn: async ({ pageParam: page }) => {
       const queryString = new URLSearchParams({
         page: page?.toString() ?? pageQuery ?? "1",
-        items: (4).toString(),
+        items: (12).toString(),
         query: debouncedQuery,
       });
 
