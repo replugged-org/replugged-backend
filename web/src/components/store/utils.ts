@@ -90,8 +90,8 @@ export function getAddons(): Promise<AddonList | null> {
       cmd: "REPLUGGED_LIST_ADDONS",
       data: {},
       onFinish: (res) => {
-        if ("kind" in res) return null;
-        if ("code" in res) return null;
+        if ("kind" in res) return resolve(null);
+        if ("code" in res) return resolve(null);
 
         resolve(res);
       },
