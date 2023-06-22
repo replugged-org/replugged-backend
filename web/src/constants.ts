@@ -63,8 +63,11 @@ export const Routes = {
   STORE_HOSTING: "/store/forms/hosting",
   STORE_COPYRIGHT: "/store/copyright",
   STORE_ITEM: "/store/:id",
-  STORE_ITEM_FN: (id: string) => `/store/${id}/`, // Vite doesn't like the dots in the path but the trailing slash fixes that. Works fine w/o it in prod.
-
+  STORE_ITEM_FN: (id: string) => {
+    const base = `/store/${id}`;
+    if (import.meta.env.DEV) return `${base}/`; // Vite/'s server doesn't like the dot in the URL but the trailing slash fixes it
+    return base;
+  },
   DOCS: "https://guide.replugged.dev",
   DOCS_ITEM: (cat: string, doc: string) => `/docs/${cat}/${doc}`,
   DOCS_GITHUB: "https://github.com/replugged-org/documentation",
