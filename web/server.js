@@ -52,7 +52,7 @@ const meta = [
     description: "Replugged branding guidelines and assets.",
   },
   {
-    match: ["/store/plugins"],
+    match: ["/store", "/store/plugins"],
     title: "Replugged Plugins",
     description: "Explore and install plugins for Replugged.",
   },
