@@ -1,4 +1,5 @@
 import { existsSync, mkdirSync } from "fs";
+import { stat } from "fs/promises";
 import path from "path";
 
 export const STORAGE_FOLDER = (folder: string): string => {
@@ -40,3 +41,12 @@ export const toArray = <T>(value: T | T[]): T[] => {
   if (value === undefined) return [];
   return [value];
 };
+
+export async function exists(path: string): Promise<boolean> {
+  try {
+    await stat(path);
+    return true;
+  } catch {
+    return false;
+  }
+}

@@ -9,6 +9,7 @@ import legacyLinking from "./legacyLinking.js";
 import badgesModule from "./badges.js";
 import guildsModule from "./guilds.js";
 import storeModule from "./store/index.js";
+import reactDevToolsModule from "./react-devtools.js";
 
 function logout(_: FastifyRequest, reply: FastifyReply): void {
   reply.setCookie("token", "", { maxAge: 0, path: "/" }).redirect("/");
@@ -30,6 +31,7 @@ export default function (fastify: FastifyInstance, _: unknown, done: () => void)
   fastify.register(guildsModule, { prefix: "/guilds" });
   fastify.register(badgesModule, { prefix: "/badges" });
   fastify.register(storeModule, { prefix: "/store" });
+  fastify.register(reactDevToolsModule, { prefix: "/react-devtools" });
   fastify.register(legacyLinking);
   done();
 }
