@@ -1,17 +1,8 @@
-import { FastifyInstance } from "fastify";
-import { STORAGE_FOLDER, toArray } from "../../utils/misc.js";
+import type { FastifyInstance } from "fastify";
+import { readFile, readdir } from "fs/promises";
 import path from "path";
-import { readFile, readdir, stat } from "fs/promises";
-import { StoreItem } from "../../../../types/store.js";
-
-async function exists(path: string): Promise<boolean> {
-  try {
-    await stat(path);
-    return true;
-  } catch {
-    return false;
-  }
-}
+import type { StoreItem } from "../../../../types/store.js";
+import { STORAGE_FOLDER, exists, toArray } from "../../utils/misc.js";
 
 const ADDONS_FOLDER = STORAGE_FOLDER("addons");
 

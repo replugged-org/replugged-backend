@@ -1,15 +1,7 @@
 import { FastifyInstance } from "fastify";
-import { readFile, stat } from "fs/promises";
+import { readFile } from "fs/promises";
 import { resolve } from "path";
-
-async function exists(path: string): Promise<boolean> {
-  try {
-    await stat(path);
-    return true;
-  } catch {
-    return false;
-  }
-}
+import { exists } from "../utils/misc";
 
 async function getZip(): Promise<Buffer | null> {
   const fullPath = resolve("ReactDevTools.zip");
