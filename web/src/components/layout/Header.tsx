@@ -13,6 +13,7 @@ import Staff from "../../assets/badges/staff.svg";
 
 import style from "./header.module.css";
 import sharedStyle from "../shared.module.css";
+import { getDisplayNameComponent } from "../util/misc";
 
 function User(): VNode {
   const user = useContext(UserContext);
@@ -32,10 +33,7 @@ function User(): VNode {
       <Avatar user={user} />
       <div className={style.details}>
         <div className={style.name}>
-          <div className={style.username}>
-            {user.username}
-            <span className={style.discriminator}>#{user.discriminator}</span>
-          </div>
+          <div className={style.username}>{getDisplayNameComponent(user)}</div>
           {/* @ts-expect-error doesn't like native */}
           {isStaff && <Staff className={style.badge} />}
         </div>

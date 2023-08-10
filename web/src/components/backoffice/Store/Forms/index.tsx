@@ -18,6 +18,7 @@ import X from "feather-icons/dist/icons/x.svg";
 import style from "../../admin.module.css";
 import sharedStyle from "../../../shared.module.css";
 import UserContext from "../../../UserContext";
+import { getDisplayNameString } from "../../../util/misc";
 
 interface FormProps {
   form: StoreForm;
@@ -156,8 +157,7 @@ function ReviewButtons({ form, canViewDiscussions }: FormProps): VNode {
               <X className={sharedStyle.icon} />
             )}
             <span>
-              {form.approved ? "Approved" : "Rejected"} by {formReviewer?.username}#
-              {formReviewer?.discriminator}
+              {form.approved ? "Approved" : "Rejected"} by {getDisplayNameString(formReviewer)}
             </span>
           </div>
         ) : (
@@ -186,9 +186,7 @@ function ReviewButtons({ form, canViewDiscussions }: FormProps): VNode {
           </div>
           <ul>
             <li>Discord ID: {form.submitter}</li>
-            <li>
-              Discord Tag: {formUser.username}#{formUser.discriminator}
-            </li>
+            <li>Discord Tag: {getDisplayNameString(formUser)}</li>
           </ul>
         </Modal>
       )}
@@ -225,14 +223,7 @@ function Form({ form, canViewDiscussions }: FormProps): VNode {
           {form.kind.slice(1)} form
         </span>
         <span className={style.sectionSubtitle}>
-          Submitted by{" "}
-          {user ? (
-            <>
-              {user.username}#{user.discriminator}
-            </>
-          ) : (
-            "Deleted User"
-          )}
+          Submitted by {user ? getDisplayNameString(user) : "Deleted User"}
         </span>
       </header>
       <div className={style.sectionBody}>

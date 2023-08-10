@@ -22,6 +22,7 @@ import Early from "../../assets/badges/early.svg";
 
 import style from "./profile.module.css";
 import sharedStyle from "../shared.module.css";
+import { getDisplayNameComponent } from "../util/misc";
 
 interface ProfileProps {
   user: User;
@@ -98,10 +99,7 @@ export default function Profile({ user, onEdit }: ProfileProps): VNode {
             <Avatar user={user} class={style.avatar} />
             <ProfileBadges flags={user.flags} cutiePerks={user.cutiePerks} />
           </div>
-          <div className={style.props}>
-            <span>{user.username}</span>
-            <span className={style.discriminator}>#{user.discriminator}</span>
-          </div>
+          <div className={style.props}>{getDisplayNameComponent(user)}</div>
         </div>
         <div className={style.section}>
           <h3 className={style.header}>Roles</h3>

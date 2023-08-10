@@ -10,6 +10,7 @@ import { Endpoints } from "../../../constants";
 
 import style from "../admin.module.css";
 import Tabs from "../../util/Tabs";
+import { getDisplayNameString } from "../../util/misc";
 
 interface ManageModalProps {
   user: RestAdminUser;
@@ -151,7 +152,7 @@ export function ManageEdit({ user, onClose }: ManageModalProps): VNode {
 
   return (
     <Modal
-      title={`Modify user - ${user.username}#${user.discriminator}`}
+      title={`Modify user - ${getDisplayNameString(user)}`}
       confirmText="Save"
       onClose={onClose}
       onConfirm={onSave}
@@ -209,7 +210,7 @@ export function ManageModeration({ user, onClose }: ManageModalProps): VNode {
 
   return (
     <Modal
-      title={`User bans - ${user.username}#${user.discriminator}`}
+      title={`User bans - ${getDisplayNameString(user)}`}
       onClose={onClose}
       onConfirm={onApply}
       confirmText="Apply"

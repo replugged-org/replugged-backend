@@ -1,8 +1,4 @@
-import {
-  VNode,
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  h,
-} from "preact";
+import { VNode } from "preact";
 import type { MinimalUser } from "../../../types/users";
 import { useEffect, useState } from "preact/hooks";
 import { useTitle } from "hoofd/preact";
@@ -13,6 +9,7 @@ import Avatar from "./util/Avatar";
 import { Endpoints } from "../constants";
 
 import style from "./contributors.module.css";
+import { getDisplayNameComponent } from "./util/misc";
 
 type ContributorUser = MinimalUser & { github?: string };
 
@@ -27,10 +24,7 @@ function Contributor({ user }: { user: ContributorUser }): VNode {
     <div className={style.container}>
       <Avatar user={user} />
       <div className={style.name}>
-        <div className={style.username}>
-          {user.username}
-          <span className={style.discriminator}>#{user.discriminator}</span>
-        </div>
+        <div className={style.username}>{getDisplayNameComponent(user)}</div>
       </div>
     </div>
   );

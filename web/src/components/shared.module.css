@@ -117,3 +117,12 @@ a.link-wrap {
   color: inherit;
   display: contents;
 }
+
+.discriminator {
+  font-size: 0.6em;
+  opacity: 0.6;
+}
+
+.at {
+  opacity: 0.6;
+}

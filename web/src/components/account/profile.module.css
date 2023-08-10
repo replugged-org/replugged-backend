@@ -50,10 +50,6 @@
   margin-bottom: 12px;
 }
 
-.discriminator {
-  color: var(--text-dark);
-}
-
 .header {
   font-size: 0.85em;
   text-transform: uppercase;

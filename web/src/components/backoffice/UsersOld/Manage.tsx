@@ -18,6 +18,7 @@ import Trash from "feather-icons/dist/icons/trash-2.svg";
 
 import style from "../admin.module.css";
 import sharedStyle from "../../shared.module.css";
+import { getDisplayNameString } from "../../util/misc";
 
 interface UserStore {
   [page: number]: RestAdminUser[];
@@ -110,9 +111,7 @@ function UserRow({
     <div className={style.row}>
       <DiscordAvatar user={user} />
       <div className={style.rowInfo}>
-        <span>
-          {user.username}#{user.discriminator}
-        </span>
+        <span>{getDisplayNameString(user)}</span>
         <span className={bans.length ? sharedStyle.red : ""}>
           {bans.length ? `Active bans: ${bans.join(", ")}` : "No active bans"}
         </span>

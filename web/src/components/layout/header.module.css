@@ -87,11 +87,6 @@
   text-overflow: ellipsis;
 }
 
-.discriminator {
-  font-size: 0.8rem;
-  color: var(--text-dark);
-}
-
 .badge {
   margin-left: 4px;
   flex-shrink: 0;
