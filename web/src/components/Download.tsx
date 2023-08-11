@@ -1,5 +1,4 @@
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-import { JSX, VNode, h } from "preact";
+import { JSX, VNode } from "preact";
 import { useTitle } from "hoofd/preact";
 
 import style from "./download.module.css";
@@ -59,7 +58,7 @@ function Code({ children }: { children: string }): VNode {
 
 export default function Homepage(): VNode {
   const platform: string = // @ts-expect-error DOM types are out of date
-  (window.navigator.userAgentData?.platform || window.navigator.platform || "").toLowerCase();
+    (window.navigator.userAgentData?.platform || window.navigator.platform || "").toLowerCase();
 
   const operatingSystems: OperatingSystemData[] = [
     {
@@ -155,6 +154,7 @@ export default function Homepage(): VNode {
               ))}
             </div>
             <div className={style.divider} />
+            <span>Click the button below to download the installer, then run it!</span>
             <div className={style.buttons}>
               {selectedOSData.files.map((file) => (
                 <a
@@ -173,8 +173,13 @@ export default function Homepage(): VNode {
         </div>
       </div>
       <div className={style.wrapper}>
-        <section id="manual" className={style.manual}>
+        <section id="manual" className={style.section}>
           <h2>Manual Installation</h2>
+          <div className={style.warning}>
+            For most users, we recommend following the automatic installation instructions above. If
+            you are unable to use the automatic installer or you'd prefer to install via the command
+            line, you can follow the instructions below.
+          </div>
           <h3>Prerequisites</h3>
           <p>
             <ul>

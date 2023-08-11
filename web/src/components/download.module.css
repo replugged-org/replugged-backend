@@ -65,21 +65,19 @@
 }
 
 .warning {
-  width: -webkit-fit-content;
-  width: -moz-fit-content;
-  width: fit-content;
-  margin: 0 auto;
+  width: 100%;
   border: 1px solid rgba(240, 178, 50, 1);
   border-radius: 5px;
   padding: 10px;
   background-color: rgba(240, 178, 50, 0.1);
 }
 
-.manual h2 {
-  margin-bottom: 20px;
+.section h2,
+.section h3 {
+  margin: 15px 0;
 }
 
-.manual p {
+.section p {
   margin: 16px 0px;
 }
 
