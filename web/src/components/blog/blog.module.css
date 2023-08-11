@@ -1,0 +1,148 @@
+.container {
+  margin: 0;
+  padding: 0;
+  max-width: none;
+}
+
+article,
+.title,
+.spaced,
+.cta-inner {
+  max-width: 1300px;
+  padding-left: 20px;
+  padding-right: 20px;
+  margin: 0 auto;
+}
+
+article {
+  padding-bottom: 20px;
+}
+
+.title-wrapper {
+  padding-top: 20px;
+  padding-bottom: 10px;
+  width: 1300px;
+}
+
+.title {
+  text-align: center;
+  width: 100%;
+}
+
+article h2 {
+  font-size: 1.5em;
+  font-weight: 600;
+}
+
+.store-item-card {
+  margin: 10px 0;
+  transition: background-color 0.2s ease-in-out;
+}
+
+.store-item-card:hover {
+  transform: none;
+  background-color: var(--background-tertiary);
+}
+
+.cta {
+  background-color: var(--background-light);
+  padding-top: 20px;
+  padding-bottom: 20px;
+}
+
+.cta-header {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-bottom: 24px;
+}
+
+.cta-logo {
+  width: auto;
+  height: 64px;
+  padding-right: 20px;
+}
+
+.cta-motto {
+  margin: 0;
+  font-size: 1.1rem;
+  position: relative;
+  z-index: 2;
+}
+
+.cta-buttons {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 32px;
+}
+
+.italic {
+  font-style: italic;
+}
+
+article {
+  display: grid;
+  gap: 10px;
+  line-height: 1.4;
+}
+
+h2,
+h3,
+p,
+ol,
+ul {
+  margin-top: 0;
+  margin-bottom: 0;
+}
+
+.list-grid {
+  display: grid;
+  grid-template-columns: repeat(1, 1fr);
+  gap: 24px;
+}
+
+@media (min-width: 768px) {
+  .list-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (min-width: 1024px) {
+  .list-grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+.list-item {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  background-color: var(--background-secondary);
+  border-radius: 4px;
+  padding: 15px;
+  transition: transform 0.2s ease-in-out;
+}
+
+.list-item:hover,
+.list-item:focus {
+  transform: scale(1.05);
+}
+
+.list-header {
+  font-size: 1.5em;
+}
+
+.list-description {
+  font-size: 1em;
+  line-height: 1.5em;
+  font-weight: 400;
+  margin-top: 8px;
+}
+
+.list-button {
+  margin-top: 12px;
+  align-self: flex-end;
+  display: flex;
+  gap: 16px;
+}

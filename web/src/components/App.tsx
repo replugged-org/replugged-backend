@@ -20,6 +20,7 @@ import Install from "./Install";
 import Storefront from "./store/Storefront";
 import Terms from "./legal/Terms";
 import Privacy from "./legal/Privacy";
+import Blog from "./blog";
 
 const Admin = lazy(() => import("./backoffice/Admin"));
 
@@ -85,6 +86,7 @@ export default function App(props: AppProps): VNode {
 
             <Route path={Routes.TERMS} component={Terms} />
             <Route path={Routes.PRIVACY} component={Privacy} />
+            <Route path={`${Routes.BLOG}/:path*`} component={Blog} />
 
             <Route path={`${Routes.BACKOFFICE}/:path*`} component={AuthBoundary} staff>
               <Admin />

@@ -10,8 +10,8 @@ export const Endpoints = {
   USER_AVATAR: (id: string) => `/api/v1/avatars/${id}.png`,
   USER_AVATAR_DISCORD: (id: string, avatar: string) =>
     `https://cdn.discordapp.com/avatars/${id}/${avatar}.png?size=128`,
-  DEFAULT_AVATAR_DISCORD: (dicrim: number) =>
-    `https://cdn.discordapp.com/embed/avatars/${dicrim % 6}.png?size=128`,
+  DEFAULT_AVATAR_DISCORD: (key: number) =>
+    `https://cdn.discordapp.com/embed/avatars/${key}.png?size=128`,
 
   STORE_FORM_ELIGIBILITY: "/api/v1/store/forms/eligibility",
   STORE_FORM: (id: string) => `/api/v1/store/forms/${id}`,
@@ -50,6 +50,9 @@ export const Routes = {
   INSTALL: "/install",
   FAQ: "/faq",
   DOWNLOAD: "/download",
+
+  BLOG: "/blog",
+  BLOG_ITEM: (id: string) => `/blog/${id}`,
 
   STORE: "/store",
   STORE_PLUGINS: "/store/plugins",

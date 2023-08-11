@@ -4,23 +4,10 @@ import Redirect from "../util/Redirect";
 import Router from "preact-router";
 import Store from "./Store";
 import StoreItemPage from "./StoreItemPage";
-import { useEffect, useState } from "preact/hooks";
-import { AddonList, getAddons } from "./utils";
+import { useInstalledAddons } from "./utils";
 
 export default function Storefront(): VNode {
-  const [installedAddons, setInstalledAddons] = useState<AddonList>({
-    plugins: [],
-    themes: [],
-  });
-
-  const updateAddonList = async (): Promise<void> => {
-    const res = await getAddons();
-    if (res) setInstalledAddons(res);
-  };
-
-  useEffect(() => {
-    updateAddonList();
-  }, []);
+  const { installedAddons, updateAddonList } = useInstalledAddons();
 
   return (
     <Router>

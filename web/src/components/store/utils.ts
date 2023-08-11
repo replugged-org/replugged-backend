@@ -1,7 +1,34 @@
+import { useEffect, useState } from "preact/hooks";
 import install, { rpc } from "../../install";
 import { toast } from "react-hot-toast";
+import { StoreItem } from "../../../../types/store";
+import { RouteError } from "../../types";
 
 const toastIdMap = new Map<string, string>();
+
+export const useInstalledAddons = (): {
+  installedAddons: AddonList;
+  updateAddonList: () => Promise<void>;
+} => {
+  const [installedAddons, setInstalledAddons] = useState<AddonList>({
+    plugins: [],
+    themes: [],
+  });
+
+  const updateAddonList = async (): Promise<void> => {
+    const res = await getAddons();
+    if (res) setInstalledAddons(res);
+  };
+
+  useEffect(() => {
+    updateAddonList();
+  }, []);
+
+  return {
+    installedAddons,
+    updateAddonList,
+  };
+};
 
 export function installAddon(
   identifier: string,
@@ -97,4 +124,17 @@ export function getAddons(): Promise<AddonList | null> {
       },
     });
   });
+}
+
+export function getError(data: StoreItem | RouteError | undefined): string | undefined {
+  if (data && !("error" in data)) {
+    // @ts-expect-error Not adding to type for convenience
+    if (data.type === "replugged") return "Addon not found.";
+    return undefined;
+  }
+  const genericError = "Failed to load.";
+  if (!data) return genericError;
+  const { error } = data;
+  if (error === 404) return "Addon not found.";
+  return genericError;
 }

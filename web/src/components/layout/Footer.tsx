@@ -12,6 +12,9 @@ export default function Footer(): VNode {
         </span>
       </div>
       <div className={style.section}>
+        <a className={style.link} href={Routes.BLOG}>
+          Blog
+        </a>
         <a className={style.link} href={Routes.DOCS} target="_blank" rel="noreferrer">
           Developer Guide
         </a>

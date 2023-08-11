@@ -3,7 +3,7 @@ import { VNode } from "preact";
 import style from "./store.module.css";
 import sharedStyle from "../shared.module.css";
 import formStyle from "../util/form.module.css";
-import { UseInfiniteQueryResult, useInfiniteQuery } from "@tanstack/react-query";
+import { UseInfiniteQueryResult, useInfiniteQuery, useQuery } from "@tanstack/react-query";
 import { useTitle } from "hoofd/preact";
 import { PaginatedStore, StoreItem } from "../../../../types/store";
 import { useEffect, useState } from "preact/hooks";
@@ -11,8 +11,9 @@ import Spinner from "../util/Spinner";
 import { useInView } from "react-intersection-observer";
 import { useDebounce } from "react-use";
 import { toArray } from "../util/misc";
-import { installAddon } from "./utils";
+import { getError, installAddon, useInstalledAddons } from "./utils";
 import { Routes } from "../../constants";
+import { RouteError } from "../../types";
 
 type StoreKind = "plugin" | "theme";
 
@@ -51,22 +52,26 @@ function Item(
   item: StoreItem & {
     updateAddonList: () => Promise<void>;
     installed: boolean;
+    itemClassName?: string;
+    openInNewTab?: boolean;
   },
 ): VNode {
   const [isInstalling, setIsInstalling] = useState(false);
 
   const authors = formatAuthors(item.author);
 
+  const target = item.openInNewTab ? "_blank" : undefined;
+
   return (
-    <a class={sharedStyle.linkWrap} href={Routes.STORE_ITEM_FN(item.id)}>
-      <div class={style.item}>
+    <a class={sharedStyle.linkWrap} href={Routes.STORE_ITEM_FN(item.id)} target={target}>
+      <div class={item.itemClassName || style.item}>
         <div>
           <h2 class={style.itemHeader}>{item.name}</h2>
           <p class={style.itemAuthor}>by {authors}</p>
           <p class={style.itemDescription}>{item.description}</p>
         </div>
         <div class={style.itemButton}>
-          <a class={sharedStyle.buttonLink} href={Routes.STORE_ITEM_FN(item.id)}>
+          <a class={sharedStyle.buttonLink} href={Routes.STORE_ITEM_FN(item.id)} target={target}>
             Details
           </a>
           <button
@@ -174,6 +179,59 @@ function StoreBody(
         <LoadMore {...props} />
       </div>
     </>
+  );
+}
+
+export function StandaloneStoreItem({
+  id,
+  className,
+  openInNewTab,
+}: {
+  id: string;
+  className?: string;
+  openInNewTab?: boolean;
+}): VNode {
+  const itemClassName = [style.item, className].filter(Boolean).join(" ");
+
+  const { installedAddons, updateAddonList } = useInstalledAddons();
+
+  const { isLoading, data } = useQuery<StoreItem | RouteError>(["store", id], () =>
+    fetch(`/api/store/${id}`).then((res) => res.json()),
+  );
+
+  if (isLoading) {
+    return (
+      <a class={sharedStyle.linkWrap} href={Routes.STORE_ITEM_FN(id)}>
+        <div class={itemClassName}>
+          <Spinner />
+        </div>
+      </a>
+    );
+  }
+
+  const error = getError(data);
+  if (error) {
+    return (
+      <a class={sharedStyle.linkWrap} href={Routes.STORE_ITEM_FN(id)}>
+        <div class={itemClassName}>
+          <h2 class={style.itemHeader}>{error}</h2>
+        </div>
+      </a>
+    );
+  }
+
+  const item = data as StoreItem;
+
+  const installed = Object.values(installedAddons).flat().includes(id);
+
+  return (
+    <Item
+      {...item}
+      installed={installed}
+      updateAddonList={updateAddonList}
+      itemClassName={itemClassName}
+      openInNewTab={openInNewTab}
+    />
   );
 }
 

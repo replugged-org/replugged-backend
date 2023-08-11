@@ -1,12 +1,15 @@
 import express from "express";
 import cors from "cors";
 import fs from "fs";
+import articleMeta from "./src/components/blog/articles.json" assert { type: "json" };
+
 const app = express();
 
 const index = fs.readFileSync("dist/index.html", "utf8");
 const distFiles = fs.readdirSync("dist").filter((x) => !["assets", "index.html"].includes(x));
 
 const STORE_ITEM_RGX = /^\/store\/([^/]+)/;
+const BLOG_ITEM_RGX = /^\/blog\/([^/]+)/;
 
 const meta = [
   {
@@ -80,6 +83,18 @@ const meta = [
       return {
         title: `${data.name} - Replugged ${type}`,
         description: data.description,
+      };
+    },
+  },
+  {
+    match: [BLOG_ITEM_RGX],
+    data: (path) => {
+      const id = path.match(BLOG_ITEM_RGX)[1];
+      const meta = articleMeta[id];
+      if (!meta) return null;
+      return {
+        title: `${meta.title} - Replugged Blog`,
+        description: meta.description,
       };
     },
   },

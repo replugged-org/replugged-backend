@@ -7,7 +7,7 @@ import { useTitle } from "hoofd/preact";
 import { StoreItem } from "../../../../types/store";
 import { useState } from "preact/hooks";
 import Spinner from "../util/Spinner";
-import { AddonList, installAddon } from "./utils";
+import { AddonList, getError, installAddon } from "./utils";
 import { toArray } from "../util/misc";
 import { RouteError } from "../../types";
 import ArrowHeadBack from "feather-icons/dist/icons/chevron-left.svg";
@@ -80,19 +80,6 @@ const formatAuthors = (authors: StoreItem["author"]): string => {
     authorNames.length - 3
   } more`;
 };
-
-function getError(data: StoreItem | RouteError | undefined): string | undefined {
-  if (data && !("error" in data)) {
-    // @ts-expect-error Not adding to type for convenience
-    if (data.type === "replugged") return "Addon not found.";
-    return undefined;
-  }
-  const genericError = "Failed to load.";
-  if (!data) return genericError;
-  const { error } = data;
-  if (error === 404) return "Addon not found.";
-  return genericError;
-}
 
 export default function StoreItemPage({
   id: inputId,
