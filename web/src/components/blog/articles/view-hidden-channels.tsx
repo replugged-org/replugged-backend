@@ -11,9 +11,9 @@ export default (): VNode => (
         Do you ever feel intrigued by the hidden channels lurking within your favorite Discord
         servers? You're not alone! Many servers have private channels that pique our curiosity. Some
         channels might be exclusive to server staff, while others may be reserved for VIPs.
-        Regardless of their purpose, these hidden channels are often shrouded in mystery.
-        Thankfully, with the assistance of Replugged and a few simple steps, uncovering these
-        secrets has become easier than ever before.
+        Regardless of their purpose, these hidden channels are often shrouded in mystery. With the
+        assistance of Replugged and our "Show Hidden Channels" plugin, you can now see all of the
+        hidden channels in any Discord server!
       </p>
       <h2 id="install-replugged">Step 1: Download and Install Replugged</h2>
 
@@ -31,7 +31,7 @@ export default (): VNode => (
         <li>Follow the installation prompts to install Replugged into your Discord app.</li>
       </ol>
 
-      <h2 id="install-show-hidden-channels">Step 2: Install the "ShowHiddenChannels" Plugin</h2>
+      <h2 id="install-show-hidden-channels">Step 2: Install the Show Hidden Channels Plugin</h2>
       <ol>
         <li>Click on the "Install" button presented below.</li>
         <li>In your Discord app, confirm the installation of the plugin.</li>
