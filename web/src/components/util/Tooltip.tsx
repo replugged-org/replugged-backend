@@ -53,10 +53,12 @@ export default function Tooltip({
   );
 
   let tooltip = null;
-  if (display && elementRef.current) {
+  // @ts-expect-error Could be a component
+  const element = elementRef.current?.base ?? elementRef.current;
+  if (display && element?.nodeType === Node.ELEMENT_NODE) {
     const css: Record<string, string | number> = {};
     const className = [style.tooltip];
-    const rect = elementRef.current.getBoundingClientRect();
+    const rect = element.getBoundingClientRect();
 
     if (align === "left" || align === "left-center") {
       className.push(style.alignLeft);
