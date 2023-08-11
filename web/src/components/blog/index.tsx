@@ -5,8 +5,11 @@ import ARTICLES from "./articles";
 import { Routes } from "../../constants";
 import style from "./blog.module.css";
 import sharedStyle from "../shared.module.css";
+import { useTitle } from "hoofd/preact";
 
 function BlogHome(): VNode {
+  useTitle("Blog");
+
   return (
     <main>
       <div className={style.titleWrapper}>

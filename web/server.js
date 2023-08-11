@@ -65,6 +65,11 @@ const meta = [
     description: "Explore and install themes for Replugged.",
   },
   {
+    match: ["/blog"],
+    title: "Replugged Blog",
+    description: "News, updates, and guides about Replugged.",
+  },
+  {
     match: [STORE_ITEM_RGX],
     data: async (path) => {
       const id = path.match(STORE_ITEM_RGX)[1];
