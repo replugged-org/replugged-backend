@@ -20,10 +20,7 @@ export default (): VNode => (
       <p>
         One of the primary advantages of client mods for Discord is the ability to personalize the
         interface and apply custom themes or skins. While Discord recently added built in themes,
-        they are only available to Nitro subscribers and offer extremely limited customization
-      </p>
-
-      <p>
+        they are only available to Nitro subscribers and offer extremely limited customization.
         Client mod themes, on the other hand, have virtually limitless customization options. If you
         can think of it, you can probably do it.
       </p>
