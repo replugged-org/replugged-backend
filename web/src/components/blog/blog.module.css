@@ -150,3 +150,13 @@ article {
   display: flex;
   gap: 16px;
 }
+
+.link-with-icon {
+  display: flex;
+  align-items: center;
+}
+
+.feature-link {
+  display: flex;
+  justify-content: flex-end;
+}
