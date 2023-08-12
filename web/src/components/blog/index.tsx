@@ -6,6 +6,7 @@ import { Routes } from "../../constants";
 import style from "./blog.module.css";
 import sharedStyle from "../shared.module.css";
 import { useTitle } from "hoofd/preact";
+import { Redirect } from "../App";
 
 function BlogHome(): VNode {
   useTitle("Blog");
@@ -49,6 +50,7 @@ export default function Blog(): VNode {
         />
       ))}
       <Route path={Routes.BLOG} component={BlogHome} />
+      <Redirect default to={Routes.BLOG} />
     </Router>
   );
 }

@@ -37,7 +37,7 @@ interface AppProps {
   ctx?: Record<string, unknown>;
 }
 
-function Redirect({ to }: { path: string; to: string }): null {
+export function Redirect({ to }: { path?: string; default?: boolean; to: string }): null {
   useEffect(() => {
     route(to, true);
   }, [to]);
