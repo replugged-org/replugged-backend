@@ -21,6 +21,7 @@ export default {
       donator: "1000955917237506130",
     },
   },
+  ipSalt: "", // Generate with "openssl rand -hex 32"
   github: {
     clientID: "",
     clientSecret: "",
