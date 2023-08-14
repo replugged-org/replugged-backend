@@ -119,7 +119,7 @@ export default function (fastify: FastifyInstance, _: unknown, done: () => void)
     }
 
     const { type, version } = request.query;
-    if (type && ["update", "install"].includes(type) && version) {
+    if (type && ["update", "install"].includes(type)) {
       const collection = fastify.mongo.db!.collection<StoreStats>("storeStats");
 
       // Will be used to make sure someone can't inflate their stats by sending a bunch of requests

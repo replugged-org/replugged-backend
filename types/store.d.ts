@@ -95,6 +95,6 @@ export interface StoreStats {
   id: string;
   date: Date;
   type: "install" | "update";
-  version: string;
+  version?: string;
   ipHash: string;
 }
