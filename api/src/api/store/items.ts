@@ -1,8 +1,10 @@
 import type { FastifyInstance } from "fastify";
 import { readFile, readdir } from "fs/promises";
 import path from "path";
-import type { StoreItem } from "../../../../types/store.js";
+import type { StoreItem, StoreStats } from "../../../../types/store.js";
 import { STORAGE_FOLDER, exists, toArray } from "../../utils/misc.js";
+import { createHash } from "crypto";
+import config from "../../config.js";
 
 const ADDONS_FOLDER = STORAGE_FOLDER("addons");
 
@@ -105,12 +107,40 @@ export default function (fastify: FastifyInstance, _: unknown, done: () => void)
     Params: {
       id: string;
     };
+    Querystring: {
+      type?: "update" | "install";
+      version?: string;
+    };
   }>("/:id.asar", async (request, reply) => {
     const asar = await getAsar(request.params.id);
     if (!asar) {
       reply.callNotFound();
       return;
     }
+
+    const { type, version } = request.query;
+    if (type && ["update", "install"].includes(type)) {
+      const collection = fastify.mongo.db!.collection<StoreStats>("storeStats");
+
+      // Will be used to make sure someone can't inflate their stats by sending a bunch of requests
+      // But to protect user privacy, we will hash the IP address.
+      const salt = config.ipSalt;
+      if (!config.ipSalt) {
+        throw new Error("IP salt is not set");
+      }
+      const ipHash = createHash("sha256").update(request.ip).update(salt).digest("hex");
+
+      const data = {
+        id: request.params.id,
+        date: new Date(),
+        type,
+        version,
+        ipHash,
+      };
+
+      await collection.insertOne(data);
+    }
+
     return asar;
   });
 
