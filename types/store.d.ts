@@ -94,7 +94,7 @@ export type StoreForm = FormPublish | FormVerification | FormHosting;
 export interface StoreStats {
   id: string;
   date: Date;
-  type: "install" | "update";
-  version?: string;
+  type?: "install" | "update";
+  version: string;
   ipHash: string;
 }
