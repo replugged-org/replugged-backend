@@ -2,7 +2,7 @@ import type { FastifyInstance } from "fastify";
 import { readFile, readdir } from "fs/promises";
 import path from "path";
 import type { StoreItem, StoreStats } from "../../../../types/store.js";
-import { STORAGE_FOLDER, exists, toArray } from "../../utils/misc.js";
+import { STORAGE_FOLDER, exists, getRequestIp, toArray } from "../../utils/misc.js";
 import { createHash } from "crypto";
 import config from "../../config.js";
 
@@ -124,6 +124,7 @@ export default function (fastify: FastifyInstance, _: unknown, done: () => void)
 
       // Will be used to make sure someone can't inflate their stats by sending a bunch of requests
       // But to protect user privacy, we will hash the IP address.
+      const ip = getRequestIp(request);
       const salt = config.ipSalt;
       if (!config.ipSalt) {
         throw new Error("IP salt is not set");

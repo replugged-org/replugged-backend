@@ -1,3 +1,4 @@
+import { FastifyRequest } from "fastify";
 import { existsSync, mkdirSync } from "fs";
 import { stat } from "fs/promises";
 import path from "path";
@@ -49,4 +50,30 @@ export async function exists(path: string): Promise<boolean> {
   } catch {
     return false;
   }
+}
+
+export function getRequestIp(request: FastifyRequest): string {
+  // https://github.com/metcoder95/fastify-ip#how-it-works
+  const headers = [
+    "x-client-ip", // Most common
+    "x-forwarded-for", // Mostly used by proxies
+    "cf-connecting-ip", // Cloudflare
+    "Cf-Pseudo-IPv4", // Cloudflare
+    "fastly-client-ip",
+    "true-client-ip", // Akamai and Cloudflare
+    "x-real-ip", // Nginx
+    "x-cluser-client-ip", // Rackspace LB
+    "forwarded-for",
+    "x-forwarded",
+    "forwarded",
+    "x-appengine-user-ip", // GCP App Engine
+  ].map((header) => {
+    const value = request.headers[header];
+    if (!value) return null;
+    if (Array.isArray(value)) return value[0];
+    return value;
+  });
+
+  const firstAvailableHeader = headers.find(Boolean);
+  return firstAvailableHeader || request.ip;
 }
