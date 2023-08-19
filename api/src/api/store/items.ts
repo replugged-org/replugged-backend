@@ -117,6 +117,11 @@ export default function (fastify: FastifyInstance, _: unknown, done: () => void)
       reply.callNotFound();
       return;
     }
+    const manifest = await getManifest(request.params.id);
+    if (!manifest) {
+      reply.callNotFound();
+      return;
+    }
 
     const { type, version } = request.query;
     if (!type || ["update", "install"].includes(type)) {
@@ -132,10 +137,10 @@ export default function (fastify: FastifyInstance, _: unknown, done: () => void)
       const ipHash = createHash("sha256").update(ip).update(salt).digest("hex");
 
       const data = {
-        id: request.params.id,
+        id: manifest.id,
         date: new Date(),
         type,
-        version,
+        version: version || manifest.version,
         ipHash,
       };
 
