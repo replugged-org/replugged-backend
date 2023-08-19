@@ -129,7 +129,7 @@ export default function (fastify: FastifyInstance, _: unknown, done: () => void)
       if (!config.ipSalt) {
         throw new Error("IP salt is not set");
       }
-      const ipHash = createHash("sha256").update(request.ip).update(salt).digest("hex");
+      const ipHash = createHash("sha256").update(ip).update(salt).digest("hex");
 
       const data = {
         id: request.params.id,
