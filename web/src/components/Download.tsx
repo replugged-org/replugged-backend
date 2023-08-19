@@ -9,7 +9,7 @@ import Check from "feather-icons/dist/icons/check.svg";
 import { Routes } from "../constants";
 
 const DOWNLOAD_URL_BASE =
-  "https://github.com/replugged-org/electron-installer/releases/latest/download";
+  "https://github.com/replugged-org/tauri-installer/releases/latest/download";
 
 type OperatingSystems = "windows" | "macos" | "linux";
 
@@ -96,12 +96,8 @@ export default function Homepage(): VNode {
       ),
       files: [
         {
-          label: "Download for Intel",
-          file: "replugged-installer-macos.zip",
-        },
-        {
-          label: "Download for Apple Silicon",
-          file: "replugged-installer-macos-arm64.zip",
+          label: "Download",
+          file: "replugged-installer-macos.app.tar.gz",
         },
       ],
     },
@@ -117,12 +113,12 @@ export default function Homepage(): VNode {
       ),
       files: [
         {
-          label: "Download for x86",
+          label: "Download .AppImage (most distros)",
           file: "replugged-installer-linux.AppImage",
         },
         {
-          label: "Download for arm64",
-          file: "replugged-installer-linux-arm64.AppImage",
+          label: "Download .deb (Debian, Ubuntu, etc.)",
+          file: "replugged-installer-linux.deb",
         },
       ],
     },
