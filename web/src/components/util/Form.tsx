@@ -171,7 +171,12 @@ export function SelectField(props: SelectFieldProps): VNode {
   const field = useField(props.note, props.error, props.rk);
 
   return (
-    <BaseField {...field} label={props.label} required={props.required} id={field.id} className={props.fieldClassName}>
+    <BaseField
+      {...field}
+      label={props.label}
+      required={props.required}
+      id={field.id}
+      className={props.fieldClassName}>
       <select
         type="checkbox"
         id={field.id}
