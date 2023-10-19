@@ -14,6 +14,7 @@ import { toArray } from "../util/misc";
 import { getError, installAddon, useInstalledAddons } from "./utils";
 import { Routes } from "../../constants";
 import { RouteError } from "../../types";
+import { SelectField } from "../util/Form";
 
 type StoreKind = "plugin" | "theme";
 
@@ -238,6 +239,8 @@ export function StandaloneStoreItem({
 export default function Store({ kind, installedAddons, updateAddonList }: StoreProps): VNode {
   useTitle(`Replugged ${LABELS[kind]}`);
 
+  const [sort, setSort] = useState("downloads");
+
   const [query, setQuery] = useState("");
   const [debouncedQuery, setDebouncedQuery] = useState(query);
 
@@ -252,12 +255,13 @@ export default function Store({ kind, installedAddons, updateAddonList }: StoreP
   );
 
   const itemsQuery = useInfiniteQuery<PaginatedStore>({
-    queryKey: ["store", kind, debouncedQuery],
+    queryKey: ["store", kind, debouncedQuery, sort],
     queryFn: async ({ pageParam: page }) => {
       const queryString = new URLSearchParams({
         page: page?.toString() ?? pageQuery ?? "1",
         items: (12).toString(),
         query: debouncedQuery,
+        sort,
       });
 
       const res = await fetch(`/api/store/list/${kind}?${queryString}`);
@@ -290,7 +294,17 @@ export default function Store({ kind, installedAddons, updateAddonList }: StoreP
   return (
     <main class={style.main}>
       <h1 class={style.header}>Replugged {LABELS[kind]}</h1>
-      <div class={style.grid}>
+      <div class={style.controls}>
+        <SelectField
+          fieldClassName={style.sortSelect}
+          name="sort"
+          label="Sort By"
+          options={[
+            { id: "downloads", name: "Downloads" },
+            { id: "name", name: "Name" },
+          ]}
+          onChange={(e) => setSort(e.currentTarget.value)}
+        />
         {items.length > 0 || debouncedQuery ? (
           <input
             class={`${formStyle.textField} ${style.search}`}
@@ -300,6 +314,8 @@ export default function Store({ kind, installedAddons, updateAddonList }: StoreP
             onInput={(e) => setQuery(e.currentTarget.value)}
           />
         ) : null}
+      </div>
+      <div class={style.grid}>
         <StoreBody
           {...itemsQuery}
           items={items}

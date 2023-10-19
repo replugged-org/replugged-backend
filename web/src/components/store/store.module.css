@@ -6,6 +6,24 @@
   margin-bottom: 24px;
 }
 
+.controls {
+  display: flex;
+  gap: 10px;
+  flex-direction: column;
+  margin-bottom: 24px;
+}
+
+.sortSelect {
+  flex: 0.25;
+  margin: 0;
+  padding-bottom: 0;
+  border-bottom: none;
+}
+
+.search {
+  width: auto;
+}
+
 .grid {
   display: grid;
   grid-template-columns: repeat(1, 1fr);
@@ -16,16 +34,19 @@
   .grid {
     grid-template-columns: repeat(2, 1fr);
   }
+  .controls {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    flex-direction: row;
+    margin-bottom: 24px;
+  }
 }
 
 @media (min-width: 1024px) {
   .grid {
     grid-template-columns: repeat(3, 1fr);
   }
-}
-
-.search {
-  grid-column-end: -1;
 }
 
 .full-grid {
