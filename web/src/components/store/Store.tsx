@@ -295,24 +295,26 @@ export default function Store({ kind, installedAddons, updateAddonList }: StoreP
     <main class={style.main}>
       <h1 class={style.header}>Replugged {LABELS[kind]}</h1>
       <div class={style.controls}>
-        <SelectField
-          fieldClassName={style.sortSelect}
-          name="sort"
-          label="Sort By"
-          options={[
-            { id: "downloads", name: "Downloads" },
-            { id: "name", name: "Name" },
-          ]}
-          onChange={(e) => setSort(e.currentTarget.value)}
-        />
         {items.length > 0 || debouncedQuery ? (
-          <input
-            class={`${formStyle.textField} ${style.search}`}
-            type="text"
-            placeholder="Search"
-            value={query}
-            onInput={(e) => setQuery(e.currentTarget.value)}
-          />
+          <>
+            <SelectField
+              fieldClassName={style.sortSelect}
+              name="sort"
+              label="Sort By"
+              options={[
+                { id: "downloads", name: "Downloads" },
+                { id: "name", name: "Name" },
+              ]}
+              onChange={(e) => setSort(e.currentTarget.value)}
+            />
+            <input
+              class={`${formStyle.textField} ${style.search}`}
+              type="text"
+              placeholder="Search"
+              value={query}
+              onInput={(e) => setQuery(e.currentTarget.value)}
+            />
+          </>
         ) : null}
       </div>
       <div class={style.grid}>
