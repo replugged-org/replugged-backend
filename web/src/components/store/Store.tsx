@@ -298,13 +298,14 @@ export default function Store({ kind, installedAddons, updateAddonList }: StoreP
         {items.length > 0 || debouncedQuery ? (
           <>
             <SelectField
-              fieldClassName={style.sortSelect}
               name="sort"
               label="Sort By"
               options={[
                 { id: "downloads", name: "Downloads" },
                 { id: "name", name: "Name" },
               ]}
+              value={sort}
+              fieldClassName={style.sortSelect}
               onChange={(e) => setSort(e.currentTarget.value)}
             />
             <input
