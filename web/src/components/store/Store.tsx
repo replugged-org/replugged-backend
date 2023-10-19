@@ -294,7 +294,7 @@ export default function Store({ kind, installedAddons, updateAddonList }: StoreP
   return (
     <main class={style.main}>
       <h1 class={style.header}>Replugged {LABELS[kind]}</h1>
-      <div class={style.controls}>
+      <div class={style.grid}>
         {items.length > 0 || debouncedQuery ? (
           <>
             <SelectField
@@ -316,8 +316,6 @@ export default function Store({ kind, installedAddons, updateAddonList }: StoreP
             />
           </>
         ) : null}
-      </div>
-      <div class={style.grid}>
         <StoreBody
           {...itemsQuery}
           items={items}

@@ -6,22 +6,15 @@
   margin-bottom: 24px;
 }
 
-.controls {
-  display: flex;
-  gap: 10px;
-  flex-direction: column;
-  margin-bottom: 24px;
-}
-
 .sortSelect {
-  flex: 0.25;
   margin: 0;
   padding-bottom: 0;
   border-bottom: none;
 }
 
 .search {
-  width: auto;
+  grid-column-end: -1;
+  align-self: end;
 }
 
 .grid {
@@ -33,13 +26,6 @@
 @media (min-width: 768px) {
   .grid {
     grid-template-columns: repeat(2, 1fr);
-  }
-  .controls {
-    display: flex;
-    justify-content: space-between;
-    align-items: flex-end;
-    flex-direction: row;
-    margin-bottom: 24px;
   }
 }
 
