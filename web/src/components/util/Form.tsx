@@ -1,6 +1,7 @@
 import {
   type Attributes,
   type ComponentChild,
+  type JSX,
   ComponentChildren,
   VNode,
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -20,6 +21,7 @@ type BaseProps = Attributes & {
   error?: ComponentChild;
   children: ComponentChild;
   required?: boolean;
+  className?: string;
 };
 
 type BaseFieldProps = Attributes & {
@@ -31,6 +33,7 @@ type BaseFieldProps = Attributes & {
   disabled?: boolean;
   raw?: boolean;
   rk?: number; // [Cynthia] this is used to force re-render of form fields, to help with errors sometimes not showing up
+  fieldClassName?: string;
 };
 
 type TextFieldProps = BaseFieldProps & {
@@ -42,6 +45,7 @@ type TextFieldProps = BaseFieldProps & {
 };
 type CheckboxFieldProps = BaseFieldProps & { value?: boolean };
 type SelectFieldProps = BaseFieldProps & {
+  onChange: JSX.GenericEventHandler<HTMLSelectElement>;
   value?: string;
   options: Array<{ id: string; name: string }>;
 };
@@ -81,7 +85,7 @@ function useField(note?: ComponentChild, error?: ComponentChild, rk?: number): F
 
 function BaseField(props: BaseProps): VNode {
   return (
-    <div className={style.field}>
+    <div className={[style.field, props.className].filter(Boolean).join(" ")}>
       <label className={style.label} for={props.id}>
         {props.label}
         {props.required && <span className={style.required}>*</span>}
@@ -167,7 +171,12 @@ export function SelectField(props: SelectFieldProps): VNode {
   const field = useField(props.note, props.error, props.rk);
 
   return (
-    <BaseField {...field} label={props.label} required={props.required} id={field.id}>
+    <BaseField
+      {...field}
+      label={props.label}
+      required={props.required}
+      id={field.id}
+      className={props.fieldClassName}>
       <select
         type="checkbox"
         id={field.id}
@@ -176,7 +185,8 @@ export function SelectField(props: SelectFieldProps): VNode {
         required={props.required}
         disabled={props.disabled}
         className={style.selectField}
-        onClick={field.onChange}>
+        onClick={field.onChange}
+        onChange={props.onChange}>
         {props.options.map(({ id, name }) => (
           <option key={id} value={id}>
             {name}

@@ -6,6 +6,17 @@
   margin-bottom: 24px;
 }
 
+.sortSelect {
+  margin: 0;
+  padding-bottom: 0;
+  border-bottom: none;
+}
+
+.search {
+  grid-column-end: -1;
+  align-self: end;
+}
+
 .grid {
   display: grid;
   grid-template-columns: repeat(1, 1fr);
@@ -22,10 +33,6 @@
   .grid {
     grid-template-columns: repeat(3, 1fr);
   }
-}
-
-.search {
-  grid-column-end: -1;
 }
 
 .full-grid {

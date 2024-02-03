@@ -1,10 +1,11 @@
+import { createHash } from "crypto";
 import type { FastifyInstance } from "fastify";
 import { readFile, readdir } from "fs/promises";
+import type { Document } from "mongodb";
 import path from "path";
 import type { StoreItem, StoreStats } from "../../../../types/store.js";
-import { STORAGE_FOLDER, exists, getRequestIp, toArray } from "../../utils/misc.js";
-import { createHash } from "crypto";
 import config from "../../config.js";
+import { STORAGE_FOLDER, exists, getRequestIp, toArray } from "../../utils/misc.js";
 
 const ADDONS_FOLDER = STORAGE_FOLDER("addons");
 
@@ -13,6 +14,9 @@ type AddonType = (typeof ADDON_TYPES)[number];
 
 const manifestCache = new Map<string, StoreItem>();
 const CACHE_DURATION = 1000 * 60 * 1;
+
+let storeStatsCache: Document[];
+let storeStatsLastFetch = 0;
 
 async function getManifest(id: string): Promise<StoreItem | null> {
   if (manifestCache.has(id)) {
@@ -159,8 +163,9 @@ export default function (fastify: FastifyInstance, _: unknown, done: () => void)
       page?: string;
       items?: string;
       query?: string;
+      sort?: "downloads" | "name";
     };
-  }>("/list/:type", (request, reply) => {
+  }>("/list/:type", async (request, reply) => {
     // @ts-expect-error includes bs
     if (!ADDON_TYPES.includes(request.params.type.replace(/s$/, ""))) {
       reply.code(400).send({
@@ -191,7 +196,7 @@ export default function (fastify: FastifyInstance, _: unknown, done: () => void)
       return;
     }
 
-    const manifests = listAddons(type, request.query.query);
+    let manifests = listAddons(type, request.query.query);
     const numPages = Math.ceil(manifests.length / perPage);
     if (page > numPages) {
       reply.code(404).send({
@@ -202,6 +207,51 @@ export default function (fastify: FastifyInstance, _: unknown, done: () => void)
 
     const start = (page - 1) * perPage;
     const end = start + perPage;
+
+    const sort = request.query.sort ?? "downloads";
+    if (sort === "downloads") {
+      if (!storeStatsCache || storeStatsLastFetch < Date.now() - CACHE_DURATION) {
+        const collection = fastify.mongo.db!.collection<StoreStats>("storeStats");
+        const aggregation = collection.aggregate([
+          {
+            $match: {
+              type: "install",
+            },
+          },
+          {
+            $group: {
+              _id: "$id",
+              ips: {
+                $addToSet: "$ipHash",
+              },
+            },
+          },
+          {
+            $project: {
+              count: {
+                $size: "$ips",
+              },
+            },
+          },
+          {
+            $sort: {
+              count: -1,
+            },
+          },
+        ]);
+        storeStatsCache = await aggregation.toArray();
+        storeStatsLastFetch = Date.now();
+      }
+
+      manifests = manifests.sort((a, b) => {
+        const aStat = storeStatsCache.find((x) => x._id === a.id);
+        const bStat = storeStatsCache.find((x) => x._id === b.id);
+        if (!aStat && !bStat) return 0;
+        if (!aStat) return 1;
+        if (!bStat) return -1;
+        return bStat.count - aStat.count;
+      });
+    }
 
     return {
       page,
